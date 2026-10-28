@@ -1,6 +1,0 @@
-# android-fleet — autonomous rig task wiring (Phase-B).
-# bin/run = pixel-adb keepalive canonical loop; bin/check = syntax + adb + surface gate.
-
-[tasks]
-run = "./bin/run"
-check = "./bin/check"
