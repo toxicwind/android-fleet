@@ -98,6 +98,26 @@ adb -s $D shell getprop ro.build.version.release ro.product.model
 | taps land in Termius | focus never left your SSH app | **good** — that's the covenant; tap the card first |
 | `device offline` | wireless port rotated | fleet keepalive re-scan, update `FLOTILLA_DEVICE` |
 
+## MCP surface (2026-10-28)
+
+`flotilla/mcp/server.ts` — the phone as first-class MCP tools, federated via
+thresher (`flotilla:*` on `:25127/mcp`):
+
+| Tool | What it does |
+|---|---|
+| `flotilla:pixel_screenshot` | screencap → PNG on the box (+ focus in the result) |
+| `flotilla:pixel_open` / `pixel_openshot` | headless URL open (fenix is the sole default — no chooser); openshot polls focus then caps in one round trip |
+| `flotilla:pixel_tap` / `pixel_text` / `pixel_key` | input, **always returns current focus** (the covenant, enforced in-band) |
+| `flotilla:pixel_ui` | UI-hierarchy XML — the safe prelude to any tap |
+| `flotilla:pixel_connect` / `pixel_focus` | adb rescue (rotating port) / who owns the screen |
+| `flotilla:flotilla_float` | freeform float via the CLI (windowingMode-5 alpha levers stay here) |
+
+Daemon: pitchfork `estate/flotilla-mcp`, `:25245` (`FLOTILLA_MCP_PORT` in
+ports.env), registered in the LIVE thresher config — registration walkthrough:
+`estate/docs/mcp-guide-thresher.md`. Verified ship-day: routed
+`retrieve_tools` → all tools namespaced `flotilla:*`; screenshot returned a
+real 348 KB PNG while the architect SSH'd from the phone.
+
 ## Provenance
 
 - Distilled live on 2026-10-27/28 completing a GitHub device-flow login while
