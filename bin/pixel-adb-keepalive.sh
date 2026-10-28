@@ -55,8 +55,5 @@ while true; do
       done
     fi
   fi
-  # isleep(1) was removed with ~/bin — its absence made `|| break` kill the
-  # daemon after exactly one loop (pitchfork showed "stopped"). A daemon's own
-  # re-scan loop is its job, not an agent-blocking command: plain sleep.
-  sleep 60
+  "${ISLEEP}" 60 --name pixel-adb-keepalive || break
 done

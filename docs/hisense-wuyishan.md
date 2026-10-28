@@ -95,46 +95,6 @@ IPv6 is live (Comcast `2601:280:5280:1c00::/64`); many outbound 443 flows.
 
 ## IPTV schema reverse (from APK dex strings)
 
-### nuvio.livetv — `PlaylistSource` (the Xtream credential store) — FULL REVERSE 2026-10-28
-
-Decompiled via jadx (`qa/C4304v.java` model, `p047oa/C3462q2.java` org.json
-codec):
-
-```
-PlaylistSource {
-  id: String, name: String, url: String,          // m3u/xstreams url
-  enabled: Boolean, userAgent: String,
-  useEmbeddedEpg: Boolean,
-  xtreamServer: String, xtreamUsername: String, xtreamPassword: String,
-  lastUpdatedMs: Long, lastError: String,
-  streamFormat: String, serverTimezone: String, logoSource: String,
-  epgOffsetMs / refresh interval fields (Longs)
-}
-```
-Serialized as org.json → persisted via the Room `meta (k TEXT, v TEXT)`
-k/v store / DataStore. Room tables across the three DBs:
-
-| DB | Tables |
-|---|---|
-| `livetv_guide.db` | `stage`, `stage_channels`, `stage_info`, `stage_meta`, `programs`, `auto` (ch/source/xmltv map) |
-| `livetv_on_demand.db` | `items`, `categories`, `meta`, `posters` |
-| `livetv_posters.db` | `posters`, `poster_fix`, `prefixes` |
-
-**Cross-app migration fact:** `com.nuvio.tv` and `com.nuvio.livetv` launch the
-identical `com.nuvio.tv.MainActivity` — same core, same PlaylistSource JSON
-shape. Portal creds are wire-compatible 1:1; migration is re-add (headless
-extraction is walled: no root, non-debuggable, FileProvider not exported).
-
-### playtorrio — xtream universe
-
-- `iptv_portals` DataStore route (portalUrl/portalUser/portalPass/portalName/
-  portalExpiry) — navigation template `iptv_portal_browser/{url}/{user}/{pass}`.
-- Ships `xtreamity-plus-db.csv.gz` fetchers (r2.dev + backblazeb2) — public
-  Xtream portal lists, not user data.
-- CloudStream extension packs in `files/cs_extensions/*.cs3` (`IPTVPlayer`,
-  `PublicSportsIPTV`, `QuickIPTV` + VOD providers). `.cs3` = CS extension
-  archive, not a database.
-
 ### playtorrio — `iptv_portals` (DataStore-backed)
 
 ```
