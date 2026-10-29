@@ -19,9 +19,19 @@
  */
 import { serve } from "bun";
 import { $ } from "bun";
+import { floatyCardHtml } from "./floaty-card.ts";
 
 const PORT = Number(process.env.FLOTILLA_MCP_PORT ?? 25245);
 const SERIAL_BASE = process.env.FLOTILLA_DEVICE_IP ?? "10.0.0.77";
+
+// ── floaty card serving (pixel_floaty aesthetic channel) ────────────────
+const PORT_FLOATY = PORT; // same HTTP surface; /floaty/<route> serves message cards
+const floatyPages = new Map<string, string>();
+/** LAN host IP the phone can reach (default: the box's LAN address). */
+async function hostIp(): Promise<string> {
+	const out = await $`ip -4 addr show scope global`.quiet().text();
+	return out.match(/inet (\d+\.\d+\.\d+\.\d+)/)?.[1] ?? "10.0.0.218";
+}
 
 // ── adb device resolution (keepalive normally keeps this warm) ──────────
 let device: string | null = null;
@@ -171,6 +181,36 @@ const tools = [
 		},
 	},
 	{
+		name: "pixel_floaty",
+		description: "Aesthetic message delivery: float a pixel-font (DepartureMono) message card over any app on the Pixel. The fleet's visual channel — deliver status, results, or nags with lo-fi techy styling instead of a plain toast. Optionally dark or light card, custom accent, auto-dismiss.",
+		inputSchema: {
+			type: "object",
+			properties: {
+				message: { type: "string", description: "The message to deliver (rendered large, DepartureMono pixel font)" },
+				sub: { type: "string", description: "Optional smaller sub-line under the message" },
+				accent: { type: "string", description: "accent color hex (default #7CFC00 terminal green)" },
+				secs: { type: "number", description: "auto-dismiss seconds (default 0 = stays until flotilla close)" },
+			},
+			required: ["message"],
+		},
+		run: async (args: Record<string, unknown>) => {
+			const msg = String(args.message).slice(0, 400);
+			const sub = String(args.sub ?? "").slice(0, 200);
+			const accent = /^#[0-9a-fA-F]{3,8}$/.test(String(args.accent ?? "")) ? String(args.accent) : "#7CFC00";
+			const secs = Number(args.secs ?? 0);
+			// embed the pixel font from the flotilla assets dir (base64 into the page — no font install needed)
+			let fontB64 = "";
+			try { fontB64 = (await Bun.file(`${import.meta.dir}/../assets/fonts/DepartureMono-Regular.otf`).bytes()).toBase64(); } catch { /* falls back to monospace */ }
+			const html = floatyCardHtml({ message: msg, sub, accent, secs, fontB64 });
+			// serve the card from this same HTTP surface, then float it on the phone
+			const route = `/floaty/${Date.now()}`;
+			floatyPages.set(route, html);
+			const dev = await ensureDevice();
+			await $`flotilla open http://${await hostIp()}:${PORT_FLOATY}${route}`.quiet().nothrow().text();
+			return { floated: true, route, focus: await currentFocus(), font: fontB64 ? "DepartureMono" : "fallback-monospace" };
+		},
+	},
+	{
 		name: "pixel_shell",
 		description: "Run an arbitrary adb shell command on the Pixel and return its output (≤60KB). The audit escape hatch: package/process/settings forensics past the focused tools. Output cap keeps the RPC frame sane.",
 		inputSchema: { type: "object", properties: { command: { type: "string", description: "shell command, e.g. 'pm list packages | grep -i termius' — no 2>&1 merges, keep streams clean" } }, required: ["command"] },
@@ -277,6 +317,11 @@ const server = serve({
 	port: PORT,
 	async fetch(request) {
 		const url = new URL(request.url);
+		if (url.pathname.startsWith("/floaty/")) {
+			const html = floatyPages.get(url.pathname);
+			if (!html) return new Response("expired", { status: 404 });
+			return new Response(html, { headers: { "content-type": "text/html; charset=utf-8" } });
+		}
 		if (url.pathname === "/health") {
 			return Response.json({ ok: true, service: "flotilla-mcp", device });
 		}

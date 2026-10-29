@@ -1,0 +1,20 @@
+{
+  "$comment": "flotilla config — device route + privilege mode. shizuku_mode is DEFAULT: shizuku_server runs as shell uid (full privileges, survives wireless-adb port rotation, no root needed). Falls back to plain adb when shizuku is down. FLOTILLA_CONFIG env overrides this path.",
+  "device": {
+    "name": "Pixel 9 Pro XL",
+    "serial_base": "10.0.0.77",
+    "port_rotates": true,
+    "mdns_service": "_adb-tls-connect._tcp"
+  },
+  "shizuku_mode": {
+    "default": true,
+    "package": "moe.shizuku.privileged.api",
+    "server_process": "shizuku_server",
+    "how": "adb shell sh /sdcard/Android/data/moe.shizuku.privileged.api/start.sh (starts server as shell uid via wireless-adb run-as shell)",
+    "rish_path": "/sdcard/Android/data/moe.shizuku.privileged.api/start.sh"
+  },
+  "adb_fallback": {
+    "when": "shizuku_server process absent OR rish exec fails twice",
+    "degrade": "plain adb shell (shell uid, no elevated grants)"
+  }
+}
