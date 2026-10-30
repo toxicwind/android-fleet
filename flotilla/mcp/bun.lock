@@ -1,0 +1,31 @@
+{
+  "lockfileVersion": 2,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "@flotilla/mcp",
+      "dependencies": {
+        "@devicefarmer/adbkit": "^4.0.0",
+      },
+    },
+  },
+  "packages": {
+    "@devicefarmer/adbkit": ["@devicefarmer/adbkit@4.0.0", "", { "dependencies": { "@devicefarmer/adbkit-logcat": "^3.0.0", "@devicefarmer/adbkit-monkey": "^2.0.0", "commander": "^15.0.0", "debug": "~4.4.3", "node-forge": "^1.4.0", "split": "~1.0.1" }, "bin": { "adbkit": "bin/adbkit" } }, "sha512-PW812CAN6n2OapLIWVSxYuciLE1RTpFKuINKxPHA/4lN12e2ibmRl9m69URGJFtv2U8Jq9FklogYQd6ToRySFA=="],
+
+    "@devicefarmer/adbkit-logcat": ["@devicefarmer/adbkit-logcat@3.0.0", "", {}, "sha512-J8cUertmcDKrGmJswjiGEt9aYpB2vttLTuG9hzIUcCV666if2PIVLQOdWemfm7fKTjOlghKE83uYW7em35TKgw=="],
+
+    "@devicefarmer/adbkit-monkey": ["@devicefarmer/adbkit-monkey@2.0.0", "", {}, "sha512-lG0vEFDN6v6UQAwxVLzzRSC5z9su1Z7T02B0BHYFGh06DUAja/N42hWztJ63zsF0cNTJuUze8fNnWgpVUL5tLA=="],
+
+    "commander": ["commander@15.0.0", "", {}, "sha512-z67u4ZhzCL/Tydu1lJARtEZYWbWaN7oYLHbsuzocr6y4N6WZAagG3RQ4FW61V1/0+jImpj293XfrcYnd1qxtPg=="],
+
+    "debug": ["debug@4.4.3", "", { "dependencies": { "ms": "^2.1.3" }, "peerDependencies": { "supports-color": "*" }, "optionalPeers": ["supports-color"] }, "sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA=="],
+
+    "ms": ["ms@2.1.3", "", {}, "sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA=="],
+
+    "node-forge": ["node-forge@1.4.2", "", {}, "sha512-rRtAR5XLJ8gCKd9du4qrKAsgCG1ObGP4gLeNJMa4vYSeq4bmBMOJk5IHkrviBV0q7uoAJlVd8HEQYQSVUb4FGQ=="],
+
+    "split": ["split@1.0.1", "", { "dependencies": { "through": "2" } }, "sha512-mTyOoPbrivtXnwnIxZRFYRrPNtEFKlpB2fvjSnCQUiAA6qAZzqwna5envK4uk6OIeP17CsdF3rSBGYVBsU0Tkg=="],
+
+    "through": ["through@2.3.8", "", {}, "sha512-w89qg7PI8wAdvX60bMDP+bFoD5Dvhm9oLheFp5O4a2QF0cSBGsBX4qZmadPMvVqlLJBBci+WqGGOAPvcDeNSVg=="],
+  }
+}
