@@ -15,7 +15,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
-import { serve } from "bun";
+import { serve, $ } from "bun";
 import { floatyCardHtml } from "./floaty-card.ts";
 import { ensureDevice } from "./device.ts";
 import { currentFocus, screencap, openUrl, openAndCapture } from "./ops.ts";
