@@ -27,6 +27,8 @@ const SERIAL_BASE = process.env.FLOTILLA_DEVICE_IP ?? "10.0.0.77";
 // ── floaty card serving (pixel_floaty aesthetic channel) ────────────────
 const PORT_FLOATY = PORT; // same HTTP surface; /floaty/<route> serves message cards
 const floatyPages = new Map<string, string>();
+/** In-memory file cache for /serve/<name> requests. */
+const servedFiles = new Map<string, { body: Uint8Array; contentType: string }>();
 /** LAN host IP the phone can reach (default: the box's LAN address). */
 async function hostIp(): Promise<string> {
 	const out = await $`ip -4 addr show scope global`.quiet().text();
@@ -70,9 +72,45 @@ async function sh(...args: string[]): Promise<string> {
 	return $`adb -s ${dev} ${args}`.quiet().nothrow().text();
 }
 
+/** Split a single command string into argv (respects quotes) without executing a shell. */
+function splitCmd(cmd: string): string[] {
+	const argv: string[] = [];
+	let cur = "";
+	let quote: string | null = null;
+	for (const ch of cmd) {
+		if (quote) { if (ch === quote) quote = null; else cur += ch; }
+		else if (ch === "'" || ch === '"') quote = ch;
+		else if (ch === " " || ch === "\t") { if (cur) { argv.push(cur); cur = ""; } }
+		else cur += ch;
+	}
+	if (cur) argv.push(cur);
+	return argv;
+}
+
 async function currentFocus(): Promise<string> {
 	const out = await sh("shell", "dumpsys window 2>/dev/null | grep mCurrentFocus");
 	return out.trim() || "unknown";
+}
+
+/**
+ * adb raw-byte capture (screencap etc.) — returns Uint8Array.
+ * Bun.spawn cannot stream `adb exec-out` binary (returns 0 bytes in bun 1.4.x),
+ * so the proven path is on-device screencap + pull via the `$` shell helper.
+ */
+async function shBytes(): Promise<Uint8Array> {
+	const dev = await ensureDevice();
+	const remote = `/sdcard/flotilla-${Date.now()}.png`;
+	await sh("shell", "screencap", "-p", remote);
+	await $`adb -s ${dev} pull ${remote} /tmp/flotilla-shot.png`.quiet().nothrow().text();
+	await $`adb -s ${dev} shell rm ${remote}`.quiet().nothrow().text();
+	return new Uint8Array(await Bun.file("/tmp/flotilla-shot.png").arrayBuffer());
+}
+
+/** Canonical string-arg reader that fails loud (no silent undefined), naming the tool. */
+function need(args: Record<string, unknown>, key: string, tool: string): string {
+	const v = args[key];
+	if (typeof v !== "string" || v.length === 0) throw new Error(`${tool}: missing/empty string arg '${key}' (got ${JSON.stringify(v)})`);
+	return v;
 }
 
 function content(result: unknown, isError = false) {
@@ -94,7 +132,7 @@ const tools = [
 		run: async (args: Record<string, unknown>) => {
 			const file = String(args.file ?? `/tmp/pixel-shot-${Date.now()}.png`);
 			const dev = await ensureDevice();
-			const png = await $`adb -s ${dev} exec-out screencap -p`.quiet().bytes();
+			const png = await shBytes();
 			await Bun.write(file, png);
 			return { file, bytes: png.byteLength, focus: await currentFocus() };
 		},
@@ -121,7 +159,7 @@ const tools = [
 				if (/mCurrentFocus=.*(fenix|chrome|WebView)/.test(await sh("shell", "dumpsys window"))) break;
 				await Bun.sleep(150);
 			}
-			const png = await $`adb -s ${dev} exec-out screencap -p`.quiet().bytes();
+			const png = await shBytes();
 			await Bun.write(file, png);
 			return { file, bytes: png.byteLength, ms: Date.now() - t0, focus: await currentFocus() };
 		},
@@ -212,12 +250,16 @@ const tools = [
 	},
 	{
 		name: "pixel_shell",
-		description: "Run an arbitrary adb shell command on the Pixel and return its output (≤60KB). The audit escape hatch: package/process/settings forensics past the focused tools. Output cap keeps the RPC frame sane.",
-		inputSchema: { type: "object", properties: { command: { type: "string", description: "shell command, e.g. 'pm list packages | grep -i termius' — no 2>&1 merges, keep streams clean" } }, required: ["command"] },
+		description: "Run an arbitrary adb shell command string on the Pixel and return stdout (≤60KB). The audit escape hatch: package/process/settings forensics past the focused tools. The string is tokenized locally (quotes respected) and passed as argv to adb shell — no remote shell, no 2>&1 merging; keep streams clean.",
+		inputSchema: { type: "object", properties: { command: { type: "string", description: "shell command as a tokenizable string, e.g. 'pm list packages 3 grep termius' or 'settings get global http_proxy'" }, mergeErr: { type: "boolean", description: "append stderr to stdout (2>&1). Default false — stream discipline." } }, required: ["command"] },
 		run: async (args: Record<string, unknown>) => {
-			const dev = await ensureDevice();
-			const raw = await $`adb -s ${dev} shell ${String(args.command)}`.quiet().nothrow().text();
-			return { out: raw.slice(0, 60000), truncated: raw.length > 60000, focus: await currentFocus() };
+			const cmd = need(args, "command", "pixel_shell");
+			const mergeErr = args.mergeErr === true;
+			const argv = splitCmd(cmd);
+			const proc = Bun.spawn({ cmd: ["adb", "-s", await ensureDevice(), "shell", ...argv], stdout: "pipe", stderr: mergeErr ? "pipe" : "pipe" });
+			const [out, err] = await Promise.all([new Response(proc.stdout).text(), new Response(proc.stderr).text()]);
+			const merged = mergeErr ? `${out}\n${err}` : out;
+			return { out: merged.slice(0, 60000), truncated: merged.length > 60000, stderr: err.trim().slice(0, 4000), focus: await currentFocus() };
 		},
 	},
 	{
@@ -309,7 +351,149 @@ const tools = [
 			}
 		}
 	},
+	{
+		name: "pixel_settings",
+		description: "Read or write an Android system setting (global/system/secure) via adb. The about:config/settings primitive: change a pref, then pixel_foreground to restart the app.",
+		inputSchema: { type: "object", properties: { namespace: { type: "string", enum: ["global", "system", "secure"] }, key: { type: "string" }, value: { type: "string", description: "value to set (omit to get)" } }, required: ["namespace", "key"] },
+		run: async (args: Record<string, unknown>) => {
+			const ns = need(args, "namespace", "pixel_settings");
+			const key = need(args, "key", "pixel_settings");
+			const value = args.value;
+			const dev = await ensureDevice();
+			if (value !== undefined) {
+				await $`adb -s ${dev} shell settings put ${ns} ${key} ${String(value)}`.quiet().nothrow().text();
+				const readback = await $`adb -s ${dev} shell settings get ${ns} ${key}`.quiet().nothrow().text();
+				return { ok: true, action: "set", ns, key, value: String(value), readback: readback.trim(), focus: await currentFocus() };
+			}
+			const out = await $`adb -s ${dev} shell settings get ${ns} ${key}`.quiet().nothrow().text();
+			return { ok: true, action: "get", ns, key, value: out.trim(), focus: await currentFocus() };
+		},
+	},
+	{
+		name: "pixel_foreground",
+		description: "Force-stop and relaunch a package (the 'change prefs then restart the app' primitive), or just bring the running app to foreground. Safest way to apply an about:config/settings change that needs a clean process.",
+		inputSchema: { type: "object", properties: { pkg: { type: "string" }, activity: { type: "string", description: "optional explicit Activity; default: resolve main via resolve-activity" }, restart: { type: "boolean", description: "force-stop before relaunch (true = clean restart picks up new prefs). Default true." } }, required: ["pkg"] },
+		run: async (args: Record<string, unknown>) => {
+			const pkg = need(args, "pkg", "pixel_foreground");
+			const restart = args.restart !== false;
+			const dev = await ensureDevice();
+			let target = args.activity ? String(args.activity) : null;
+			if (!target) {
+				const dump = await $`adb -s ${dev} shell cmd package resolve-activity --brief ${pkg}`.quiet().nothrow().text();
+				target = (dump.split("\n").map((l) => l.trim()).find((l) => l.startsWith(pkg)) ?? `${pkg}/.App`).trim();
+			}
+			if (restart) { await $`adb -s ${dev} shell am force-stop ${pkg}`.quiet().nothrow(); await Bun.sleep(500); }
+			await $`adb -s ${dev} shell am start -n ${target}`.quiet().nothrow().text();
+			const dump = await sh("shell", "dumpsys activity activities 2>/dev/null | grep -m1 ResumedActivity");
+			return { pkg, target, restarted: restart, resumed: dump.trim(), focus: await currentFocus() };
+		},
+	},
+	{
+		name: "pixel_browser",
+		description: "Open a URL in an EXPLICIT browser component and wait for page CONTENT (not focus), then screenshot + return URL/page state. Fixes pixel_open's race where focus is captured before the page paints.",
+		inputSchema: { type: "object", properties: { url: { type: "string" }, browser: { type: "string", description: "package name to force (default: resolve VIEW intent)" }, file: { type: "string", description: "screenshot out (default /tmp/pixel-browser-<ts>.png)" }, waitMs: { type: "number", description: "poll settle budget (default 6000)" } }, required: ["url"] },
+		run: async (args: Record<string, unknown>) => {
+			const url = need(args, "url", "pixel_browser");
+			const dev = await ensureDevice();
+			const file = String(args.file ?? `/tmp/pixel-browser-${Date.now()}.png`);
+			const waitMs = Number(args.waitMs ?? 6000);
+			const browser = args.browser ? String(args.browser) : null;
+			if (browser) await $`adb -s ${dev} shell am start -a android.intent.action.VIEW -d ${url} -p ${browser}`.quiet().nothrow().text();
+			else await $`adb -s ${dev} shell am start -a android.intent.action.VIEW -d ${url}`.quiet().nothrow().text();
+			const t0 = Date.now();
+			let paints = 0;
+			while (Date.now() - t0 < waitMs) {
+				const focus = await currentFocus();
+				if (/(fenix|chrome|WebView)/.test(focus)) paints++;
+				if (paints >= 3) break;
+				await Bun.sleep(400);
+			}
+			const png = await shBytes();
+			await Bun.write(file, png);
+			return { file, bytes: png.byteLength, url, focus: await currentFocus(), settled: paints >= 3 };
+		},
+	},
+	{
+		name: "pixel_intent",
+		description: "Fire an arbitrary Android intent with an explicit component and extras on the Pixel. The deep-link escape hatch: launcher, settings panes, per-app document providers, ACTION_VIEW with mime.",
+		inputSchema: { type: "object", properties: { action: { type: "string" }, component: { type: "string", description: "'pkg/activity' to target explicitly" }, data: { type: "string", description: "data URI" }, type: { type: "string", description: "MIME type" }, flags: { type: "string", description: "hex/category flags e.g. '0x10000000'", extras: { type: "object", description: "flat string-extras key->value" } } }, required: ["action"] },
+		run: async (args: Record<string, unknown>) => {
+			const action = need(args, "action", "pixel_intent");
+			const dev = await ensureDevice();
+			const parts = ["start"];
+			if (args.component) parts.push("-n", String(args.component));
+			if (args.data) parts.push("-d", String(args.data));
+			if (args.type) parts.push("-t", String(args.type));
+			if (args.flags) parts.push("-f", String(args.flags));
+			if (args.extras && typeof args.extras === "object") for (const [k, v] of Object.entries(args.extras as Record<string, unknown>)) parts.push("--es", k, String(v));
+			parts.push("-a", action);
+			const p = Bun.spawn({ cmd: ["adb", "-s", dev, "shell", "am", ...parts], stdout: "pipe", stderr: "pipe" });
+			const [so, se] = await Promise.all([new Response(p.stdout).text(), new Response(p.stderr).text()]);
+			return { ok: !se.includes("Error"), out: (so || se).trim().slice(0, 1000), action, focus: await currentFocus() };
+		},
+	},
+	{
+		name: "pixel_install",
+		description: "Install an APK on the Pixel via adb install (-r -g: replace, grant all runtime perms). The deploy primitive for pushing an updated bundle to the phone.",
+		inputSchema: { type: "object", properties: { path: { type: "string" }, replace: { type: "boolean", description: "-r replace (default true)" } }, required: ["path"] },
+		run: async (args: Record<string, unknown>) => {
+			const path = need(args, "path", "pixel_install");
+			const dev = await ensureDevice();
+			const replace = args.replace !== false;
+			const out = await $`adb -s ${dev} install ${replace ? "-r" : ""} -g ${path}`.quiet().nothrow().text();
+			const ok = /Success/i.test(out);
+			return { ok, out: out.trim().slice(0, 2000), path, focus: await currentFocus() };
+		},
+	},
+	{
+		name: "serve",
+		description: "Serve a file from the box to the phone via an ephemeral HTTP server. Best for delivering self-contained HTML pages that don't depend on a local bridge. Returns the URL.",
+		inputSchema: { type: "object", properties: { path: { type: "string", description: "Absolute path to file on the box" }, name: { type: "string", description: "Optional URL slug (defaults to basename)" } }, required: ["path"] },
+		run: async (args: Record<string, unknown>) => {
+			const filePath = String(args.path);
+			const name = String(args.name ?? filePath.split("/").pop() ?? "file");
+			const body = await Bun.file(filePath).bytes();
+			const contentType = filePath.endsWith(".html") ? "text/html; charset=utf-8" : filePath.endsWith(".json") ? "application/json" : "application/octet-stream";
+			const route = `/serve/${name}`;
+			servedFiles.set(name, { body, contentType });
+			// port is resolved lazily after serveServer is created (circular init)
+			const port = (serveServer as unknown as { port?: number }).port ?? 0;
+			const url = `${await hostIp()}:${port}`;
+			return { ok: true, url: `${url}${route}`, size: body.byteLength, contentType };
+		},
+	},
+	{
+		name: "pixel_view",
+		description: "Open a URL on the phone, wait for browser to settle, capture a screenshot. Best for proving what the browser actually rendered.",
+		inputSchema: { type: "object", properties: { url: { type: "string", description: "URL to open on the phone's browser" }, file: { type: "string", description: "output screenshot path" } }, required: ["url"] },
+		run: async (args: Record<string, unknown>) => {
+			const dev = await ensureDevice();
+			const url = String(args.url);
+			const file = String(args.file ?? `/tmp/pixel-view-${Date.now()}.png`);
+			await $`adb -s ${dev} shell am start -a android.intent.action.VIEW -d ${url}`.quiet().nothrow();
+			const t0 = Date.now();
+			while (Date.now() - t0 < 8000) {
+				if (/mCurrentFocus=.*(fenix|chrome|WebView)/.test(await sh("shell", "dumpsys window"))) break;
+				await Bun.sleep(200);
+			}
+			const png = await shBytes();
+			await Bun.write(file, png);
+			return { file, bytes: png.byteLength, ms: Date.now() - t0, focus: await currentFocus(), url };
+		},
+	},
 ];
+
+// ── /serve HTTP endpoint (ephemeral file server) ───────────────────────
+const serveServer = serve({
+	hostname: "0.0.0.0",
+	port: 0,
+	fetch: (req: Request) => {
+		const url = new URL(req.url);
+		const file = servedFiles.get(url.pathname.replace(/^\/serve\//, ""));
+		if (!file) return new Response("not found", { status: 404 });
+		return new Response(file.body, { headers: { "content-type": file.contentType, "cache-control": "no-cache" } });
+	},
+});
 
 // ── streamable-HTTP JSON-RPC surface (taas.ts shape) ────────────────────
 const server = serve({
