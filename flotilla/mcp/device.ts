@@ -1,61 +1,83 @@
 /**
- * device.ts — flotilla device layer, 100% on @devicefarmer/adbkit.
+ * device.ts — device resolution + low-level shell over @devicefarmer/adbkit.
  *
- * No `$ adb` string-splicing anywhere. The Pixel's wireless debug port
- * rotates; adbkit's Client.listDevices() is the source of truth, with an
- * mDNS/nmap rescue when the port shifts.
+ * adbkit v4: DeviceClient.shell() returns a Node Socket stream — read it via
+ * shellText() (chunk-by-chunk await). screencap()/startActivity() are native
+ * DeviceClient methods.
+ *
+ * Contract: ensureDevice() -> live serial string; deviceClient() -> adbkit
+ * DeviceClient bound to it; shellText() -> full stdout of a shell command.
  */
-import { Adb } from "@devicefarmer/adbkit";
-import type { Device, DeviceClient } from "@devicefarmer/adbkit";
-import { $ } from "bun";
 
-const SERIAL_BASE = process.env.FLOTILLA_DEVICE_IP ?? "10.0.0.77";
-let cached: Device | null = null;
+import { execFileSync } from "node:child_process";
+import { Adb, type Client, type DeviceClient } from "@devicefarmer/adbkit";
 
-function adbClient() {
+const SERIAL_BASE = process.env.FLOTILLA_DEVICE ?? "10.0.0.77";
+
+let cached: string | null = null;
+
+function adbClient(): Client {
   return Adb.createClient({ host: "127.0.0.1", port: 5037 });
 }
 
-async function devices(): Promise<Device[]> {
-  return adbClient().listDevices();
+function serialize(): string {
+  const text = execFileSync("adb", ["devices"], { encoding: "utf8" });
+  return text
+    .split("\n")
+    .filter((l) => l && !l.startsWith("List of devices attached"))
+    .map((l) => {
+      const [serial, state] = l.split(/\t/).map((s) => s.trim());
+      return serial && state ? `${serial}:${state}` : "";
+    })
+    .filter(Boolean)
+    .join("\n");
 }
 
-/** The live device matching our IP (not offline). */
-async function liveDevice(): Promise<Device | null> {
-  const list = await devices();
-  return list.find((d) => d.id.startsWith(`${SERIAL_BASE}:`) && d.type === "device") ?? null;
-}
-
-async function scanPorts(): Promise<string[]> {
-  try {
-    const mdns = await $`adb mdns services`.quiet().nothrow().text();
-    const found = [...mdns.matchAll(new RegExp(`${SERIAL_BASE.replace(/\./g, "\\.")}:(\\d+)`, "g"))].map((m) => m[1]!);
-    if (found.length) return found;
-  } catch {}
-  try {
-    const nmap = await $`nmap -T4 --open -p 30000-50000 ${SERIAL_BASE}`.quiet().nothrow().text();
-    return [...nmap.matchAll(/^(\d+)\/tcp\s+open/gm)].map((m) => m[1]!);
-  } catch {}
-  return [];
-}
-
-/** Resolve the live device, auto-rescuing a rotated port once. */
-export async function ensureDevice(): Promise<Device> {
-  const live = await liveDevice();
-  if (cached && cached.id === live?.id) return cached;
-  if (live) { cached = live; return live; }
-  for (const p of await scanPorts()) {
-    await $`adb connect ${`${SERIAL_BASE}:${p}`}`.quiet().nothrow();
-    const d = await liveDevice();
-    if (d) { cached = d; return d; }
+type LiveEntry = { serial: string; state: string };
+function liveSerials(): LiveEntry[] {
+  const out: LiveEntry[] = [];
+  for (const line of serialize().split("\n")) {
+    const m = line.match(/^(.+?):(device|recovery|sideload|unauthorized|offline|bootloader)$/);
+    if (m) out.push({ serial: m[1].replace(/:\d+$/, "") + (m[1].includes(":") ? ":" + m[1].split(":")[1] : ""), state: m[2] });
   }
-  throw new Error(`no adb route to ${SERIAL_BASE} — wireless-debug off or keepalive down`);
+  return out;
 }
 
-/** Device client with all operations (startActivity, shell, screencap, …). */
+export async function resolveLive(): Promise<{ serial: string; adb: Client }> {
+  const list = liveSerials();
+  const live = list.find((d) => d.state === "device" && d.serial.startsWith(SERIAL_BASE.split(":")[0]));
+  if (!live) throw new Error(`no adb route to ${SERIAL_BASE} — wireless-debug off or keepalive down`);
+  return { serial: live.serial, adb: adbClient() };
+}
+
+export async function ensureDevice(): Promise<string> {
+  const live = await resolveLive();
+  cached = live.serial;
+  return live.serial;
+}
+
+/** The live adbkit DeviceClient (has shell/screencap/startActivity). */
 export async function deviceClient(): Promise<DeviceClient> {
-  const dev = await ensureDevice();
-  return adbClient().getDevice(dev);
+  const live = await resolveLive();
+  const dc = live.adb.getDevice(live.serial);
+  if (!dc) throw new Error(`no device client for ${live.serial}`);
+  return dc;
 }
 
-export { SERIAL_BASE };
+/** Full stdout of a shell command (adbkit returns a Socket stream). */
+export async function shellText(cmd: string): Promise<string> {
+  const live = await resolveLive();
+  const dc = live.adb.getDevice(live.serial);
+  return socketText(await dc.shell(cmd));
+}
+
+/** Read an adbkit stream fully to a string. */
+export async function socketText(stream: unknown): Promise<string> {
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream as AsyncIterable<Buffer>) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+  return Buffer.concat(chunks).toString("utf8");
+}
+
+export { adbClient, liveSerials, SERIAL_BASE };

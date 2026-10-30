@@ -98,25 +98,34 @@ adb -s $D shell getprop ro.build.version.release ro.product.model
 | taps land in Termius | focus never left your SSH app | **good** — that's the covenant; tap the card first |
 | `device offline` | wireless port rotated | fleet keepalive re-scan, update `FLOTILLA_DEVICE` |
 
-## MCP surface (2026-10-28)
+## MCP surface (2026-10-30 — rebuilt v2.1.0)
 
 `flotilla/mcp/server.ts` — the phone as first-class MCP tools, federated via
-thresher (`flotilla:*` on `:25127/mcp`):
+thresher (`flotilla:*` on `:25127/mcp`). Built on the real deps:
+`@modelcontextprotocol/sdk` (McpServer + sessioned
+`WebStandardStreamableHTTPServerTransport`) and `@devicefarmer/adbkit` for all
+device ops (no shell-splicing). Reflects the current 11-tool surface; the old
+`pixel_browser` was folded into `pixel_view` (unified settle-until-content).
 
 | Tool | What it does |
 |---|---|
-| `flotilla:pixel_screenshot` | screencap → PNG on the box (+ focus in the result) |
-| `flotilla:pixel_open` / `pixel_openshot` | headless URL open (fenix is the sole default — no chooser); openshot polls focus then caps in one round trip |
-| `flotilla:pixel_tap` / `pixel_text` / `pixel_key` | input, **always returns current focus** (the covenant, enforced in-band) |
+| `flotilla:pixel_connect` | adb rescue (rotating wireless port) — resolves the live serial |
+| `flotilla:pixel_screenshot` | screencap → PNG on the box (+ focus) |
+| `flotilla:pixel_focus` | who owns the screen right now |
+| `flotilla:pixel_open` | open a URL headlessly (no capture) |
+| `flotilla:pixel_view` | open URL, wait for browser CONTENT (settle), capture; `restore=true` returns to prior app (focus covenant) |
+| `flotilla:pixel_tap` / `pixel_text` / `pixel_key` | input, **always returns focus** (the covenant, enforced in-band) |
 | `flotilla:pixel_ui` | UI-hierarchy XML — the safe prelude to any tap |
-| `flotilla:pixel_connect` / `pixel_focus` | adb rescue (rotating port) / who owns the screen |
-| `flotilla:flotilla_float` | freeform float via the CLI (windowingMode-5 alpha levers stay here) |
+| `flotilla:flotilla_float` | freeform PiP float via the CLI (windowingMode-5 alphas live here) |
+| `flotilla:pixel_floaty` | keyboard-safe DepartureMono message card over any app (the to-the-user channel) |
 
 Daemon: pitchfork `estate/flotilla-mcp`, `:25245` (`FLOTILLA_MCP_PORT` in
 ports.env), registered in the LIVE thresher config — registration walkthrough:
-`estate/docs/mcp-guide-thresher.md`. Verified ship-day: routed
-`retrieve_tools` → all tools namespaced `flotilla:*`; screenshot returned a
-real 348 KB PNG while the architect SSH'd from the phone.
+`estate/docs/mcp-guide-thresher.md`. Verified live 2026-10-30: sessioned MCP
+init + tools/list (11 tools) via the SDK transport; device resolved to the
+live serial; `restore_focus` round-trip proven (capture lands, foreground app
+restored). Focus doctrine: `input tap/text` lands on the focused window; read
+tools never leave the user's foreground app displaced.
 
 ## Provenance
 

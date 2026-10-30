@@ -1,11 +1,11 @@
 /**
- * ops.ts — flotilla device operations on @devicefarmer/adbkit.
+ * ops.ts — flotilla device operations on @devicefarmer/adbkit (v4-correct).
  *
- * Every primitive (focus read, screencap, shell, startActivity) goes through
- * adbkit — no `$ adb` shell-splicing. These are the atomic operations the MCP
- * tools wrap; settle logic stays here (shared by every browser tool).
+ * adbkit v4: DeviceClient.shell() returns a Socket stream — read via the
+ * socketText() helper. screencap()/startActivity() are native methods, not
+ * shell strings.
  */
-import { deviceClient } from "./device.ts";
+import { adbClient as deviceClient, shellText, ensureDevice } from "./device.ts";
 import { isBrowserFocus } from "../focus.ts";
 
 export interface Capture { file: string; bytes: number; }
@@ -13,39 +13,31 @@ export interface Capture { file: string; bytes: number; }
 /** Read the current focus window line. */
 export async function currentFocus(): Promise<string> {
   try {
-    const dc = await deviceClient();
-    const out = await dc.shell("dumpsys window 2>/dev/null | grep mCurrentFocus");
-    return out.toString().trim() || "unknown";
-  } catch {
-    return "unknown";
-  }
+    const out = await shellText("dumpsys window 2>/dev/null | grep mCurrentFocus");
+    return out.trim() || "unknown";
+  } catch { return "unknown"; }
 }
 
-/** Screencap the device to a png on the box. */
+/** Screencap the device to a png on the box (adbkit native framebuffer-free route). */
 export async function screencap(file: string): Promise<Capture> {
   const dc = await deviceClient();
-  // adbkit framebuffer doesn't write PNG; use screencap -> exec-out via shell
-  const dev = await deviceClient();
-  void dev;
-  const buf = await dc.shell(["screencap", "-p"]);
+  const stream = await dc.shell(["screencap", "-p"]);
+  const buf = await new Response(stream as BodyInit).arrayBuffer();
   await Bun.write(file, new Uint8Array(buf));
-  return { file, bytes: (await Bun.file(file).exists()) ? (await Bun.file(file).size) : 0 };
+  return { file, bytes: buf.byteLength };
 }
 
-/** Launch a URL via the VIEW intent (browser from a fresh tab). */
+/** Launch a URL via the VIEW intent. */
 export async function openUrl(url: string, browser?: string): Promise<string> {
   const dc = await deviceClient();
-  const args = browser
-    ? ["start", "-a", "android.intent.action.VIEW", "-d", url, "-p", browser]
-    : ["start", "-a", "android.intent.action.VIEW", "-d", url];
-  const out = await dc.shell(["am", ...args]);
-  return out.toString().trim();
+  const opts = browser
+    ? { wait: true, action: "android.intent.action.VIEW", data: url, package: browser }
+    : { wait: true, action: "android.intent.action.VIEW", data: url };
+  await dc.startActivity(opts);
+  return "Starting: Intent";
 }
 
-/**
- * Open a URL and capture once the browser owns the screen (settle-until-
- * content). With restore=true, returns to the pre-launch foreground app.
- */
+/** Open a URL and capture once the browser owns the screen (settle-until-content). */
 export async function openAndCapture(
   url: string,
   opts: { file?: string; browser?: string; timeoutMs?: number; restore?: boolean } = {},
@@ -76,8 +68,8 @@ export async function openAndCapture(
     const cur = await currentFocus();
     if (!cur.includes(prePkg)) {
       const res = await dc.shell(["cmd", "package", "resolve-activity", "--brief", prePkg]);
-      const act = res.toString().split("\n").map((l) => l.trim()).find((l) => l.startsWith(prePkg));
-      if (act) await dc.startActivity({ wait: true, action: "android.intent.action.MAIN", data: undefined, package: prePkg, activity: act.replace(prePkg + "/", "") }).catch(() => null);
+      const act = (await shellText("cmd package resolve-activity --brief " + prePkg)).split("\n").map((l) => l.trim()).find((l) => l.startsWith(prePkg));
+      if (act) await dc.startActivity({ wait: false, action: "android.intent.action.MAIN", data: undefined, package: prePkg, activity: act.replace(prePkg + "/", "") }).catch(() => null);
       restored = true;
     }
   }
