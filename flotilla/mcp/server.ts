@@ -92,6 +92,36 @@ async function currentFocus(): Promise<string> {
 	return out.trim() || "unknown";
 }
 
+/** Extract the package from a focus line (`Window{.. pkg/act}`) or null. */
+function focusPackage(focus: string): string | null {
+	const m = focus.match(/pkg\/([^\s}]+)/);
+	if (m?.[1]) {
+		const pkg = m[1].split("}")[0]!;
+		const slash = pkg.indexOf("/");
+		return slash > 0 ? pkg.slice(0, slash) : pkg;
+	}
+	const m2 = focus.match(/mCurrentFocus=.*?([A-Za-z0-9_.]+\/[A-Za-z0-9_.]+)/);
+	return m2?.[1]?.split("/")[0] ?? null;
+}
+
+/**
+ * Restore the screen to `targetFocus`'s app after a browser-launch capture,
+ * so flotilla read tools never leave the user's foreground app displaced.
+ * `am start` to the app's main activity (resolved) brings it back without
+ * knowing its exact launcher activity. No-op when already on it.
+ */
+async function restoreFocus(target: string | null): Promise<void> {
+	if (!target) return;
+	const pkg = focusPackage(target);
+	if (!pkg) return;
+	const cur = await currentFocus();
+	if (cur.includes(pkg)) return;
+	const dev = await ensureDevice();
+	const brief = await $`adb -s ${dev} shell cmd package resolve-activity --brief ${pkg}`.quiet().nothrow().text();
+	const act = (brief.split("\n").map((l) => l.trim()).find((l) => l.startsWith(pkg)) ?? `${pkg}/.MainActivity`).trim();
+	if (act) await $`adb -s ${dev} shell am start -n ${act}`.quiet().nothrow().text();
+}
+
 /**
  * adb raw-byte capture (screencap etc.) — returns Uint8Array.
  * Bun.spawn cannot stream `adb exec-out` binary (returns 0 bytes in bun 1.4.x),
@@ -148,10 +178,12 @@ const tools = [
 	},
 	{
 		name: "pixel_openshot",
-		description: "Open a URL then screencap once the browser holds focus (polls ~4s, no fixed sleeps). One round trip — use instead of open+shot.",
-		inputSchema: { type: "object", properties: { url: { type: "string" }, file: { type: "string" } }, required: ["url"] },
+		description: "Open a URL then screencap once the browser holds focus (polls ~4s, no fixed sleeps). One round trip — use instead of open+shot. WITH restore_focus=true it returns you to your prior foreground app after capture (never leaves your SSH/terminal displaced).",
+		inputSchema: { type: "object", properties: { url: { type: "string" }, file: { type: "string" }, restore_focus: { type: "boolean", description: "return to the pre-launch foreground app after capture (default false)" } }, required: ["url"] },
 		run: async (args: Record<string, unknown>) => {
 			const dev = await ensureDevice();
+			const restore = args.restore_focus === true;
+			const pre = restore ? await currentFocus() : null;
 			await $`adb -s ${dev} shell am start -a android.intent.action.VIEW -d ${String(args.url)}`.quiet().nothrow();
 			const file = String(args.file ?? `/tmp/pixel-shot-${Date.now()}.png`);
 			const t0 = Date.now();
@@ -161,7 +193,8 @@ const tools = [
 			}
 			const png = await shBytes();
 			await Bun.write(file, png);
-			return { file, bytes: png.byteLength, ms: Date.now() - t0, focus: await currentFocus() };
+			if (restore) await restoreFocus(pre);
+			return { file, bytes: png.byteLength, ms: Date.now() - t0, focus: await currentFocus(), restored: restore };
 		},
 	},
 	{
@@ -464,12 +497,14 @@ const tools = [
 	},
 	{
 		name: "pixel_view",
-		description: "Open a URL on the phone, wait for browser to settle, capture a screenshot. Best for proving what the browser actually rendered.",
-		inputSchema: { type: "object", properties: { url: { type: "string", description: "URL to open on the phone's browser" }, file: { type: "string", description: "output screenshot path" } }, required: ["url"] },
+		description: "Open a URL on the phone, wait for browser to settle, capture a screenshot. Best for proving what the browser actually rendered. WITH restore_focus=true it returns you to your prior foreground app after capture.",
+		inputSchema: { type: "object", properties: { url: { type: "string", description: "URL to open on the phone's browser" }, file: { type: "string", description: "output screenshot path" }, restore_focus: { type: "boolean", description: "return to the pre-launch foreground app after capture (default false)" } }, required: ["url"] },
 		run: async (args: Record<string, unknown>) => {
 			const dev = await ensureDevice();
 			const url = String(args.url);
 			const file = String(args.file ?? `/tmp/pixel-view-${Date.now()}.png`);
+			const restore = args.restore_focus === true;
+			const pre = restore ? await currentFocus() : null;
 			await $`adb -s ${dev} shell am start -a android.intent.action.VIEW -d ${url}`.quiet().nothrow();
 			const t0 = Date.now();
 			while (Date.now() - t0 < 8000) {
@@ -478,7 +513,8 @@ const tools = [
 			}
 			const png = await shBytes();
 			await Bun.write(file, png);
-			return { file, bytes: png.byteLength, ms: Date.now() - t0, focus: await currentFocus(), url };
+			if (restore) await restoreFocus(pre);
+			return { file, bytes: png.byteLength, ms: Date.now() - t0, focus: await currentFocus(), url, restored: restore };
 		},
 	},
 ];
