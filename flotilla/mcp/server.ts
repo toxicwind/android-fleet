@@ -20,6 +20,7 @@
 import { serve } from "bun";
 import { $ } from "bun";
 import { floatyCardHtml } from "./floaty-card.ts";
+import { focusPackage, isFocusOn } from "../focus.ts";
 
 const PORT = Number(process.env.FLOTILLA_MCP_PORT ?? 25245);
 const SERIAL_BASE = process.env.FLOTILLA_DEVICE_IP ?? "10.0.0.77";
@@ -92,30 +93,19 @@ async function currentFocus(): Promise<string> {
 	return out.trim() || "unknown";
 }
 
-/** Extract the package from a focus line (`Window{.. pkg/act}`) or null. */
-function focusPackage(focus: string): string | null {
-	const m = focus.match(/pkg\/([^\s}]+)/);
-	if (m?.[1]) {
-		const pkg = m[1].split("}")[0]!;
-		const slash = pkg.indexOf("/");
-		return slash > 0 ? pkg.slice(0, slash) : pkg;
-	}
-	const m2 = focus.match(/mCurrentFocus=.*?([A-Za-z0-9_.]+\/[A-Za-z0-9_.]+)/);
-	return m2?.[1]?.split("/")[0] ?? null;
-}
-
 /**
  * Restore the screen to `targetFocus`'s app after a browser-launch capture,
  * so flotilla read tools never leave the user's foreground app displaced.
  * `am start` to the app's main activity (resolved) brings it back without
  * knowing its exact launcher activity. No-op when already on it.
+ * Focus-shape parsing lives in ../focus.ts (unit-tested, single source).
  */
 async function restoreFocus(target: string | null): Promise<void> {
 	if (!target) return;
 	const pkg = focusPackage(target);
 	if (!pkg) return;
 	const cur = await currentFocus();
-	if (cur.includes(pkg)) return;
+	if (isFocusOn(cur, pkg)) return;
 	const dev = await ensureDevice();
 	const brief = await $`adb -s ${dev} shell cmd package resolve-activity --brief ${pkg}`.quiet().nothrow().text();
 	const act = (brief.split("\n").map((l) => l.trim()).find((l) => l.startsWith(pkg)) ?? `${pkg}/.MainActivity`).trim();
