@@ -25,6 +25,12 @@ export function isFocusOn(focus: string, pkg: string): boolean {
 	return p !== null && p === pkg;
 }
 
+/** True when the focus line is a browser window (fenix/chrome/geckoview/webview). */
+export function isBrowserFocus(focus: string): boolean {
+	const pkg = focusPackage(focus);
+	return pkg ? /fenix|chrome|geckoview|webview/i.test(pkg) : false;
+}
+
 /** Strip a port from a device serial (`10.0.0.77:42357` -> `10.0.0.77`). */
 export function deviceHost(serial: string): string {
 	const i = serial.lastIndexOf(":");

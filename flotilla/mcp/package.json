@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
-    "@devicefarmer/adbkit": "^4.0.0"
+    "@devicefarmer/adbkit": "^4.0.0",
+    "@modelcontextprotocol/sdk": "^1.32.2"
   }
 }

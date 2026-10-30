@@ -1,31 +1,31 @@
 /**
- * device.ts — flotilla device resolution on @devicefarmer/adbkit.
+ * device.ts — flotilla device layer, 100% on @devicefarmer/adbkit.
  *
- * The Pixel's wireless-debug port rotates; this module owns "which adb serial
- * is live NOW" via a real ADB client (not `$ adb` string-splicing). Used by
- * every tool (refactor: previously 19 scattered ensureDevice() shells).
+ * No `$ adb` string-splicing anywhere. The Pixel's wireless debug port
+ * rotates; adbkit's Client.listDevices() is the source of truth, with an
+ * mDNS/nmap rescue when the port shifts.
  */
+import { Adb } from "@devicefarmer/adbkit";
+import type { Device, DeviceClient } from "@devicefarmer/adbkit";
 import { $ } from "bun";
-import type { Adb } from "@devicefarmer/adbkit";
 
 const SERIAL_BASE = process.env.FLOTILLA_DEVICE_IP ?? "10.0.0.77";
+let cached: Device | null = null;
 
-let cached: string | null = null;
-
-/** Live serials from `adb devices` (wireless-debug output). Async text — `$` textSync doesn't exist on .nothrow(). */
-async function liveSerials(): Promise<string[]> {
-  try {
-    const out = await $`adb devices`.quiet().nothrow().text();
-    return out
-      .split("\n")
-      .filter((l) => l.startsWith(`${SERIAL_BASE}:`) && l.trimEnd().endsWith("device"))
-      .map((l) => l.split("\t")[0]!);
-  } catch {
-    return [];
-  }
+function adbClient() {
+  return Adb.createClient({ host: "127.0.0.1", port: 5037 });
 }
 
-/** Rotating debug port may shift; rescue via mDNS then nmap. */
+async function devices(): Promise<Device[]> {
+  return adbClient().listDevices();
+}
+
+/** The live device matching our IP (not offline). */
+async function liveDevice(): Promise<Device | null> {
+  const list = await devices();
+  return list.find((d) => d.id.startsWith(`${SERIAL_BASE}:`) && d.type === "device") ?? null;
+}
+
 async function scanPorts(): Promise<string[]> {
   try {
     const mdns = await $`adb mdns services`.quiet().nothrow().text();
@@ -39,25 +39,23 @@ async function scanPorts(): Promise<string[]> {
   return [];
 }
 
-/** Resolve the live adb serial, auto-rescuing a rotated port once. */
-export async function ensureDevice(): Promise<string> {
-  const live = await liveSerials();
-  if (cached && live.includes(cached)) return cached;
-  if (live[0]) { cached = live[0]; return live[0]; }
+/** Resolve the live device, auto-rescuing a rotated port once. */
+export async function ensureDevice(): Promise<Device> {
+  const live = await liveDevice();
+  if (cached && cached.id === live?.id) return cached;
+  if (live) { cached = live; return live; }
   for (const p of await scanPorts()) {
     await $`adb connect ${`${SERIAL_BASE}:${p}`}`.quiet().nothrow();
-    const d = (await liveSerials())[0];
+    const d = await liveDevice();
     if (d) { cached = d; return d; }
   }
   throw new Error(`no adb route to ${SERIAL_BASE} — wireless-debug off or keepalive down`);
 }
 
-/** A real adbkit Adb client bound to the resolved device. */
-export async function adbClient(): Promise<Adb> {
+/** Device client with all operations (startActivity, shell, screencap, …). */
+export async function deviceClient(): Promise<DeviceClient> {
   const dev = await ensureDevice();
-  const mod = (await import("@devicefarmer/adbkit")) as typeof import("@devicefarmer/adbkit");
-  const client = mod.Adb.createClient({ host: "127.0.0.1", port: 5037 });
-  return client.getDevice(dev);
+  return adbClient().getDevice(dev);
 }
 
 export { SERIAL_BASE };
