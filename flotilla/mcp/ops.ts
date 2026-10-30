@@ -5,7 +5,7 @@
  * socketText() helper. screencap()/startActivity() are native methods, not
  * shell strings.
  */
-import { adbClient as deviceClient, shellText, ensureDevice } from "./device.ts";
+import { deviceClient, shellText, ensureDevice } from "./device.ts";
 import { isBrowserFocus } from "../focus.ts";
 
 export interface Capture { file: string; bytes: number; }
