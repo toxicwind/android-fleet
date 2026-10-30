@@ -237,8 +237,11 @@ const tools = [
 		description: "Float a URL in a freeform window on the phone (flotilla: picture-in-picture card over the user's SSH session). Uses the flotilla CLI so the alpha-tax levers (windowingMode 5) stay in one place.",
 		inputSchema: { type: "object", properties: { url: { type: "string" } }, required: ["url"] },
 		run: async (args: Record<string, unknown>) => {
-			const out = await $`flotilla open ${String(args.url)}`.quiet().nothrow().text();
-			return { floated: !out.includes("error"), out: out.trim().slice(0, 400), focus: await currentFocus() };
+			// Inject the LIVE resolved device (NOT the flotilla CLI's stale
+			// 10.0.0.77:43945 default) so the freeform float lands on the right port.
+			const dev = await ensureDevice();
+			const out = await $`FLOTILLA_DEVICE=${dev} flotilla open ${String(args.url)}`.quiet().nothrow().text();
+			return { floated: !out.includes("error"), out: out.trim().slice(0, 400), device: dev, focus: await currentFocus() };
 		},
 	},
 	{
@@ -267,7 +270,7 @@ const tools = [
 			const route = `/floaty/${Date.now()}`;
 			floatyPages.set(route, html);
 			const dev = await ensureDevice();
-			await $`flotilla open http://${await hostIp()}:${PORT_FLOATY}${route}`.quiet().nothrow().text();
+			await $`FLOTILLA_DEVICE=${dev} flotilla open http://${await hostIp()}:${PORT_FLOATY}${route}`.quiet().nothrow().text();
 			return { floated: true, route, focus: await currentFocus(), font: fontB64 ? "DepartureMono" : "fallback-monospace" };
 		},
 	},
