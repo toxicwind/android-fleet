@@ -68,7 +68,9 @@ Levers that work, and how they misbehave:
 | Lever | The truth |
 |---|---|
 | `settings put global enable_freeform_support 1` | freeform OFF by default on user builds; set-and-forget, survives reboots |
-| `am start … --windowingMode 5` | mode **5** = freeform. Flag is **invisible in `am start --help`** — it only shows in the parent `am` help. Nobody blogs this. |
+| `am start … --windowingMode 5` | mode **5** = freeform. Flag is **invisible in `am start --help`** — it only shows in the parent `am` help. Nobody blogs this. **Bare use drops to fullscreen on keyboard focus** — use `freeform.ts`'s two-step (see below) |
+| `settings put global force_resizable_activities 1` | the gate that lets apps declaring `resizeableActivity=false` still open in a window (many silently launch fullscreen without it) |
+| `am task <id> set-windowing-mode 5` | re-assert freeform on a *live task* — the keyboard-survival step. Probe id-first, fall back to verb-first `am task set-windowing-mode <id> 5` (ROMs differ; One UI/Android 16 rejects id-first). |
 | `am stack resize <taskId> L T R B` | the ONLY move/resize lever. Bounds are **space-separated** (flotilla converts your commas). Silently no-ops outside freeform. |
 | `am stack list` | taskId source of truth for `bounds` |
 | `cmd window` | `set-display-windowing-mode 5` exists but is **display-wide**, per-app freeform beats it |
@@ -95,8 +97,27 @@ adb -s $D shell getprop ro.build.version.release ro.product.model
 | `both `port` and deprecated…` pitchfork WARN | unrelated monolith churn | ignore |
 | floated app opens **fullscreen** | freeform support off | `flotilla enable`, re-open |
 | `am stack resize` no-op | task not in mode 5 | re-open with flotilla, check `am stack list` |
+| floated app drops to fullscreen on keyboard | mode not re-asserted by task id | use `flotilla_float` (goes through `freeform.ts`) — bare `flotilla open` still dies; re-assert `am task <id> set-windowing-mode 5` |
 | taps land in Termius | focus never left your SSH app | **good** — that's the covenant; tap the card first |
 | `device offline` | wireless port rotated | fleet keepalive re-scan, update `FLOTILLA_DEVICE` |
+
+## Keyboard-surviving freeform (2026-10-30 — `mcp/freeform.ts`)
+
+Bare `am start --windowingMode 5` drops the float to fullscreen when the IME /
+focused app reclaims the screen (`visibleRequested=false`) — the windowing
+mode is never re-asserted, so it dies. `flotilla_float` now ports PortalPad's
+`FreeformManager.kt` recipe:
+
+1. **Gates** (idempotent): `enable_freeform_support 1` + `force_resizable_activities 1` + `force_resizable 1`.
+2. **Launch** with `-f 0x18000000` (NEW_TASK|MULTIPLE_TASK) — forces a distinct task.
+3. **Settle** ~700ms, find the task id.
+4. **Re-assert** `am task <id> set-windowing-mode 5` on the concrete task (probe id-first → verb-first). *This is the keyboard-survival step.*
+5. **Resize** `am task resize <id> L T R B` (legacy `am stack resize` fallback).
+
+Verified live 2026-10-30: task stays `mode=freeform` through HOME/focus
+switches and is recallable by task id (`mode=fullscreen` in dumpsys = collapse;
+`mode=freeform` = healthy). Reference: PortalPad FreeformManager.kt; arch note —
+Bun does **not** run on Android; this is a host-side Bun→adb command sequence.
 
 ## MCP surface (2026-10-30 — rebuilt v2.1.0)
 
@@ -116,7 +137,7 @@ device ops (no shell-splicing). Reflects the current 11-tool surface; the old
 | `flotilla:pixel_view` | open URL, wait for browser CONTENT (settle), capture; `restore=true` returns to prior app (focus covenant) |
 | `flotilla:pixel_tap` / `pixel_text` / `pixel_key` | input, **always returns focus** (the covenant, enforced in-band) |
 | `flotilla:pixel_ui` | UI-hierarchy XML — the safe prelude to any tap |
-| `flotilla:flotilla_float` | freeform PiP float via the CLI (windowingMode-5 alphas live here) |
+| `flotilla:flotilla_float` | freeform PiP float — **keyboard-surviving** launch via `mcp/freeform.ts` (PortalPad port): gates + new-task flag + settle + re-assert `set-windowing-mode 5` by task id |
 | `flotilla:pixel_floaty` | keyboard-safe DepartureMono message card over any app (the to-the-user channel) |
 
 Daemon: pitchfork `estate/flotilla-mcp`, `:25245` (`FLOTILLA_MCP_PORT` in
