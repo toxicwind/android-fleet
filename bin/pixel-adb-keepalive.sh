@@ -14,7 +14,6 @@ set -u
 PIXEL_IP="10.0.0.77"
 KNOWN_PORT="43585"
 TARGET="${PIXEL_IP}:${KNOWN_PORT}"
-ISLEEP="/home/toxic/bin/isleep"
 ADB="/usr/bin/adb"
 # Drop any stale entry for the retired Tailscale target, once per loop is cheap.
 STALE="100.123.57.58:5555"
@@ -55,5 +54,8 @@ while true; do
       done
     fi
   fi
-  "${ISLEEP}" 60 --name pixel-adb-keepalive || break
+  # isleep(1) was removed with ~/bin — its absence made `|| break` kill the
+  # daemon after exactly one loop (pitchfork showed "stopped"). A daemon's own
+  # re-scan loop is its job, not an agent-blocking command: plain sleep.
+  sleep 60
 done
