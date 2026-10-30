@@ -18,7 +18,6 @@ import { z } from "zod";
 import { serve, $ } from "bun";
 import { floatyCardHtml } from "./floaty-card.ts";
 import { ensureDevice } from "./device.ts";
-import { enableFreeform } from "./freeform.ts";
 import { currentFocus, screencap, openUrl, openAndCapture } from "./ops.ts";
 
 const PORT = Number(process.env.FLOTILLA_MCP_PORT ?? 25245);
@@ -104,7 +103,6 @@ function createMcpServer(): McpServer {
   server.tool("flotilla_float", "Float a URL in a freeform (PiP) window over the user's app — keyboard-surviving (PortalPad launch)", { url: z.string() }, async ({ url }) => {
     const { launchFreeform } = await import("./freeform.ts");
     await ensureDevice();
-    await enableFreeform();
     const r = await launchFreeform({ url, pkg: "org.mozilla.fenix" });
     return { content: [{ type: "text" as const, text: JSON.stringify({ floated: r.taskId !== null, taskId: r.taskId, resized: r.resize, gates: r.gates }) }] };
   });
