@@ -16,6 +16,10 @@
  *      `am task resize` to our bounds. Re-asserting the mode by task id is the
  *      keyboard-survival step — the windowing mode is pinned on the task, not
  *      just requested at launch.
+ *
+ * Testability: every command builder + parser is a pure export asserted by
+ * tests/freeform.test.ts. The device-backed orchestrators accept an injected
+ * `shell` (default = real adb shellText) so unit tests run with a fake shell.
  */
 
 import { shellText } from "./device.ts";
@@ -31,115 +35,164 @@ export function defaultBounds(): FreeformBounds {
   return { left: 300, top: 240, right: 1020, bottom: 2280 };
 }
 
-/** Idempotent: turn on freeform support + force resizable activities. */
-export async function enableFreeform(): Promise<{ ok: boolean; gates: string[] }> {
-  const cmds = [
+/** A shell command runner — injected in tests (fake), real in prod. */
+export type Shell = (cmd: string) => Promise<string>;
+
+/** True when shell output signals success (no Error/Unknown/unknown command). */
+export function isClean(out: string): boolean {
+  return !/[Ee]rror|Unknown|unknown command/.test(out);
+}
+
+/** Idempotent freeform + resizable gates, in application order. */
+export function buildGates(): string[] {
+  return [
     "settings put global enable_freeform_support 1",
     "settings put global force_resizable_activities 1",
     "settings put global force_resizable 1",
   ];
-  const gates: string[] = [];
-  for (const c of cmds) {
-    const out = await shellText(c);
-    gates.push(`${c} -> ${out.trim() || "ok"}`);
-  }
-  return { ok: true, gates };
 }
 
-function clean(out: string): boolean {
-  return !/[Ee]rror|Unknown|unknown command/.test(out);
+/** Space-separated rect string for `am ... resize`. */
+export function rectString(b: FreeformBounds): string {
+  return `${b.left} ${b.top} ${b.right} ${b.bottom}`;
+}
+
+/** Build the freeform AM start command (new-task flag + windowingMode 5). */
+export function buildLaunchCommand(opts: {
+  url?: string; pkg: string; activity?: string; displayId?: number;
+}): string {
+  const { url, pkg, activity, displayId = 0 } = opts;
+  const component = activity ? `${pkg}/${activity}` : pkg;
+  const dataFlag = url ? `-d '${url}'` : "";
+  return `am start --display ${displayId} --windowingMode ${FREEORM_MODE} -f ${NEW_TASK_MULTIPLE} ` +
+    `-a android.intent.action.MAIN -c android.intent.category.LAUNCHER -n '${component}' ${dataFlag}`.trim();
+}
+
+/** Fallback plain VIEW launch (used if the freeform launch errors). */
+export function buildViewFallback(url: string, pkg: string): string {
+  const dataFlag = url ? `-d '${url}'` : "";
+  return `am start -a android.intent.action.VIEW ${dataFlag} -p '${pkg}'`.trim();
+}
+
+/** The two `am task` windowing-mode spellings, in probe order (id-first, verb-first). */
+export function buildModeCmds(taskId: number, mode: number = FREEORM_MODE): [string, string] {
+  return [`am task ${taskId} set-windowing-mode ${mode}`, `am task set-windowing-mode ${taskId} ${mode}`];
+}
+
+/** Resize commands: modern first, legacy `am stack resize` fallback. */
+export function buildResizeCmds(taskId: number, b: FreeformBounds): [string, string] {
+  const rect = rectString(b);
+  return [`am task resize ${taskId} ${rect}`, `am stack resize ${taskId} ${rect}`];
 }
 
 /**
- * Set a task to freeform mode, probing both `am task` spellings (id-first vs
- * verb-first) — ROMs differ (One UI/Android 16 rejects id-first). Returns true
- * only when a spelling executed cleanly.
+ * Parse a task id for `pkg` out of a `dumpsys activity activities` snapshot.
+ * Pure + deterministic. Prefers `tN` on a pkg line, falls back to a nearby
+ * `taskId=N`.
  */
-let verbStyle = 0; // 0 undetermined, 1 id-first, 2 verb-first, 3 neither
-export async function setWindowingMode(taskId: number, mode: number = FREEORM_MODE): Promise<boolean> {
-  if (verbStyle === 0 || verbStyle === 1) {
-    const a = await shellText(`am task ${taskId} set-windowing-mode ${mode}`);
-    if (clean(a)) { verbStyle = 1; return true; }
-    if (verbStyle === 1) return false;
-  }
-  if (verbStyle === 0 || verbStyle === 2) {
-    const b = await shellText(`am task set-windowing-mode ${taskId} ${mode}`);
-    if (clean(b)) { verbStyle = 2; return true; }
-    if (verbStyle === 0) verbStyle = 3;
-  }
-  return false;
-}
-
-/** Resize a task to bounds (modern `am task resize`, legacy `am stack resize`). */
-export async function resizeTask(taskId: number, b: FreeformBounds): Promise<boolean> {
-  const rect = `${b.left} ${b.top} ${b.right} ${b.bottom}`;
-  const a = await shellText(`am task resize ${taskId} ${rect}`);
-  if (clean(a)) return true;
-  const s = await shellText(`am stack resize ${taskId} ${rect}`);
-  return clean(s);
-}
-
-/** Find a task id by package from the task list. */
-export async function findTaskId(pkg: string): Promise<number | null> {
-  const out = await shellText("dumpsys activity activities");
-  // mResumedActivity / topResumedActivity lines carry the task id: `... t1234`
-  for (const line of out.split("\n")) {
+export function parseTaskId(dumpsys: string, pkg: string): number | null {
+  for (const line of dumpsys.split("\n")) {
     if (!line.includes(pkg)) continue;
-    const m = line.match(/\bt(\d+)\b/) ?? line.match(/task id=t?(\d+)/);
+    // 1) `t<id>` on a Hist/ActivityRecord line, 2) `task id=t?<id>`, 3) `#<id>` on
+    //    the Task line: `Task{<hex> #<id> … A=<uid>:<pkg> …}` — the `#<id>` is the id.
+    const m = line.match(/\bt(\d+)\b/) ?? line.match(/task id=t?(\d+)/) ?? line.match(/Task\{[0-9a-f]+\s+#(\d+)/);
     if (m) {
       const id = Number(m[1]);
       if (Number.isInteger(id) && id > 0) return id;
     }
   }
-  // fallback: latest started ActivityRecord for the pkg's stack
-  const m = out.match(new RegExp(`[\\s\\S]{0,40}${pkg.replace(/\./g, "\\.")}[\\s\\S]{0,60}taskId=(\\d+)`));
+  const m = dumpsys.match(new RegExp(`[\\s\\S]{0,40}${pkg.replace(/\./g, "\\.")}[\\s\\S]{0,60}taskId=(\\d+)`));
   return m ? Number(m[1]) : null;
 }
 
+/** Validate the launch opts are sane (bounds have positive extent, pkg non-empty). */
+export function validLaunchOpts(o: { pkg: string; bounds?: FreeformBounds }): boolean {
+  if (!o.pkg || o.pkg.trim().length === 0) return false;
+  if (!o.bounds) return true;
+  const b = o.bounds;
+  return b.right > b.left && b.bottom > b.top && b.left >= 0 && b.top >= 0;
+}
+
+// ── Device-backed orchestrators (shell injectable) ──────────────────────
+
+/** Apply gates. Returns per-command results. */
+export async function applyGates(shell: Shell = shellText): Promise<{ ok: boolean; gates: string[] }> {
+  const gates: string[] = [];
+  for (const c of buildGates()) {
+    const out = await shell(c);
+    gates.push(`${c} -> ${out.trim() || "ok"}`);
+  }
+  return { ok: true, gates };
+}
+
 /**
- * Launch component/URL into a freeform window that SURVIVES the keyboard.
- *
- * component: "pkg/.Activity" flattened, or we derive from pkg + URL.
- * Returns the task id on success (for bounds/focus control) or null.
+ * Set a task to freeform, probing both spellings. Caches which spelling this
+ * ROM accepts. Returns true only when one executed cleanly.
+ */
+export function makeWindowingModeSetter(shell: Shell = shellText) {
+  let verbStyle = 0; // 0 undetermined, 1 id-first, 2 verb-first, 3 neither
+  return async function setWindowingMode(taskId: number, mode: number = FREEORM_MODE): Promise<boolean> {
+    const [idFirst, verbFirst] = buildModeCmds(taskId, mode);
+    if (verbStyle === 0 || verbStyle === 1) {
+      const a = await shell(idFirst);
+      if (isClean(a)) { verbStyle = 1; return true; }
+      if (verbStyle === 1) return false;
+    }
+    if (verbStyle === 0 || verbStyle === 2) {
+      const b = await shell(verbFirst);
+      if (isClean(b)) { verbStyle = 2; return true; }
+      if (verbStyle === 0) verbStyle = 3;
+    }
+    return false;
+  };
+}
+
+/** Resize a task to bounds (modern, then legacy stack fallback). */
+export async function resizeTask(taskId: number, b: FreeformBounds, shell: Shell = shellText): Promise<boolean> {
+  const [modern, legacy] = buildResizeCmds(taskId, b);
+  const a = await shell(modern);
+  if (isClean(a)) return true;
+  const s = await shell(legacy);
+  return isClean(s);
+}
+
+/** Find a task id by package from a fresh dumpsys. */
+export async function findTaskId(pkg: string, shell: Shell = shellText): Promise<number | null> {
+  const out = await shell("dumpsys activity activities");
+  return parseTaskId(out, pkg);
+}
+
+/**
+ * Launch a URL/app into a freeform window that SURVIVES the keyboard.
+ * Returns the task id (for bounds/focus control) or null.
  */
 export async function launchFreeform(
-  opts: {
-    url: string;
-    pkg: string;
-    activity?: string;
-    bounds?: FreeformBounds;
-    displayId?: number;
-  },
+  opts: { url: string; pkg: string; activity?: string; bounds?: FreeformBounds; displayId?: number },
+  shell: Shell = shellText,
 ): Promise<{ taskId: number | null; launched: boolean; gates: string[]; resize?: boolean }> {
   const { url, pkg, activity, bounds = defaultBounds(), displayId = 0 } = opts;
+  if (!validLaunchOpts({ pkg, bounds })) return { taskId: null, launched: false, gates: [], resize: false };
 
-  await enableFreeform();
+  const gates = (await applyGates(shell)).gates;
 
-  // Build the component. For a browser/URL, use pkg/.Activity via MAIN/LAUNCHER
-  // with the VIEW data so the app resolves the URL, but in a NEW distinct task
-  // (0x18000000) + freeform mode.
-  const component = activity ? `${pkg}/${activity}` : pkg;
-  const dataFlag = url ? `-d '${url}'` : "";
-  const am = `am start --display ${displayId} --windowingMode ${FREEORM_MODE} -f ${NEW_TASK_MULTIPLE} ` +
-    `-a android.intent.action.MAIN -c android.intent.category.LAUNCHER -n '${component}' ${dataFlag}`;
-  const out = await shellText(am);
+  const am = buildLaunchCommand({ url, pkg, activity, displayId });
+  const out = await shell(am);
 
-  const path = url ? url : pkg;
-  if (clean(out) === false && !out.toLowerCase().includes("starting")) {
-    // Fallback: plain launch (lands fullscreen), then move into freeform by id.
-    await shellText(`am start -a android.intent.action.VIEW ${dataFlag} -p '${pkg}'`);
+  if (!isClean(out) && !out.toLowerCase().includes("starting")) {
+    await shell(buildViewFallback(url, pkg));
   }
 
   await Bun.sleep(SETTLE_MS);
 
-  const taskId = await findTaskId(pkg);
+  const taskId = await findTaskId(pkg, shell);
   let resized = false;
   if (taskId !== null) {
-    await setWindowingMode(taskId); // THE keyboard-survival step
-    resized = await resizeTask(taskId, bounds);
+    const setMode = makeWindowingModeSetter(shell);
+    await setMode(taskId); // THE keyboard-survival step
+    resized = await resizeTask(taskId, bounds, shell);
   }
 
-  return { taskId, launched: true, gates: [], resize: resized };
+  return { taskId, launched: true, gates, resize: resized };
 }
 
 export const freeformVersion = "2.2.0-portalpad";
