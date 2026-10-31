@@ -126,8 +126,8 @@ flowchart TB
 | Tool | Rebrand in-fleet | What it does for us | Status |
 |---|---|---|---|
 | [**Shizuku**](https://github.com/RikkaApps/Shizuku) `v13.6.0` | `pixel-priv-bridge` | spawns a privileged `app_process` via `adb shell sh …/start.sh` → system-API elevation for non-rooted phones | 📥 [`vendored/shizuku/`](vendored/shizuku/) · installed on Pixel |
-| [**BlackDex**](https://github.com/CodingGay/BlackDex) `v3.2` | `apk-unpack-vault` | non-root dex unpacking — feeds `apk-autopsy` when jadx hits packed APKs | 📥 [`vendored/shizuku/BlackDex64-v3.2.apk`](vendored/shizuku/) |
-| [**apkeep**](https://github.com/EFForg/apkeep) | `apk-provenance` | clean APK acquisition from Play / APKPure / F-Droid / Huawei — no device pulls | 🛠 cargo install |
+| [**BlackDex**](https://github.com/CodingGay/BlackDex) `v3.2` | `apk-unpack-vault` | non-root dex unpacking — feeds `apk-autopsy` when jadx hits packed APKs | ✅ installed + live on Pixel (`top.niunaijun.blackdexa64`, 2026-10-30) · [`vendored/shizuku/BlackDex64-v3.2.apk`](vendored/shizuku/) |
+| [**apkeep**](https://github.com/EFForg/apkeep) | `apk-provenance` | clean APK acquisition from Play / APKPure / F-Droid / Huawei — no device pulls | ✅ `cargo install apkeep` → `~/.cargo/bin/apkeep` v1.1.0 (2026-10-30) |
 | [**Frida gadget**](https://github.com/kiks7/frida-non-root) | `in-house-instrument` | dynamic instrumentation of **our own** fleet-tv builds (never the signed daily-driver apps) | 🔬 next build |
 | [**VirtualXposed / VirtualApp**](https://github.com/android-hacker/virtualxposed) | `sandbox-app-config` | sandbox-runnable app copies for safe config forensics | 🔬 on demand |
 | [**STF / DeviceFarmer**](https://github.com/DeviceFarmer/stf) | `device-farm` | browser-based multi-device fleet control — the "every pen has a rig" pattern | 🗺 roadmap |
