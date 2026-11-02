@@ -1,3 +1,7 @@
+> **MOVED 2026-11-02: flotilla merged into `pens/mosaic`** (the aesthetic-surfaces pen).
+> The MCP lives at `pens/mosaic/products/mosaic-mcp` (running :25245 as `mosaic-mcp`).
+> This dir remains for history; new features land in mosaic only.
+
 # flotilla 🛶
 
 > A **flotilla of floating windows** on the android-fleet Pixel — freeform
