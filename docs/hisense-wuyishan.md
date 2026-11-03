@@ -319,3 +319,31 @@ plug is the only guaranteed power-off/refresh path. alvidaa's "reboot"
 confusion (uptime 26.6h after a "reboot") proved this on a healthy TV —
 ours is that condition squared: even the standby transition can't happen
 because nothing is processing input.
+
+## 2026-11-03 addendum 5 — the official unbrick lane: USB .PKG firmware reinstall
+
+The lane that needs NO root, NO adb, NO network, NO remote-dependent UI:
+**USB firmware reinstall via the OTA/loader phase.** Per alvidaa, the boot
+tail switches to `rcS.OTA`/`rc.ota` when `otaflag` is set — the .PKG
+update path intercepts boot BEFORE startgui, which is exactly the phase
+our TV hangs in.
+
+Procedure (55E8x consumer-verified):
+1. Exact-model firmware `.PKG` from hisense-usa.com/support/firmware-download
+   (model 55E82GUA — read the back-panel label, don't trust memory).
+2. FAT32 USB stick, `.PKG` at the ROOT of the stick.
+3. TV off (wall plug), stick into a REAR USB port.
+4. Power on while holding the TV's own standby/power button; release when
+   "software updating" appears. 15–20 min. DO NOT pull power mid-install.
+5. After: factory reset recommended; our recovery adb pass then runs
+   (uptime proof, `df -h /data`, fsck check), Shizuku reinstall from the
+   archived APK if wiped (`/tmp/shizuku-release.apk`, v13.6.0 asset —
+   remember `latest/download/shizuku.apk` 404s to a 9-byte body), nuvio.livetv
+   rebuild per the KEEP order, portal creds re-entry.
+
+Rollback warning: Hisense does not officially support downgrades; a .PKG
+older than installed firmware may be rejected or risk a hard brick. Prefer
+the newest available .PKG for the exact model.
+
+Shizuku assets on hand: `/tmp/shizuku.apk` + `/tmp/shizuku-release.apk`
+(2.5 MB each, v13.6.0). adb helpers: `~/.local/bin/adb-reset`, `adb-log-cap`.
