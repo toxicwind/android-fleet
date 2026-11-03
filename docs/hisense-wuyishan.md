@@ -209,3 +209,27 @@ upstream NuvioTV 1.1.0-beta.8) gained:
   `df -h /data` + `settings list system | head` integrity check before anything else.
 - If factory reset is forced: rebuild plan = reinstall nuvio.livetv APK (KEEP
   per architect order), playtorrio portal creds re-entry, Downloader for sideloads.
+
+## 2026-11-03 addendum — alvidaa intel corrects the incident read
+
+Key correction from carteakey/alvidaa findings (§10.10): **ICMP echo is
+disabled by firmware** (`icmp_echo_ignore_all` in rc.local). Ping 100% loss
+is NOT evidence of death on this TV — **TCP 36669 (RemoteNow MQTT) is the
+reliable liveness probe**, 5555 adb second.
+
+Re-probed with the corrected ladder: 36669/5555/8009/2222/9009 all closed,
+and `ip neigh` shows INCOMPLETE (AP has dropped the association). Read:
+the TV stalls at logo BEFORE the network stack comes up — boot never
+reaches netd, so no wifi assoc, no ARP, no TCP. Consistent with zygote
+handoff failure, not with "OS up but ICMP-silent".
+
+Recovery stays physical: wall-plug pull ≥60s (alvidaa confirms standby ≠
+reboot; only wall-plug re-runs rc.local/boot), then hold TV power 30s at
+replug. If a shell comes back (adb 5555 or, if our own otaTest hook was
+armed, SSH 2222), first moves: `df -h /data`, `/proc/uptime` (prove real
+boot), settings.db integrity, then `dmesg | grep -iE "e2fsck|error|fs"`.
+
+alvidaa refs: root primitive = `/var/local/otaTest.sh` via rc.local (root
+on every boot); UART root gate = `key_check.sh` USB-key auth; CVTE
+factory logger can remount / rw with a `FAC_BOOT_SMART.cvt` USB file —
+the unbrick lane if zygote never returns.
