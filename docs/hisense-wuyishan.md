@@ -190,3 +190,22 @@ upstream NuvioTV 1.1.0-beta.8) gained:
 - `pm uninstall -k --user 0 com.nuvio.tv` to drop regular Nuvio while keeping
   IPTV variant — awaiting explicit go (destructive, architect-ordered:
   "delete regular nuvio, keep iptv").
+
+## 2026-11-03 boot-stall incident (logo after restart)
+
+- Symptom: panel shows Hisense logo indefinitely after a restart; network
+  stack fully dead — no ARP entry (INCOMPLETE), ping 100% loss, adb 5555,
+  cast 8009/8443, 9000, 6466 all closed, no mDNS answer. WoL (38:64:07:f0:48:56,
+  ports 9/7 x5) did not raise it.
+- Stage analysis: logo = bootloader+kernel OK, OS handoff (zygote) failing —
+  matches the documented VIDAA four-stage boot.
+- Prime suspect: /data at 76% + swap 680/800MB profile (see memory section);
+  a settings.db write from the redlight session (anomaly #75 pattern) landing
+  on a full /data during shutdown could corrupt the boot-critical db.
+- No remote-CVE recovery lane exists for a network-dead TV (searched CISA/HKCERT
+  2025-2026 Hisense/Android TV CVEs — all require network or local access).
+- Recovery ladder (next physical pass): unplug 60s → hold TV power 30s while
+  replug → if it boots, immediately `adb connect 10.0.0.225:5555` and run
+  `df -h /data` + `settings list system | head` integrity check before anything else.
+- If factory reset is forced: rebuild plan = reinstall nuvio.livetv APK (KEEP
+  per architect order), playtorrio portal creds re-entry, Downloader for sideloads.
