@@ -303,3 +303,19 @@ If the eth lane lights up anything, the first commands over adb/SSH are:
 `/proc/uptime` (prove fresh boot), `df -h /data`, `dmesg | grep -iE "fsck|ext4|error"`,
 settings.db integrity — BEFORE any more writes (the stall's suspect list
 still includes a settings.db write on a 76%-full /data from our last session).
+
+## 2026-11-03 addendum 4 — why the remote does nothing at the logo hang
+
+The BT remote is an EV_KEY input device handled by the kernel input stack —
+which only runs once the OS boots. At a logo-stuck boot (stall in
+tvmain/startgui), the input stack is down: remote keypresses land nowhere.
+The IR receiver (MStar event1) was silent even on alvidaa's healthy unit
+until drivers load — same story. So "remote won't turn it off / do
+anything" is a SYMPTOM of the hang, not a separate fault.
+
+Power semantics from alvidaa (verified): remote "power off" = standby
+round-trip; standby never re-runs rc.local and never reboots. The wall
+plug is the only guaranteed power-off/refresh path. alvidaa's "reboot"
+confusion (uptime 26.6h after a "reboot") proved this on a healthy TV —
+ours is that condition squared: even the standby transition can't happen
+because nothing is processing input.
