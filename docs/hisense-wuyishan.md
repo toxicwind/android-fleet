@@ -276,3 +276,30 @@ Probes already exhausted 2026-11-03 (pre-ladder): ARP INCOMPLETE, ping
 (expected-silent — ICMP is firmware-disabled), TCP
 36669/5555/8009/8443/9000/7000/6466/2222/9009 all closed, mDNS silent,
 WoL x5 on 38:64:07:f0:48:56 ignored. Dossier commits: 6589a90, 0489b00.
+
+## 2026-11-03 addendum 3 — beyond-the-network lanes (all exhausted or physical)
+
+LAN itself verified healthy (gateway 1.6 ms, 14 neighbors, LG OLED answers
+SSDP/scan instantly) — the failure is TV-local, not AP-local.
+
+Lanes probed and closed:
+- **Bluetooth**: hcitool scan sees the LG TV's BT; Hisense BT (remote is BT,
+  EV_KEY on event3 per alvidaa) does NOT appear — BT host stack never started.
+- **SSDP/UPnP + cast wake**: full M-SEARCH across ssdp:all, DIAL, AVTransport —
+  zero responders except our own host echo. Cast-wake lane needs the TV to
+  answer 8009 first; dead.
+- **WoL**: x5 ignored (wifi-only SKU state; eth PHY absent or unpowered).
+
+Two physical lanes worth the walk (ranked):
+1. **Ethernet cable if the chassis has the jack**: `start-network.sh` runs
+   BEFORE startgui in the boot map — an eth0 link would DHCP at the stuck
+   stage, giving us TCP 36669/5555 probes (and possibly adb) WHILE the logo
+   hangs. That turns an opaque bootloop into an instrumented one.
+2. **Hardware-watchdog reboot**: hold the TV's OWN power button ~10-30 s
+   (55E8x consumer-verified for exactly this logo hang), or wall-plug ≥60 s.
+   alvidaa evidence: standby ≠ reboot; only real power-cycle re-runs rc.local.
+
+If the eth lane lights up anything, the first commands over adb/SSH are:
+`/proc/uptime` (prove fresh boot), `df -h /data`, `dmesg | grep -iE "fsck|ext4|error"`,
+settings.db integrity — BEFORE any more writes (the stall's suspect list
+still includes a settings.db write on a 76%-full /data from our last session).
