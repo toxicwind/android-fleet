@@ -233,3 +233,46 @@ alvidaa refs: root primitive = `/var/local/otaTest.sh` via rc.local (root
 on every boot); UART root gate = `key_check.sh` USB-key auth; CVTE
 factory logger can remount / rw with a `FAC_BOOT_SMART.cvt` USB file —
 the unbrick lane if zygote never returns.
+
+## 2026-11-03 addendum 2 — full alvidaa-derived recovery ladder (all docs read)
+
+Boot chain (from alvidaa privilege map §10.4/10.7): `rcS` → `rcS.utopia.linux`
+(mounts rw partitions, then `start-hisense.sh`: `start-security.sh` →
+`start-network.sh` → `superwatch` → secure_exec(`masman`/`systemserver`/
+`tvmain`/`startgui.sh`)) → `rcS.ko.linux`. Logo-hang = stall in the
+tvmain/startgui phase. Wifi association happens via the UI's wifi service
+AFTER startgui — so a startgui stall leaves the network dead exactly as
+probed (no assoc, no ARP, no TCP). Liveness probe for when it changes:
+**TCP 36669** (MQTT broker comes up late but reliably), then 5555.
+
+Root-cause candidates for this stall (stock TV, no otaTest hook):
+1. fsck/e2fsck halt or unclean-data rejection on /data (76% full; if the
+   restart happened while our settings.db writes were mid-flight, the db
+   or a block could be inconsistent).
+2. zygote/systemserver OOM loop — 1.9 GB RAM with 680/800 MB swap used is
+   the documented floor; a run of heavyweight apps resident at the restart
+   could wedge the handoff.
+
+Recovery ladder (no remote lane exists — network is dead by symptom):
+1. **Wall-plug pull ≥60 s**, then hold the TV's own power ~30 s at replug.
+   alvidaa-verified: standby ≠ reboot; only wall-plug re-runs rc.local.
+2. If it boots: `adb connect 10.0.0.225:5555` → `/proc/uptime` (prove real
+   boot) → `df -h /data` → `dmesg | grep -iE "fsck|ext4|error"` →
+   settings.db integrity before any more writes.
+3. If logo persists: **UART service port** — `inittab` respawns
+   `getty -L ttyS0 115200`; USB-TTL adapter reaches a real login prompt.
+   Gate = `key_check.sh`: FAT32 USB root file named
+   `md5(vendorID + productID + tvModel)` (IDs from
+   `/hidata/critical/config/critical.ini`, root-only readable — but the
+   interactive `dummy` fallback path exists and also ends in
+   `check_usb_key`). Success also enables UART output (`envAccess UARTOnOff on`).
+4. Deeper primitives once a shell exists (alvidaa §10.12):
+   CVTE `cvte-logger.sh` with `FAC_BOOT_SMART.cvt` on USB **remounts / and
+   /usr/local rw** (factory remount in shipping firmware); busybox has
+   `nanddump/dd`; `/var/tvservice/reset_working` (rw) triggers the root
+   factory-reset flow — create only with intent.
+
+Probes already exhausted 2026-11-03 (pre-ladder): ARP INCOMPLETE, ping
+(expected-silent — ICMP is firmware-disabled), TCP
+36669/5555/8009/8443/9000/7000/6466/2222/9009 all closed, mDNS silent,
+WoL x5 on 38:64:07:f0:48:56 ignored. Dossier commits: 6589a90, 0489b00.
