@@ -20,3 +20,12 @@ Required** with `N1-Backend: Echo` + random `N1-Request` ids. Proxies/geo were r
 - Stream classification (api-ok/stream-ok/stream-407) must be part of portal audits; ONE portal is stream-ok today (android-iptv.com).
 - Gate already shipped: saturated-portal capacity gate (fleet-tv XtreamCapacityGate) prevents the disconnect fight.
 - Proxy-rotator stays for genuine geo-gates (different class; verify against a target that returns 2xx-without-body, not 407-gated edges).
+
+
+## Addendum — VLC-UA unlock (2026-11-08, PROVEN live)
+Follow the 302→token→LB flow **with `VLC/3.0.20 LibVLC/3.0.20` UA (+ Range bytes=0-N)**:
+- `/live/u/p/42558.m3u8` → 302 token → LB → **200** `application/x-mpegurl` (2828B, EXT-X-MEDIA-SEQUENCE:68, tokenized /hlsr/ segments).
+- Segment: `GET /hlsr/<token>/u/p/42558/<hash>/42558_68.ts` with VLC UA + Range → **200 `video/mp2t`, 3.6MB**.
+- Earlier bare-UA follow 403'd → the LB/external flow is UA-gated, not geo.
+- cabtxNjD's N1 edge still 407s even with VLC UA → that account's stream edge is DEAD (separate class).
+- Product impact: StreamProbe uses VLC UA for xtream classifications; PlayTorrio's `_isAlive` already used VLC UA + Range (the finder's one good pattern); its login-only `verifyOrNull` misses stream/capacity (our seeder fixed that gap).
