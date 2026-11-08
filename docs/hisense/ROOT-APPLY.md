@@ -66,3 +66,14 @@ logged with `monadicRollback` event tag, never swallowed.
 repos — all NAME-collisions (generic React Native / Java "OTA" apps), zero pattern match
 for the Hisense factory lane. The CVT/remount mechanics are proprietary firmware; the
 correct validation is empirical: plug stick → observe `mount | grep ' / '` rw.
+
+## FacRootMenu findings (2026-11-09, LIVE)
+- `com.hisense.uifac.action.FacRootMenu` launches the factory root menu (single activity).
+- Dex shows `AdbEnabled`/`AdbStatus` methods + exit intents (`exit_factory_intent`) +
+  props `persist.sys.factory.mode`, `ro.boot.bootenterfactory`.
+- Entering the menu set `persist.sys.factory.mode`, and its network/factory scanner dropped
+  wifi once — displayed a giant keypad dialog (`WIFI LOST`). **Safe exit = TV reboot**
+  (verified: reboot → launcher home, factory-mode value returns 0).
+- Post-reboot gate check: `adb root` still refused ("production builds"), no su → factory
+  mode alone does NOT grant root. Next lever: re-enter FacRootMenu → flip **AdbEnabled**
+  (likely sets adbd root / ro.debuggable) — not yet attempted, rollback = reboot.
