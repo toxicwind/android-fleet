@@ -413,3 +413,35 @@ Observed: TCP 5555 OPEN while 36669 (RemoteNow MQTT) CLOSED on a healthy
 4.9-day-uptime box — the broker can be down independently of the TV's
 health; keep the two-probe ladder (36669 then 5555) and treat 5555 as the
 authoritative signal.
+
+## 2026-11-08 addendum 7 — deep links EXIST (recon correction), esencial M3U + EPG seeded, Xtream audit
+
+**1. "nuvio registers zero intent schemes" is WRONG.** `dumpsys package
+com.nuvio.livetv` shows `com.nuvio.tv.MainActivity` with TWO VIEW/BROWSABLE
+filters — schemes `stremio://` and `nuvio://`. The app is a single-activity
+Compose app; routes are built dynamically from those scheme constants (the
+dex string pool holds `stremio://`; addon-URL input normalizes
+`stremio://` → `https://` for addon config). Blind am-start of guessed
+routes (`nuvio://livetv` etc.) falls back to home — route table needs
+decompilation to use; D-pad nav remains the practical lane.
+
+**2. Fleet M3U + EPG seeded (seeder v2, live verified).** `XtreamPortalSeeder`
+v2 (fleet-tv `app/src/main/java/.../data/XtreamPortalSeeder.kt`) now ALSO
+seeds the fleet's complex M3U (`esencial.m3u`, 1868 grouped entries with
+per-entry `#EXTVLCOPT` user-agent/referrer) as a `PlaylistSource`
+(`useEmbeddedEpg=true` — its `#EXTM3U url-tvg` header auto-registers the EPG)
+plus an explicit `EpgSource` for `esencial epg.xml`. Guarded by the new
+`fleet_seeded_v2` DataStore marker (idempotent, one-shot, avoids user dupes).
+M3U parser handles EXTVLCOPT + pipe-URL headers + catchup + `url-tvg`.
+4 unit tests (mockk + TestPreferencesStore seam) green; rebuilt APK
+`install -r` (data preserved → v1 portal marker survived, portals intact).
+Live verify: logcat `Seeded fleet M3U playlist` + `Seeded fleet EPG source`;
+Live TV screen renders esencial channels (Canal 2/4 TCS SD + [Opc.2]/[Opc.3]
+variants) with an EPG time grid.
+
+**3. Xtream server audit (2026-11-08): 56/60 ALIVE.** Full `player_api.php`
+sweep of `fleet_portals.csv` (24-way parallel, 6s timeout): 56 auth-verified
+Active, 4 dead (`kb87.eshofrcep.top`, `esyjfzpw.top`, `ege8k.com` no-route,
+`xw5.nhnsqtef.top` — all timeouts/no-route). Dead entries parked in the CSV
+(`#dead-20261108` prefix) so seeders skip them. Full report:
+`fleet-tv/docs/xtream-audit-20261108.md` (exp dates included).
