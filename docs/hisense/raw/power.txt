@@ -1,0 +1,41 @@
+POWER MANAGER (dumpsys power)
+
+Power Manager State:
+  Settings power_manager_constants:
+    no_cached_wake_locks=true
+  mDirty=0x0
+  mWakefulness=Awake
+  mWakefulnessChanging=false
+  mIsPowered=true
+  mPlugType=1
+  mBatteryLevel=100
+  mBatteryLevelWhenDreamStarted=100
+  mDockState=0
+  mStayOn=false
+  mProximityPositive=false
+  mBootCompleted=true
+  mSystemReady=true
+  mHalAutoSuspendModeEnabled=false
+  mHalInteractiveModeEnabled=true
+  mWakeLockSummary=0x1
+  mNotifyLongScheduled=(none)
+  mNotifyLongDispatched=-11s972ms
+  mNotifyLongNextCheck=(none)
+  mUserActivitySummary=0x1
+  mRequestWaitForNegativeProximity=false
+  mSandmanScheduled=false
+  mSandmanSummoned=false
+  mBatteryLevelLow=false
+  mLightDeviceIdleMode=false
+  mDeviceIdleMode=false
+  mDeviceIdleWhitelist=[2000, 10015, 10040, 10044, 10045, 10075, 10098, 10105]
+  mDeviceIdleTempWhitelist=[]
+  mInattentiveForceShutdownList=[]
+  mLastWakeTime=434931531 (421518 ms ago)
+  mLastSleepTime=434877024 (476025 ms ago)
+  mLastWakeRtcTime=1794133090485 (in 1793697737436 ms)
+  mLastSleepRtcTime=1794133035991 (in 1793697682942 ms)
+  mLastSleepReason=sleep_button
+  mLastUserActivityTime=435313852 (39197 ms ago)
+  mLastUserActivityTimeNoChangeLights=432684199 (2668850 ms ago)
+Failed to write while dumping service power: Broken pipe

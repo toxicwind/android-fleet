@@ -1,0 +1,12 @@
+Root#0
+mWindowContainers#0
+DisplayArea.Root#0
+Leaf:0:1#0
+WallpaperWindowToken{66abd06 token=android.os.Binder@d6ebbe1}#0
+c6f37bc com.android.systemui.ImageWallpaper#0
+com.android.systemui.ImageWallpaper#0
+Leaf:2:2#0
+DefaultTaskDisplayArea#0
+Task=1#0
+Task=1905#0
+57ee27d ActivityRecordInputSink com.google.android.apps.tv.launcherx/.home.HomeActivity#0

@@ -1,0 +1,7 @@
+  Unattached video devices:
+    Sources: 0x81000311
+    Sources: 0x81000311
+    Sources: 0x00000301
+    Sources: 0x00000701
+    Sources: 0x00000301
+    Sources: 0x00000301
