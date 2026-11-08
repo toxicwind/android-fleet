@@ -77,3 +77,12 @@ correct validation is empirical: plug stick → observe `mount | grep ' / '` rw.
 - Post-reboot gate check: `adb root` still refused ("production builds"), no su → factory
   mode alone does NOT grant root. Next lever: re-enter FacRootMenu → flip **AdbEnabled**
   (likely sets adbd root / ro.debuggable) — not yet attempted, rollback = reboot.
+
+## setAdbStatus RE chain (2026-11-09, deep)
+- FacRootMenu → TVNative.setAdbStatus_native(boolean) @ libcom_mediatek_twoworlds_tv_jni.so
+  (pulled /vendor/lib, exported JNI; strings "Enter JNI_setAdbStatus") → calls a_mtktvapi_* (MTK TV
+  API into the vendor factory service). Not shell-reachable; no factory binder service visible in
+  service list; no su; adb root refused (user+production builds); RECOVERY lane verified: adbd still
+  shell, /system unmounted, SELinux enforcing → dead end.
+- Remote root verdict: NOT reachable without the USB CVT factory-remount (physical) or a CVE.
+- FacRootMenu is hostile: launch kills wifi (setWifiEnabled in dex), power key = full reboot.
