@@ -26,3 +26,5 @@ Explore later (todo-tracked): zuli provider speed, proxmint page caps, CVE resea
   2. `adb shell sm list-disks` → the disk id must NOT be 8,0 (8,0 = internal eMMC).
   3. `adb shell df -h /storage/<VOL>` → mount < 64G (a stick), never 116G.
   4. Only then: file at the FAT32 ROOT, `sync`, cold boot (wall), verify `mount | grep ' / '` rw.
+
+| 13 | **9001 = ATSC 3.0 RMP JSON-RPC (com.vt.interact)** | The 9001/9000/8008 owner = `com.vt.interact` (priv-app Interactive.apk, /system_ext). It speaks **ATSC 3.0 Remote Media Player JSON-RPC over WebSocket**: `{"jsonrpc":"2.0","id":n,"method":"org.atsc.query.deviceInfo","params":{}}` replies with `deviceMake=hisense`, `deviceModel=SmartTV 4K FFM`, `deviceInput` keymap (Arrow/Back/Home/Select + BAAppear barker img/keycode). Method table recovered from `libwsapi.so`; `org.atsc.launchApp` = "appId not found" for arbitrary ids (ATSC app catalog, not tv packages); no key-injection method found in the org.atsc surface. Power/RemoteNow verbs are NOT on this port (earlier `devicecontrol` fuzz = wrong vocabulary). | DONE (discovery); ATSC-parser RCE = open research lane |
