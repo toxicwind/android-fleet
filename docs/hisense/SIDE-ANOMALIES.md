@@ -18,3 +18,11 @@ Every non-task anomaly worth remembering from the overnight run:
 Explore later (todo-tracked): zuli provider speed, proxmint page caps, CVE research lane for MTK-11 if USB never comes, keeper boot-prompt post-reboot verification, StreamProbe parallel runtime.
 
 | 11 | **AI Gateway key rot (Vercel)** | `AI_GATEWAY_API_KEY` (`vck_…`) 401s at ai-gateway.vercel.sh; `~/.bashrc:200-202` wires Copilot to it. Fix: rotate at Vercel AI api-keys (human step) — bashrc reads env automatically; helper: `estate-ops bin/ai-gateway-rotate.sh`. | OPEN (needs dashboard) |
+
+| 12 | **CVT lane mis-armed: `sm format` hit INTERNAL eMMC, not the USB stick** | `disk:8,0` = `/dev/block/sda` = the TV's INTERNAL 116G eMMC (mmcblk0, exported as SCSI). `sm format public:8,1` FORMATTED the internal partition; `touch /storage/7EA6-0BF6/FAC_BOOT_SMART.cvt` wrote to the TV's OWN storage (`df` = 116G). NO USB stick has EVER been visible: `/dev/block` has only mmcblk0 + sda (no sdb/sdc); `/proc/partitions` shows nothing. "cvte-logger never fired" = CORRECT: there was never a stick for it to see. ROOT-APPLY "ARMED 04:13" entry is INVALID — see corrected lane below. | OPEN (need a REAL stick, verified via `ls /dev/block/sd*` + `sm list-disks` BEFORE planting) |
+
+**CVT-lane correction (verified 2026-11-09 04:4x):** the boot-time `cvte-logger.sh` mount-and-check happens in init, BEFORE vold — it mounts the REAL USB stick itself to `/mnt/usb` and looks for `/mnt/usb/FAC_BOOT_SMART.cvt` (root-rollback-effect.md path matches). Validation checklist BEFORE believing a plant:
+  1. `adb shell ls /dev/block/ | grep -E "sd[bc]|sda[0-9]"` → a REAL second device must exist (sdb/sdc).
+  2. `adb shell sm list-disks` → the disk id must NOT be 8,0 (8,0 = internal eMMC).
+  3. `adb shell df -h /storage/<VOL>` → mount < 64G (a stick), never 116G.
+  4. Only then: file at the FAT32 ROOT, `sync`, cold boot (wall), verify `mount | grep ' / '` rw.
