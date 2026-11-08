@@ -1,0 +1,480 @@
+{
+ "ts": "2026-11-08T08:52:07Z",
+ "total": 60,
+ "alive": [
+  {
+   "server": "http://195.128.27.253:2095",
+   "user": "cabtxNjD",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1822836953"
+  },
+  {
+   "server": "http://go.iptvhn.net:25461",
+   "user": "5213",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "2147483647"
+  },
+  {
+   "server": "http://android-iptv.com:80",
+   "user": "NTVBESTDIG",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "2081652487"
+  },
+  {
+   "server": "http://94.130.11.12:8080",
+   "user": "@Tv4Krestream",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1916683500"
+  },
+  {
+   "server": "http://s.rocketdns.info:8080",
+   "user": "protonimumtv",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": null
+  },
+  {
+   "server": "http://xdplayer.tv:8080",
+   "user": "Patricio008Escandor",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1815356805"
+  },
+  {
+   "server": "http://117.55.202.58:8080",
+   "user": "DnWvjUwE5A",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1825523280"
+  },
+  {
+   "server": "http://liontv.es",
+   "user": "DannyBarrantes",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1804359924"
+  },
+  {
+   "server": "http://wsmine.cc:80",
+   "user": "MAGC7LVSWB",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1880492694"
+  },
+  {
+   "server": "http://bumtv.mrak-iptv.com:25461",
+   "user": "ZlAtkO:MKd",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": null
+  },
+  {
+   "server": "http://hardcoremedia.xyz:80",
+   "user": "C8neuwYKes",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1796008610"
+  },
+  {
+   "server": "http://bazaruto.top:8000",
+   "user": "MIREL.SWWW57u5",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": null
+  },
+  {
+   "server": "http://zonacero.lat:8080",
+   "user": "56964319607",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1804203716"
+  },
+  {
+   "server": "http://1tv41.icu:8080",
+   "user": "S09CrA",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1808356149"
+  },
+  {
+   "server": "http://23.153.217.158:8080",
+   "user": "995258355tv",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1800749478"
+  },
+  {
+   "server": "http://velive.lat",
+   "user": "56930808023",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1798828854"
+  },
+  {
+   "server": "http://iptvpremium.ink:55577",
+   "user": "extremo1890",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1800019395"
+  },
+  {
+   "server": "http://playstreaming.net:8080",
+   "user": "guillermoro0607545",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1796943251"
+  },
+  {
+   "server": "http://fortv.cc:8080",
+   "user": "39787893",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1803963600"
+  },
+  {
+   "server": "http://myultratv.com:8080",
+   "user": "50054300",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1796071752"
+  },
+  {
+   "server": "http://kwick.cc:8080",
+   "user": "chandler1",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1795370542"
+  },
+  {
+   "server": "https://reborned.cc:8443",
+   "user": "AndsRmrs",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1794665931"
+  },
+  {
+   "server": "http://xdgo.live:8080",
+   "user": "LuisLambis10x3",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1795388474"
+  },
+  {
+   "server": "http://xdplus.site:2082",
+   "user": "jhonson01",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1796390960"
+  },
+  {
+   "server": "http://cord-cutter.net:8080",
+   "user": "59452816",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1794608543"
+  },
+  {
+   "server": "http://ipc.proipciptv.com:8000",
+   "user": "TalaatM",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1849883813"
+  },
+  {
+   "server": "http://fast-smartplus.xyz:80",
+   "user": "DJPZA1A0W31TUSG",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1840306689"
+  },
+  {
+   "server": "http://vlcdc.org",
+   "user": "FuKRydvAS6",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1828177396"
+  },
+  {
+   "server": "http://mg88gg.cc:80",
+   "user": "62153891CFF6844",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1827201602"
+  },
+  {
+   "server": "http://jarodtv62000.com:8000",
+   "user": "Meslem_laho",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1824850800"
+  },
+  {
+   "server": "http://tvshafak.xyz:8880",
+   "user": "24358407398650",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1824558549"
+  },
+  {
+   "server": "http://1905.cimbomiptv.com:8080",
+   "user": "Ozanbaldiz@pDN",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1824392036"
+  },
+  {
+   "server": "http://xamora.space:80",
+   "user": "MAG7R7DLPR",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1822947968"
+  },
+  {
+   "server": "http://brmcuyrv.kxubv.com",
+   "user": "9738584530",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1822764255"
+  },
+  {
+   "server": "http://magtvplus.xyz",
+   "user": "6303416F4D7A7C9",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1822683651"
+  },
+  {
+   "server": "http://12.dragcdn.win:8080",
+   "user": "01006942890",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1822414680"
+  },
+  {
+   "server": "http://yltvg.com:80",
+   "user": "MAG9Z9WBQE",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1822159154"
+  },
+  {
+   "server": "http://line.conex-tivi.cc:80",
+   "user": "R6GJ59",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1822123058"
+  },
+  {
+   "server": "http://solution62000.mine.nu:8000",
+   "user": "boukhari_alamine",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1821654000"
+  },
+  {
+   "server": "http://stream8k.store:80",
+   "user": "MAGENQ8NZK",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1821372585"
+  },
+  {
+   "server": "http://vca.easy747.com:80",
+   "user": "5C3655721A13121",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1820947999"
+  },
+  {
+   "server": "http://elit64.eu:2086",
+   "user": "serhatgozel-1",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1820938893"
+  },
+  {
+   "server": "http://planet4k.xyz:80",
+   "user": "ynskh24_126942",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1820847642"
+  },
+  {
+   "server": "http://arabitv5.com:8000",
+   "user": "Aya",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1818201600"
+  },
+  {
+   "server": "http://alititv.net:80",
+   "user": "MAG78S9BY1",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1820628161"
+  },
+  {
+   "server": "http://line.mytv-zone.com",
+   "user": "fransuildriks",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1820077296"
+  },
+  {
+   "server": "http://hermosud.lat:80",
+   "user": "MAGSZ95YWE",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1819374791"
+  },
+  {
+   "server": "http://cf.tiger4k.vip",
+   "user": "b216996a3e93",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1818885600"
+  },
+  {
+   "server": "http://99gopro.org",
+   "user": "4692842534155265",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1817835733"
+  },
+  {
+   "server": "http://cdn8k-link.xyz:80",
+   "user": "MAGNXDX2AU",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1817574660"
+  },
+  {
+   "server": "http://www.test123.my:80",
+   "user": "78W135BVPV8NL04",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1817222404"
+  },
+  {
+   "server": "http://megatv5074.com:80",
+   "user": "MAGNHL1VAP",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1816950269"
+  },
+  {
+   "server": "http://deepgdn.com:80",
+   "user": "MAG87EZ4P2",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1816804553"
+  },
+  {
+   "server": "http://goldenfrance.xyz:80",
+   "user": "X4C92GP56Z3TTN8",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1815307492"
+  },
+  {
+   "server": "http://quebecfasttv.vg:80",
+   "user": "M8RXTJQ",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1814853118"
+  },
+  {
+   "server": "http://longsat.xyz",
+   "user": "ahmedbenzekri",
+   "ok": true,
+   "auth": 1,
+   "status": "Active",
+   "exp": "1814823063"
+  }
+ ],
+ "dead": [
+  {
+   "server": "http://kb87.eshofrcep.top:8080",
+   "user": "es9841733861001002",
+   "ok": false,
+   "error": "<urlopen error timed out>"
+  },
+  {
+   "server": "http://esyjfzpw.top:8080",
+   "user": "es6291743877577247",
+   "ok": false,
+   "error": "<urlopen error timed out>"
+  },
+  {
+   "server": "http://ege8k.com:8080",
+   "user": "27TakDayi",
+   "ok": false,
+   "error": "<urlopen error [Errno 113] No route to host>"
+  },
+  {
+   "server": "http://xw5.nhnsqtef.top:8080",
+   "user": "5781755979184886",
+   "ok": false,
+   "error": "<urlopen error timed out>"
+  }
+ ]
+}

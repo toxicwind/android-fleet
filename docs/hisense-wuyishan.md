@@ -444,4 +444,4 @@ sweep of `fleet_portals.csv` (24-way parallel, 6s timeout): 56 auth-verified
 Active, 4 dead (`kb87.eshofrcep.top`, `esyjfzpw.top`, `ege8k.com` no-route,
 `xw5.nhnsqtef.top` — all timeouts/no-route). Dead entries parked in the CSV
 (`#dead-20261108` prefix) so seeders skip them. Full report:
-`fleet-tv/docs/xtream-audit-20261108.md` (exp dates included).
+`docs/evidence/xtream-audit-20261108/xtream-audit.md` (exp dates included).
