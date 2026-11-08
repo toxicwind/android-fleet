@@ -61,3 +61,8 @@ logged with `monadicRollback` event tag, never swallowed.
 - I auto-detect it (`lsblk` poll) and drive the rest.
 - Instructed: this is the authorized root application (explicit); rollback = remove
   stick + power cycle; nothing boot-persistent unless confirmed.
+## Flux route-intel verdict (2026-11-09)
+`forge borrow "hisense android tv root factory cvt otaTest backlight pwm"` raced 3 github
+repos — all NAME-collisions (generic React Native / Java "OTA" apps), zero pattern match
+for the Hisense factory lane. The CVT/remount mechanics are proprietary firmware; the
+correct validation is empirical: plug stick → observe `mount | grep ' / '` rw.
