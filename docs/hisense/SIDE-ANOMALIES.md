@@ -16,3 +16,5 @@ Every non-task anomaly worth remembering from the overnight run:
 | 10 | **/data usage improved** 76% → 68% | measured 2026-11-08 | monitor |
 
 Explore later (todo-tracked): zuli provider speed, proxmint page caps, CVE research lane for MTK-11 if USB never comes, keeper boot-prompt post-reboot verification, StreamProbe parallel runtime.
+
+| 11 | **AI Gateway key rot (Vercel)** | `AI_GATEWAY_API_KEY` (`vck_…`) 401s at ai-gateway.vercel.sh; `~/.bashrc:200-202` wires Copilot to it. Fix: rotate at Vercel AI api-keys (human step) — bashrc reads env automatically; helper: `estate-ops bin/ai-gateway-rotate.sh`. | OPEN (needs dashboard) |
