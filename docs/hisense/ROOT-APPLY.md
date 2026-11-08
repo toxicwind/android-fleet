@@ -61,11 +61,20 @@ logged with `monadicRollback` event tag, never swallowed.
 - I auto-detect it (`lsblk` poll) and drive the rest.
 - Instructed: this is the authorized root application (explicit); rollback = remove
   stick + power cycle; nothing boot-persistent unless confirmed.
-## Flux route-intel verdict (2026-11-09)
-`forge borrow "hisense android tv root factory cvt otaTest backlight pwm"` raced 3 github
-repos — all NAME-collisions (generic React Native / Java "OTA" apps), zero pattern match
-for the Hisense factory lane. The CVT/remount mechanics are proprietary firmware; the
-correct validation is empirical: plug stick → observe `mount | grep ' / '` rw.
+64|## Flux route-intel verdict (2026-11-09)
+65|`forge borrow "hisense android tv root factory cvt otaTest backlight pwm"` raced 3 github
+66|repos — all NAME-collisions (generic React Native / Java "OTA" apps), zero pattern match
+67|for the Hisense factory lane. The CVT/remount mechanics are proprietary firmware; the
+68|correct validation is empirical: plug stick → observe `mount | grep ' / '` rw.
+
+## ARMED 2026-11-09 04:13 (empirical, remote)
+- Previous `vold` state on this stick: `public:8,1 unmountable 1B21-2321` (Android would
+  NOT mount it → could not plant the file). Remote fix (all via adb, no PC):
+  `sm format public:8,1` (accepted disk-style ID, NOT the bare UUID) → `sm mount public:8,1`
+  → volume became `mounted 7EA6-0BF6` → `touch /storage/7EA6-0BF6/FAC_BOOT_SMART.cvt`
+  → `sync` → verified 0 bytes (md5 d41d8cd98f00b204e9800998ecf8427e). **ARMED.**
+- NEXT (user action): TV wall power-cycle with stick in rear USB. Then observe
+  `adb shell "mount | grep ' / '"` → expect rw. Mount TEST ONLY first, per rollback doc.
 
 ## FacRootMenu findings (2026-11-09, LIVE)
 - `com.hisense.uifac.action.FacRootMenu` launches the factory root menu (single activity).
