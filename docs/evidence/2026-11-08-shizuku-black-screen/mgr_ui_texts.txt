@@ -1,0 +1,9 @@
+Shizuku is running
+Version 13.5, adb
+Authorized 0 applications
+Tap to manage authorized apps
+Use Shizuku in terminal apps
+Run commands through Shizuku in terminal apps you like
+Start via Wireless debugging
+Step-by-step guide
+Shizuku

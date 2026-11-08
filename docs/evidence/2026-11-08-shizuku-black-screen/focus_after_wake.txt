@@ -1,0 +1,2 @@
+mCurrentFocus=Window{d4b7845 u0 com.google.android.apps.tv.launcherx/com.google.android.apps.tv.launcherx.coreservices.bootmode.DispatchActivity}
+  mFocusedApp=ActivityRecord{7a6a532 u0 com.google.android.apps.tv.launcherx/.coreservices.bootmode.DispatchActivity t1921}

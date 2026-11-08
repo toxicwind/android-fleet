@@ -1,0 +1,4 @@
+total 12
+drwxr-xr-x 3 system system 4096 2026-11-01 23:24 .
+drwxrwxr-x 4 system system 4096 2026-11-01 23:24 ..
+drwxr-xr-x 2 system system 4096 2026-11-01 23:24 arm

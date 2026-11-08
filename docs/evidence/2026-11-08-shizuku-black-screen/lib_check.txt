@@ -1,0 +1,1 @@
+-rwxr-xr-x 1 system system 11716 1981-01-01 01:01 /data/app/~~l3qd643h-sZwsMmqblU-nA==/moe.shizuku.privileged.api-juDGn1qbzEMsttaFjKY-Nw==/lib/arm/libshizuku.so

@@ -1,0 +1,8 @@
+  mMinimumBrightnessCurve=[(0.0, 0.0), (2000.0, 50.0), (4000.0, 90.0)]
+    mBrightnessState=-1.0
+  BrightnessObserver
+  mPendingRequestLocked=policy=OFF, useProximitySensor=false, screenBrightnessOverride=NaN, useAutoBrightness=false, screenAutoBrightnessAdjustmentOverride=NaN, screenLowPowerBrightnessFactor=1.0, blockScreenOn=false, lowPowerMode=false, boostScreenBrightness=false, dozeScreenBrightness=NaN, dozeScreenState=UNKNOWN
+  mScreenBrightnessDozeConfig=0.0
+  mScreenBrightnessDimConfig=0.05
+  mScreenBrightnessDefault=0.39763778
+  mScreenBrightnessForVrRangeMinimum=0.307087

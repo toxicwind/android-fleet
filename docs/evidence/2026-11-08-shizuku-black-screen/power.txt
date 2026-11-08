@@ -1,0 +1,4 @@
+  mWakefulness=Asleep
+  mWakefulnessChanging=false
+  mHoldingDisplaySuspendBlocker=false
+Display Power: state=OFF

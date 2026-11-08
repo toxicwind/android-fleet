@@ -1,0 +1,17 @@
+11-08 01:21:24.121   447   447 D MTK_KL  : <36>type=1400 audit(1794126084.113:22535): avc: denied { read } for comm="shizuku_server" name="u:object_r:device_config_runtime_native_boot_prop:s0" dev="tmpfs" ino=9330 scontext=u:r:shell:s0 tcontext=u:object_r:device_config_runtime_native_boot_prop:s0 tclass=file permissive=0
+11-08 01:21:24.121   447   447 D MTK_KL  : <36>type=1400 audit(1794126084.113:22536): avc: denied { read } for comm="shizuku_server" name="u:object_r:device_config_runtime_native_boot_prop:s0" dev="tmpfs" ino=9330 scontext=u:r:shell:s0 tcontext=u:object_r:device_config_runtime_native_boot_prop:s0 tclass=file permissive=0
+11-08 01:21:24.121   447   447 D MTK_KL  : <36>type=1400 audit(1794126084.113:22537): avc: denied { read } for comm="shizuku_server" name="u:object_r:device_config_runtime_native_boot_prop:s0" dev="tmpfs" ino=9330 scontext=u:r:shell:s0 tcontext=u:object_r:device_config_runtime_native_boot_prop:s0 tclass=file permissive=0
+11-08 01:21:24.121   447   447 D MTK_KL  : <36>type=1400 audit(1794126084.113:22538): avc: denied { read } for comm="shizuku_server" name="u:object_r:device_config_runtime_native_boot_prop:s0" dev="tmpfs" ino=9330 scontext=u:r:shell:s0 tcontext=u:object_r:device_config_runtime_native_boot_prop:s0 tclass=file permissive=0
+11-08 01:21:24.417 16610 16610 W shizuku_server: JNI RegisterNativeMethods: attempt to register 0 native methods for android.media.AudioAttributes
+11-08 01:21:24.434 16610 16610 D AndroidRuntime: Calling main entry rikka.shizuku.server.ShizukuService
+11-08 01:21:24.502 16610 16610 I ConfigManager: no existing config file /data/user_de/0/com.android.shell/shizuku.json; starting empty
+11-08 01:21:24.642 16610 16610 V Service : Add 0:moe.shizuku.privileged.api to power save temp whitelist for 30s
+11-08 01:21:24.662   814   840 I ActivityManager: Start proc 16626:moe.shizuku.privileged.api/u0a88 for content provider {moe.shizuku.privileged.api/moe.shizuku.manager.ShizukuManagerProvider}
+11-08 01:21:24.705 16610 16624 V Service : Add 0:moe.shizuku.privileged.api to power save temp whitelist for 30s
+11-08 01:21:24.705  6011 16124 I AudioPolicyService: Capy check package moe.shizuku.privileged.api, sdk 36
+11-08 01:21:24.863 16610 16610 I Service : send binder to user app moe.shizuku.privileged.api in user 0
+11-08 01:21:24.867 16610 16610 V Service : Add 10:moe.shizuku.privileged.api to power save temp whitelist for 30s
+11-08 01:21:24.868   814  2456 W ActivityManager: Unable to launch app moe.shizuku.privileged.api/1010088 for provider moe.shizuku.privileged.api.shizuku: user 10 is stopped
+11-08 01:21:24.869 16610 16610 E Service : provider is null moe.shizuku.privileged.api.shizuku 10
+11-08 01:21:24.877 16626 16644 I ShizukuApplication: attachApplication
+11-08 01:21:24.878 16610 16624 I Service : send binder to user app moe.shizuku.privileged.api in user 0

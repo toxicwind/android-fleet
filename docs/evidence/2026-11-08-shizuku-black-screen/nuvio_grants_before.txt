@@ -1,0 +1,8 @@
+android.permission.FOREGROUND_SERVICE: granted=true
+      android.permission.RECEIVE_BOOT_COMPLETED: granted=true
+      com.nuvio.livetv.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: granted=true
+      com.android.providers.tv.permission.READ_EPG_DATA: granted=true
+      android.permission.INTERNET: granted=true
+      com.android.providers.tv.permission.WRITE_EPG_DATA: granted=true
+      android.permission.ACCESS_NETWORK_STATE: granted=true
+      android.permission.ACCESS_WIFI_STATE: granted=true

@@ -1,0 +1,9 @@
+11-03 02:37:47.201  7641  7641 F libc    : Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 7641 (main), pid 7641 (main)
+11-03 02:37:47.251  7656  7656 F DEBUG   : pid: 7641, tid: 7641, name: main  >>> shizuku <<<
+11-03 02:37:47.251  7656  7656 F DEBUG   : Abort message: 'No pending exception expected: java.lang.ClassNotFoundException: moe.shizuku.server.ShizukuServer
+11-03 02:37:57.406  7697  7697 F libc    : Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 7697 (main), pid 7697 (main)
+11-03 02:37:57.454  7712  7712 F DEBUG   : pid: 7697, tid: 7697, name: main  >>> shizuku-server <<<
+11-03 02:37:57.454  7712  7712 F DEBUG   : Abort message: 'No pending exception expected: java.lang.ClassNotFoundException: moe.shizuku.server.ShizukuServer
+11-03 02:38:10.835  7761  7761 F libc    : Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 7761 (main), pid 7761 (main)
+11-03 02:38:10.881  7777  7777 F DEBUG   : pid: 7761, tid: 7761, name: main  >>> shizuku-server <<<
+11-03 02:38:10.881  7777  7777 F DEBUG   : Abort message: 'No pending exception expected: java.lang.ClassNotFoundException: moe.shizuku.server.ShizukuServer

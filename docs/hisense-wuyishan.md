@@ -337,7 +337,9 @@ Procedure (55E8x consumer-verified):
    "software updating" appears. 15–20 min. DO NOT pull power mid-install.
 5. After: factory reset recommended; our recovery adb pass then runs
    (uptime proof, `df -h /data`, fsck check), Shizuku reinstall from the
-   archived APK if wiped (`/tmp/shizuku-release.apk`, v13.6.0 asset —
+   archived APK if wiped
+   (`docs/evidence/2026-11-08-shizuku-black-screen/shizuku-base.apk`,
+   v13.6.0 asset —
    remember `latest/download/shizuku.apk` 404s to a 9-byte body), nuvio.livetv
    rebuild per the KEEP order, portal creds re-entry.
 
@@ -345,5 +347,69 @@ Rollback warning: Hisense does not officially support downgrades; a .PKG
 older than installed firmware may be rejected or risk a hard brick. Prefer
 the newest available .PKG for the exact model.
 
-Shizuku assets on hand: `/tmp/shizuku.apk` + `/tmp/shizuku-release.apk`
-(2.5 MB each, v13.6.0). adb helpers: `~/.local/bin/adb-reset`, `adb-log-cap`.
+Shizuku assets on hand: the TV-installed v13.6.0 APK archived at
+`docs/evidence/2026-11-08-shizuku-black-screen/shizuku-base.apk` (2.5 MB;
+the `/tmp/` copies were volatile scratch and are gone). adb helpers:
+`~/.local/bin/adb-reset`, `adb-log-cap`.
+
+## 2026-11-08 addendum 6 — Shizuku server start contract FIXED; "black screen" was standby
+
+Both open faults closed live this session; evidence:
+`docs/evidence/2026-11-08-shizuku-black-screen/` (tombstone extracts, dex
+byte-scans, probe dumps, checksums in `MANIFEST.md`).
+
+**1. Shizuku server never ran (tombstones 2026-11-03, reproduced 2026-11-08).**
+The documented `app_process / moe.shizuku.server.ShizukuServer` is a v12-era
+entry class: the v13.6 release APK's `classes.dex` contains ZERO
+`moe/shizuku/server` strings, so it SIGABRTs with
+`ClassNotFoundException` even with `CLASSPATH=` set (the env was never the
+bug). Verified against upstream source (clone @ b844bc49,
+`manager/src/main/jni/starter.cpp`): the real entry is
+**`rikka.shizuku.server.ShizukuService`**, launched by the bundled native
+launcher. The ONLY correct start on this TV:
+
+```bash
+APK=$(adb -s 10.0.0.225:5555 shell pm path moe.shizuku.privileged.api | sed s/package://)
+LIB=$(dirname "$APK")/lib/arm/libshizuku.so   # primaryCpuAbi=armeabi-v7a → lib/arm, NOT lib/arm64
+adb -s 10.0.0.225:5555 shell "$LIB --apk=$APK"
+```
+
+The launcher sets CLASSPATH itself, daemonizes (fork+setsid), and allows
+adb uid 2000. Verified: `shizuku_server` alive in `/proc` (shell uid,
+epoll), logcat `Calling main entry rikka.shizuku.server.ShizukuService`
++ `send binder to user app moe.shizuku.privileged.api`, manager UI
+(`am start -n moe.shizuku.privileged.api/moe.shizuku.manager.MainActivity`
+— FULL path; `.MainActivity` alone = Error type 3) renders
+**"Shizuku is running"** in `uiautomator dump`.
+
+**2. TV "black screen" = display asleep, not a fault.** `dumpsys power`:
+`mWakefulness=Asleep`, `Display Power: state=OFF`. `KEYCODE_WAKEUP` +
+`KEYCODE_HOME` wakes it. A screencap taken ~1 s after wake is a UNIFORM
+near-black surface (1 unique color at RGB(14,14,15)) — that is the blank
+surface, not a dead panel; seconds later the launcher renders normally
+(29,302 unique colors). Headless rule: never call "black" off a single
+early screencap; use `uiautomator dump` texts + a second late capture.
+
+**3. Grants ground truth (correction).** nuvio `com.nuvio.livetv` does NOT
+declare `WRITE_SECURE_SETTINGS`/`WRITE_SETTINGS` in its manifest — `pm grant`
+throws SecurityException("has not requested permission"); those grants are
+impossible for this app (earlier claim aspirational — dead). What works:
+`appops set com.nuvio.livetv SYSTEM_ALERT_WINDOW allow` (applied 2026-11-08,
+persists). Shizuku = ongoing shell-uid API surface (rish / Shizuku-API apps),
+not a one-shot grant tool.
+
+**4. Persistence: supervised keeper daemon (permanent).** The server dies at
+every TV reboot (locked build; manager BootCompleteReceiver can't exec
+app_process as shell). New daemon `estate/hisense-shizuku-keeper`
+(`src/hisense-shizuku-keeper.ts` + `test/`, TDD 15 unit + 4 live green):
+event-driven — blocks on `ip monitor neigh` netlink (NOTE: object is
+`neigh`, NOT `neighbor`) and re-runs the one-liner the moment the TV turns
+REACHABLE after a boot; NO sleep-polling loops. Registered in the estate
+monolith `pitchfork.toml`.
+
+**5. Fresh liveness (2026-11-08):** uptime ~4.96 d, `/data` (dm-15) 3.9G/6.0G
+**68%** — off the 76% danger zone of the 2026-11-03 boot-stall incident.
+Observed: TCP 5555 OPEN while 36669 (RemoteNow MQTT) CLOSED on a healthy
+4.9-day-uptime box — the broker can be down independently of the TV's
+health; keep the two-probe ladder (36669 then 5555) and treat 5555 as the
+authoritative signal.

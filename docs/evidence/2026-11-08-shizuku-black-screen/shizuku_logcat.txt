@@ -1,0 +1,20 @@
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655]   native: #06 pc 0000d2b3  /system/lib/libbase.so (android::base::LogMessage::~LogMessage()+222)
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655]   native: #07 pc 004442c5  /apex/com.android.art/lib/libart.so (art::Thread::AssertNoPendingException() const+1284)
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655]   native: #08 pc 0014a19b  /apex/com.android.art/lib/libart.so (art::ClassLinker::FindClass(art::Thread*, char const*, art::Handle<art::mirror::ClassLoader>)+30)
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655]   native: #09 pc 0029dc31  /apex/com.android.art/lib/libart.so (art::JNI<false>::FindClass(_JNIEnv*, char const*)+744)
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655]   native: #10 pc 00002d29  /apex/com.android.art/lib/libnativehelper.so (jniRegisterNativeMethods+20)
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655]   native: #11 pc 00068ead  /system/lib/libandroid_runtime.so (android::register_com_android_internal_os_RuntimeInit(_JNIEnv*)+44)
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655]   native: #12 pc 0006c719  /system/lib/libandroid_runtime.so (android::AndroidRuntime::startReg(_JNIEnv*)+44)
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655]   native: #13 pc 0006c4c9  /system/lib/libandroid_runtime.so (android::AndroidRuntime::start(char const*, android::Vector<android::String8> const&, bool)+400)
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655]   native: #14 pc 00002e31  /system/bin/app_process32 (main+980)
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655]   native: #15 pc 00032ce9  /apex/com.android.runtime/lib/bionic/libc.so (__libc_init+68)
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655]   (no managed stack frames)
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655] Pending exception java.lang.ClassNotFoundException: moe.shizuku.server.ShizukuServer
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655] (Throwable with empty stack trace)
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:655] 
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:663] No pending exception expected: java.lang.ClassNotFoundException: moe.shizuku.server.ShizukuServer
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:663] (Throwable with empty stack trace)
+11-08 01:16:45.908 16089 16089 F app_process: runtime.cc:663] 
+11-08 01:16:45.965 16113 16113 F DEBUG   : pid: 16089, tid: 16089, name: main  >>> app_process <<<
+11-08 01:16:45.965 16113 16113 F DEBUG   : Abort message: 'No pending exception expected: java.lang.ClassNotFoundException: moe.shizuku.server.ShizukuServer
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #11 pc 00002e31  /system/bin/app_process32 (main+980) (BuildId: af1999eecb70706a89378da0b97e9e38)

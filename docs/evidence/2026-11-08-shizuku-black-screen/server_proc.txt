@@ -1,0 +1,2 @@
+shell         16610      1 1523008  81164 do_epoll_wait       0 S shizuku_server
+u0_a88        16626    332 1219512  57948 0                   0 S moe.shizuku.privileged.api

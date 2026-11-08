@@ -1,0 +1,1 @@
+Starting: Intent { cmp=moe.shizuku.privileged.api/moe.shizuku.manager.MainActivity }

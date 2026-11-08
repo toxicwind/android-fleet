@@ -1,0 +1,4 @@
+    versionCode=1086 minSdk=24 targetSdk=36
+    versionName=13.6.0.r1086.2650830c
+    firstInstallTime=2026-10-31 00:20:17
+    lastUpdateTime=2026-11-01 23:24:16

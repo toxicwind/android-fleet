@@ -1,0 +1,1 @@
+mCurrentFocus=Window{43df2f8 u0 moe.shizuku.privileged.api/moe.shizuku.manager.MainActivity}

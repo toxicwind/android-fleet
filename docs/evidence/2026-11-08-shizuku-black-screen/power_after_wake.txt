@@ -1,0 +1,3 @@
+mWakefulness=Awake
+Display Power: state=ON
+  mState=1

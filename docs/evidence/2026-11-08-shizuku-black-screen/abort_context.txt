@@ -1,0 +1,45 @@
+11-06 11:37:27.791   814   839 I chatty  : uid=1000(system) ActivityManager expire 4 lines
+11-06 11:37:27.807   814  1840 I chatty  : uid=1000(system) Binder:814_C expire 6 lines
+11-06 11:37:27.966   814  2319 I chatty  : uid=1000(system) Binder:814_14 expire 4 lines
+11-06 11:37:28.061   814  1842 I chatty  : uid=1000(system) Binder:814_D expire 4 lines
+11-06 11:37:28.165   814   828 I chatty  : uid=1000(system) Binder:814_2 expire 1 line
+11-06 11:37:28.687   814  2630 I chatty  : uid=1000(system) Binder:814_21 expire 6 lines
+11-06 11:37:28.941   814  2370 I chatty  : uid=1000(system) Binder:814_15 expire 7 lines
+11-06 11:37:29.697   814   827 I chatty  : uid=1000(system) Binder:814_1 expire 2 lines
+11-06 11:37:29.784   814  2199 I chatty  : uid=1000(system) Binder:814_10 expire 2 lines
+11-06 11:37:29.949   814   840 I chatty  : uid=1000(system) ActivityManager expire 34 lines
+11-06 11:37:30.577   814  1846 I chatty  : uid=1000(system) Binder:814_E expire 8 lines
+11-06 11:37:31.554   814  2438 I chatty  : uid=1000(system) Binder:814_16 expire 1 line
+11-06 11:37:31.555   814  1062 I chatty  : uid=1000(system) ConnectivitySer expire 4 lines
+11-06 11:37:32.043   814  1291 I chatty  : uid=1000(system) Binder:814_6 expire 5 lines
+11-06 11:37:33.805   814  2460 I chatty  : uid=1000(system) Binder:814_1F expire 3 lines
+--
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #04 pc 004442c5  /apex/com.android.art/lib/libart.so (art::Thread::AssertNoPendingException() const+1284) (BuildId: 88c44a45aa550d0e6710a7dc79e14f3e)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #05 pc 0014a19b  /apex/com.android.art/lib/libart.so (art::ClassLinker::FindClass(art::Thread*, char const*, art::Handle<art::mirror::ClassLoader>)+30) (BuildId: 88c44a45aa550d0e6710a7dc79e14f3e)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #06 pc 0029dc31  /apex/com.android.art/lib/libart.so (art::JNI<false>::FindClass(_JNIEnv*, char const*)+744) (BuildId: 88c44a45aa550d0e6710a7dc79e14f3e)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #07 pc 00002d29  /apex/com.android.art/lib/libnativehelper.so (jniRegisterNativeMethods+20) (BuildId: 8025ce7977bcf0cbfa9a422d7eaeb691)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #08 pc 00068ead  /system/lib/libandroid_runtime.so (android::register_com_android_internal_os_RuntimeInit(_JNIEnv*)+44) (BuildId: 2e1591250118926905da2dc2cd15ed69)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #09 pc 0006c719  /system/lib/libandroid_runtime.so (android::AndroidRuntime::startReg(_JNIEnv*)+44) (BuildId: 2e1591250118926905da2dc2cd15ed69)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #10 pc 0006c4c9  /system/lib/libandroid_runtime.so (android::AndroidRuntime::start(char const*, android::Vector<android::String8> const&, bool)+400) (BuildId: 2e1591250118926905da2dc2cd15ed69)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #11 pc 00002e31  /system/bin/app_process32 (main+980) (BuildId: af1999eecb70706a89378da0b97e9e38)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #12 pc 00032ce9  /apex/com.android.runtime/lib/bionic/libc.so (__libc_init+68) (BuildId: 3a8338e8754f893d664ac79895d43a14)
+11-08 01:16:46.114   508 16078 I chatty  : uid=2000(shell) /apex/com.android.adbd/bin/adbd expire 2 lines
+11-08 01:16:46.114   508   508 I chatty  : uid=2000(shell) /apex/com.android.adbd/bin/adbd expire 3 lines
+11-08 01:16:46.147   814  1154 W NativeCrashListener: Couldn't find ProcessRecord for pid 16089
+11-08 01:16:46.149   302   302 E tombstoned: Tombstone written to: /data/tombstones/tombstone_14
+11-08 01:16:46.155   814   846 I BootReceiver: Copying /data/tombstones/tombstone_14 to DropBox (SYSTEM_TOMBSTONE)
+11-08 01:16:46.156   814   846 I DropBoxManagerService: add tag=SYSTEM_TOMBSTONE isTagEnabled=true flags=0x2
+11-08 01:16:46.162   508   521 I chatty  : uid=2000(shell) usb ffs open expire 2 lines
+11-08 01:16:46.165   508 16116 I chatty  : uid=2000(shell) /apex/com.android.adbd/bin/adbd expire 3 lines
+11-08 01:16:46.167   447   447 D MTK_KL  : <6>read descriptors
+11-08 01:16:46.167   447   447 D MTK_KL  : <6>read strings
+11-08 01:16:46.191   447   447 D MTK_KL  : <6>[wlan][646]heRlmRecHeMcsMap:(RLM WARN) Change HeRxMcsMapBW80 from 0xffaa to 0xfffa
+11-08 01:16:46.194   814   839 W BroadcastQueue: Background execution not allowed: receiving Intent { act=android.intent.action.DROPBOX_ENTRY_ADDED flg=0x10 (has extras) } to com.google.android.gms/.stats.service.DropBoxEntryAddedReceiver
+11-08 01:16:46.228   814  2453 I AlarmManager: Change Wakeup Alarm type to non Wakeup type, current type=[3] packageName = com.google.android.gmsstatsTag = *alarm*:com.google.android.chimera.container.IntentOperationService.SAVED_INTENT @315787647279 and next wakeup alarm is @Sun Nov 08 02:29:18 MST 2026
+11-08 01:16:46.277   814   823 I system_server: Background young concurrent copying GC freed 309191(12MB) AllocSpace objects, 52(3244KB) LOS objects, 36% free, 25MB/40MB, paused 523us total 124.055ms
+11-08 01:16:46.283   814   825 W System  : A resource failed to call release. 
+11-08 01:16:46.283   814   825 I chatty  : uid=1000(system) FinalizerDaemon identical 1 line
+11-08 01:16:46.283   814   825 W System  : A resource failed to call release. 
+11-08 01:16:46.302  6435  6435 D BoundBrokerSvc: onRebind: Intent { act=com.google.android.gms.libs.gmscorelogger.service.START dat=chimera-action: cmp=com.google.android.gms/.chimera.PersistentDirectBootAwareApiService }
+11-08 01:16:46.338  6435  6435 W ThreadPoolForeg: type=1400 audit(0.0:22515): avc: denied { write } for name="traced_producer" dev="tmpfs" ino=15162 scontext=u:r:gmscore_app:s0:c512,c768 tcontext=u:object_r:traced_producer_socket:s0 tclass=sock_file permissive=0 app=com.google.android.gms
+11-08 01:16:46.347   447   447 D MTK_KL  : <36>type=1400 audit(1794125806.338:22515): avc: denied { write } for comm="ThreadPoolForeg" name="traced_producer" dev="tmpfs" ino=15162 scontext=u:r:gmscore_app:s0:c512,c768 tcontext=u:object_r:traced_producer_socket:s0 tclass=sock_file permissive=0 app=com.google.android.gms

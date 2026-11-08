@@ -1,0 +1,3 @@
+u0_a45         2052    332 1329772 124760 0                   0 S com.google.android.apps.tv.launcherx:coreservices
+u0_a45         2120    332 1468480 154748 0                   0 S com.google.android.apps.tv.launcherx
+system         2865    332 1229780  30724 0                   0 S com.hisense.tv.customerlauncher

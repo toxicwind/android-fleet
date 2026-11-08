@@ -1,0 +1,15 @@
+11-08 01:16:45.965 16113 16113 F DEBUG   :     ip  00003ed9  sp  ff8c2698  lr  ee58e40d  pc  ee58e420
+11-08 01:16:45.995 16113 16113 F DEBUG   : backtrace:
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #00 pc 00038420  /apex/com.android.runtime/lib/bionic/libc.so (abort+172) (BuildId: 3a8338e8754f893d664ac79895d43a14)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #01 pc 003fe67d  /apex/com.android.art/lib/libart.so (art::Runtime::Abort(char const*)+1768) (BuildId: 88c44a45aa550d0e6710a7dc79e14f3e)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #02 pc 0000d97f  /system/lib/libbase.so (android::base::SetAborter(std::__1::function<void (char const*)>&&)::$_3::__invoke(char const*)+46) (BuildId: 318c42b0831dece1bd9c50899b8e082b)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #03 pc 0000d2b3  /system/lib/libbase.so (android::base::LogMessage::~LogMessage()+222) (BuildId: 318c42b0831dece1bd9c50899b8e082b)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #04 pc 004442c5  /apex/com.android.art/lib/libart.so (art::Thread::AssertNoPendingException() const+1284) (BuildId: 88c44a45aa550d0e6710a7dc79e14f3e)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #05 pc 0014a19b  /apex/com.android.art/lib/libart.so (art::ClassLinker::FindClass(art::Thread*, char const*, art::Handle<art::mirror::ClassLoader>)+30) (BuildId: 88c44a45aa550d0e6710a7dc79e14f3e)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #06 pc 0029dc31  /apex/com.android.art/lib/libart.so (art::JNI<false>::FindClass(_JNIEnv*, char const*)+744) (BuildId: 88c44a45aa550d0e6710a7dc79e14f3e)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #07 pc 00002d29  /apex/com.android.art/lib/libnativehelper.so (jniRegisterNativeMethods+20) (BuildId: 8025ce7977bcf0cbfa9a422d7eaeb691)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #08 pc 00068ead  /system/lib/libandroid_runtime.so (android::register_com_android_internal_os_RuntimeInit(_JNIEnv*)+44) (BuildId: 2e1591250118926905da2dc2cd15ed69)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #09 pc 0006c719  /system/lib/libandroid_runtime.so (android::AndroidRuntime::startReg(_JNIEnv*)+44) (BuildId: 2e1591250118926905da2dc2cd15ed69)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #10 pc 0006c4c9  /system/lib/libandroid_runtime.so (android::AndroidRuntime::start(char const*, android::Vector<android::String8> const&, bool)+400) (BuildId: 2e1591250118926905da2dc2cd15ed69)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #11 pc 00002e31  /system/bin/app_process32 (main+980) (BuildId: af1999eecb70706a89378da0b97e9e38)
+11-08 01:16:45.995 16113 16113 F DEBUG   :       #12 pc 00032ce9  /apex/com.android.runtime/lib/bionic/libc.so (__libc_init+68) (BuildId: 3a8338e8754f893d664ac79895d43a14)

@@ -1,0 +1,3 @@
+Starting: Intent { cmp=moe.shizuku.privileged.api/.MainActivity }
+Error type 3
+Error: Activity class {moe.shizuku.privileged.api/moe.shizuku.privileged.api.MainActivity} does not exist.

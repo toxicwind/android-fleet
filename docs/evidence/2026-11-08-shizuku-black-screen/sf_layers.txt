@@ -1,0 +1,30 @@
+Root#0
+mWindowContainers#0
+DisplayArea.Root#0
+Leaf:0:1#0
+WallpaperWindowToken{66abd06 token=android.os.Binder@d6ebbe1}#0
+c6f37bc com.android.systemui.ImageWallpaper#0
+com.android.systemui.ImageWallpaper#0
+Leaf:2:2#0
+DefaultTaskDisplayArea#0
+Task=1#0
+Task=1905#0
+57ee27d ActivityRecordInputSink com.google.android.apps.tv.launcherx/.home.HomeActivity#0
+ActivityRecord{9b6b572 u0 com.google.android.apps.tv.launcherx/.home.HomeActivity#0
+f44ad8d com.google.android.apps.tv.launcherx/com.google.android.apps.tv.launcherx.home.HomeActivity#0
+Background for -SurfaceView - com.google.android.apps.tv.launcherx/com.google.android.apps.tv.launcherx.home.HomeActivity#0
+SurfaceView - com.google.android.apps.tv.launcherx/com.google.android.apps.tv.launcherx.home.HomeActivity#0
+com.google.android.apps.tv.launcherx/com.google.android.apps.tv.launcherx.home.HomeActivity#0
+Bounds for - com.google.android.apps.tv.launcherx/com.google.android.apps.tv.launcherx.home.HomeActivity#0
+ImeContainer#0
+WindowToken{6ca231a android.os.Binder@23a5dc5}#0
+Surface(name=4e1d5b5 InputMethod)/@0x5959fbb - animation-leash#0
+4e1d5b5 InputMethod#0
+homeAnimationLayer#0
+splitScreenDividerAnchor#0
+animationLayer#0
+Task=1913#0
+6e9ab30 ActivityRecordInputSink wizard.red.the/org.xbmc.kodi.Main#0
+ActivityRecord{ac6b3a9 u0 wizard.red.the/org.xbmc.kodi.Main#0
+boostedAnimationLayer#0
+Leaf:3:14#0

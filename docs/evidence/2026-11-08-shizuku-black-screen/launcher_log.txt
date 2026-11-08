@@ -1,0 +1,12 @@
+11-08 01:16:02.286   814  1842 I Tethering: rena  getTetheringforMiracast:com.google.android.apps.tv.launcherx hasListPermission true
+11-08 01:16:08.883   814  2370 I WindowManager: getTopActivity: topActivityPackage com.google.android.apps.tv.launcherx
+11-08 01:16:08.883   814  2370 D WindowManager: topActivitycom.google.android.apps.tv.launcherx
+11-08 01:16:08.887   814  1046 I WindowManager: getTopActivity: topActivityPackage com.google.android.apps.tv.launcherx
+11-08 01:16:08.887   814  1046 I WindowManager: getTopActivity: topActivityPackage com.google.android.apps.tv.launcherx
+11-08 01:16:08.887   814  1046 D WindowManager: topActivity : com.google.android.apps.tv.launcherx ; inKidsApp = false
+11-08 01:16:08.889   814  2370 I WindowManager: getTopActivity: topActivityPackage com.google.android.apps.tv.launcherx
+11-08 01:16:08.889   814  2370 D WindowManager: topActivitycom.google.android.apps.tv.launcherx
+11-08 01:16:08.890   814  1046 I WindowManager: getTopActivity: topActivityPackage com.google.android.apps.tv.launcherx
+11-08 01:16:08.901   814   830 I ActivityTaskManager: START u0 {act=android.intent.action.MAIN cat=[android.intent.category.HOME] flg=0x10000100 cmp=com.google.android.apps.tv.launcherx/.home.HomeActivity (has extras)} from uid 0
+11-08 01:16:08.903  1990  3342 D ActivityStateManager: activityStarting:com.google.android.apps.tv.launcherx/com.google.android.apps.tv.launcherx.home.HomeActivity
+11-08 01:16:08.906   814   832 D BootInterface: set  Swappiness 60,  r:com.google.android.apps.tv.launcherx

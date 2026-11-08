@@ -1,0 +1,6 @@
+11-08 01:17:20.588 16222 16222 F DEBUG   :       #07 pc 00002d29  /apex/com.android.art/lib/libnativehelper.so (jniRegisterNativeMethods+20) (BuildId: 8025ce7977bcf0cbfa9a422d7eaeb691)
+11-08 01:17:20.588 16222 16222 F DEBUG   :       #08 pc 00068ead  /system/lib/libandroid_runtime.so (android::register_com_android_internal_os_RuntimeInit(_JNIEnv*)+44) (BuildId: 2e1591250118926905da2dc2cd15ed69)
+11-08 01:17:20.588 16222 16222 F DEBUG   :       #09 pc 0006c719  /system/lib/libandroid_runtime.so (android::AndroidRuntime::startReg(_JNIEnv*)+44) (BuildId: 2e1591250118926905da2dc2cd15ed69)
+11-08 01:17:20.588 16222 16222 F DEBUG   :       #10 pc 0006c4c9  /system/lib/libandroid_runtime.so (android::AndroidRuntime::start(char const*, android::Vector<android::String8> const&, bool)+400) (BuildId: 2e1591250118926905da2dc2cd15ed69)
+11-08 01:17:20.588 16222 16222 F DEBUG   :       #11 pc 00002e31  /system/bin/app_process32 (main+980) (BuildId: af1999eecb70706a89378da0b97e9e38)
+11-08 01:17:20.588 16222 16222 F DEBUG   :       #12 pc 00032ce9  /apex/com.android.runtime/lib/bionic/libc.so (__libc_init+68) (BuildId: 3a8338e8754f893d664ac79895d43a14)
