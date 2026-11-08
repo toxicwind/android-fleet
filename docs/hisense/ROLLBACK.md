@@ -31,3 +31,8 @@ forced state that can't be undon. Checkpoints before risky steps.
 2. `dumpsys power` — expected wakefulness.
 3. `pitiful` — no; `pitchfork status estate/hisense-shizuku-keeper` — running.
 4. If nuvio misbehaves: `am force-stop` + relaunch; worst case `install -r` same APK.
+## Monadic framing (2026-11-09)
+Every risky step in ROOT-APPLY.md is a monadic effect: on failure, the LIFO
+inverse chain runs as its own Results (rollback effects NEVER swallow errors,
+tag `monadicRollback`). Rollback is itself Testable: after any failure the
+checkpoint state (tvCheckpoint in this file) must reproduce.
