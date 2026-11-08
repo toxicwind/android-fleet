@@ -2,3 +2,6 @@
 # vendored fork clones are peers — never track their .git
 vendored/
 fleet-tv/
+
+# hisense local RE artifacts (heavy, not committed)
+docs/hisense/archive/
