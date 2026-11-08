@@ -44,14 +44,14 @@
 - RMP: `http://10.0.0.225:9001` (WS JSON-RPC) | SDAP-like 9001 426/101
 - Configs: `sm list-volumes` = only internal `public:8,1 mounted 7EA6-0BF6` (INTERNAL — see anomaly #12)
 
-## Archive map (box-side, LOCAL ONLY — gitignored, not committed)
+## Archive map (box-side, LOCAL — estate archive; gitignored at estate level)
 | path | contents |
 |---|---|
-| `/home/toxic/tmp/hisense-apks/` | pulled APKs: SmartsenseService, USBOTA, OTA, SyncPlayServer(udpserver), Interactive(vt.interact 20MB), uifac 27MB |
-| `docs/hisense/archive/apks/` | pulled APKs (moved out of /tmp 2026-11-09; gitignored) |
-| `docs/hisense/archive/re/` | jadx trees: `re-uif` (uifac/serialInfoTest), `re-smart`, `re-sync` |
-| `docs/hisense/archive/libs/` | Interactive.apk native libs (libwsapi/libinteract_jni/libatscws/libmwipc) |
-| `docs/hisense/archive/corpora/` | dex string-pool corpus dumps + classes.dex |
+| `/home/toxic/pens/estate/archive/2026-11-09-toxic-hisense-re/archive/apks/` | pulled APKs (moved off /tmp 2026-11-09; estate-ignored) |
+| `…/archive/re/` | jadx trees: `re-uif` (uifac/serialInfoTest), `re-smart`, `re-sync` |
+| `…/archive/libs/` | Interactive.apk native libs (libwsapi/libinteract_jni/libatscws/libmwipc) |
+| `…/archive/corpora/` | dex string-pool corpus dumps + classes.dex |
+| `…/archive/evidence/` | earlier session UI dumps/logs/screenshots |
 | `recon/rmp-deviceinfo.json` | live deviceInfo capture (TRACKED) |
 
 ## How to resume (5 min)
