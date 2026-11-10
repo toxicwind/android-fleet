@@ -1,0 +1,36 @@
+package com.mediatek.twoworlds.tv;
+
+import android.util.Log;
+import b.a.a.a.a;
+import com.mediatek.twoworlds.tv.model.MtkTvEASParaBase;
+
+/* JADX INFO: loaded from: classes2.dex */
+public class MtkTvEASBase {
+    public static final String TAG = "MtkTvEAS";
+
+    public MtkTvEASBase() {
+        Log.d(TAG, "MtkTvEASBase object created");
+    }
+
+    public boolean EASGetAndroidLaunchStatus() {
+        Log.d(TAG, "EASGetAndroidLaunchStatus");
+        boolean eASAndroidLaunchStatus_native = TVNativeWrapper.getEASAndroidLaunchStatus_native();
+        Log.d(TAG, "EASGetAndroidLaunchStatus " + eASAndroidLaunchStatus_native);
+        Log.d(TAG, "Leave EASGetAndroidLaunchStatus.");
+        return eASAndroidLaunchStatus_native;
+    }
+
+    public int EASSetAndroidLaunchStatus(boolean z) {
+        Log.d(TAG, "EASSetAndroidLaunchStatus=" + z);
+        return TVNativeWrapper.setEASAndroidLaunchStatus_native(z);
+    }
+
+    public int getEASCurrentStatus(MtkTvEASParaBase mtkTvEASParaBase) {
+        Log.d(TAG, "Enter getEASCurrentStatus Here.\n");
+        int eASCurrentStatus_native = TVNativeWrapper.getEASCurrentStatus_native(mtkTvEASParaBase);
+        if (eASCurrentStatus_native != 0) {
+            a.b("TVNativeWrapper.getEASCurrentStatus_native failed! return ", eASCurrentStatus_native, ".\n", TAG);
+        }
+        return eASCurrentStatus_native;
+    }
+}

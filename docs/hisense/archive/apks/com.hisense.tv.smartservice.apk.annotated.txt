@@ -1,0 +1,75 @@
+# com.hisense.tv.smartservice.apk — annotation (regenerated 2026-11-09, deps: aapt/apktool/jadx/dexwalk)
+## badging (aapt)
+package: name='com.hisense.tv.smartservice' versionCode='100000090' versionName='1.00.00.009.0' platformBuildVersionName='12' platformBuildVersionCode='31' compileSdkVersion='31' compileSdkVersionCodename='12'
+sdkVersion:'26'
+targetSdkVersion:'30'
+uses-permission: name='android.permission.FOREGROUND_SERVICE'
+uses-permission: name='android.permission.KILL_BACKGROUND_PROCESSES'
+uses-permission: name='android.permission.WRITE_EXTERNAL_STORAGE'
+uses-permission: name='android.permission.READ_EXTERNAL_STORAGE'
+uses-permission: name='android.permission.INTERNET'
+uses-permission: name='android.permission.ACCESS_NETWORK_STATE'
+uses-permission: name='android.permission.ACCESS_WIFI_STATE'
+uses-permission: name='android.permission.WAKE_LOCK'
+uses-permission: name='android.permission.READ_PHONE_STATE'
+uses-permission: name='com.hisense.tv.permission.ACTIVITY_STATE'
+uses-permission: name='com.hisense.tv.smartsense.permission.ACCESS_DOMAIN'
+uses-permission: name='android.permission.RECEIVE_BOOT_COMPLETED'
+uses-permission: name='com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE'
+uses-permission: name='com.google.android.gms.permission.AD_ID'
+application-label:'SmartsenseService'
+application-label-af:'SmartsenseService'
+application-label-am:'SmartsenseService'
+application-label-ar:'SmartsenseService'
+application-label-as:'SmartsenseService'
+application-label-az:'SmartsenseService'
+application-label-be:'SmartsenseService'
+application-label-bg:'SmartsenseService'
+application-label-bn:'SmartsenseService'
+application-label-bs:'SmartsenseService'
+application-label-ca:'SmartsenseService'
+application-label-cs:'SmartsenseService'
+application-label-da:'SmartsenseService'
+## exported manifest surface (apktool)
+(manifest decode failed)
+## jadx tree key classes
+_a
+a
+A
+Aa
+Ab
+Absent
+AbsHostReplaceInterceptor
+AbsInterceptor
+AbsSavedState
+AbstractBaseGraph
+AbstractBiMap
+AbstractByteHasher
+AbstractC0087a
+AbstractC0089ab
+AbstractC0094bb
+AbstractC0097c
+AbstractC0102d
+AbstractC0112f
+AbstractC0117g
+AbstractC0171qd
+AbstractC0173rb
+AbstractC0193vb
+AbstractC0213c
+AbstractC0218e
+AbstractC0222g
+AbstractC0224h
+AbstractC0225i
+AbstractC0226j
+AbstractC0230n
+AbstractCache
+AbstractCallback
+AbstractCatchingFuture
+AbstractComponentContainer
+AbstractCompositeHashFunction
+AbstractDataBuffer
+AbstractDirectedNetworkConnections
+AbstractExecutionThreadService
+AbstractFuture
+AbstractGraph
+AbstractGraphBuilder

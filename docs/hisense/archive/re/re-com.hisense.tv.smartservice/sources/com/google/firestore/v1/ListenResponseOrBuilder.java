@@ -1,0 +1,28 @@
+package com.google.firestore.v1;
+
+import com.google.protobuf.MessageLiteOrBuilder;
+
+/* JADX INFO: loaded from: classes.dex */
+public interface ListenResponseOrBuilder extends MessageLiteOrBuilder {
+    DocumentChange getDocumentChange();
+
+    DocumentDelete getDocumentDelete();
+
+    DocumentRemove getDocumentRemove();
+
+    ExistenceFilter getFilter();
+
+    ListenResponse.ResponseTypeCase getResponseTypeCase();
+
+    TargetChange getTargetChange();
+
+    boolean hasDocumentChange();
+
+    boolean hasDocumentDelete();
+
+    boolean hasDocumentRemove();
+
+    boolean hasFilter();
+
+    boolean hasTargetChange();
+}

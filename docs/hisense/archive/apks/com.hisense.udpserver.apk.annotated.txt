@@ -1,0 +1,75 @@
+# com.hisense.udpserver.apk — annotation (regenerated 2026-11-09, deps: aapt/apktool/jadx/dexwalk)
+## badging (aapt)
+package: name='com.hisense.udpserver' versionCode='1' versionName='1.0' platformBuildVersionName='10' platformBuildVersionCode='29' compileSdkVersion='29' compileSdkVersionCodename='10'
+sdkVersion:'26'
+targetSdkVersion:'29'
+uses-permission: name='com.hisense.syncplay.permission'
+uses-permission: name='android.permission.INTERNET'
+uses-permission: name='android.permission.ACCESS_NETWORK_STATE'
+application-label:'SyncPlayServer'
+application-label-af:'SyncPlayServer'
+application-label-am:'SyncPlayServer'
+application-label-ar:'SyncPlayServer'
+application-label-as:'SyncPlayServer'
+application-label-az:'SyncPlayServer'
+application-label-be:'SyncPlayServer'
+application-label-bg:'SyncPlayServer'
+application-label-bn:'SyncPlayServer'
+application-label-bs:'SyncPlayServer'
+application-label-ca:'SyncPlayServer'
+application-label-cs:'SyncPlayServer'
+application-label-da:'SyncPlayServer'
+application-label-de:'SyncPlayServer'
+application-label-el:'SyncPlayServer'
+application-label-en-AU:'SyncPlayServer'
+application-label-en-CA:'SyncPlayServer'
+application-label-en-GB:'SyncPlayServer'
+application-label-en-IN:'SyncPlayServer'
+application-label-en-XC:'SyncPlayServer'
+application-label-es:'SyncPlayServer'
+application-label-es-US:'SyncPlayServer'
+application-label-et:'SyncPlayServer'
+application-label-eu:'SyncPlayServer'
+## exported manifest surface (apktool)
+(manifest decode failed)
+## jadx tree key classes
+a
+AbsActionBarView
+AbsSavedState
+AccessibilityClickableSpanCompat
+AccessibilityDelegateCompat
+AccessibilityEventCompat
+AccessibilityManagerCompat
+AccessibilityNodeInfoCompat
+AccessibilityNodeProviderCompat
+AccessibilityRecordCompat
+AccessibilityServiceInfoCompat
+AccessibilityViewCommand
+AccessibilityWindowInfoCompat
+ActionBar
+ActionBarBackgroundDrawable
+ActionBarContainer
+ActionBarContextView
+ActionBarDrawerToggle
+ActionBarDrawerToggleHoneycomb
+ActionBarOverlayLayout
+ActionBarPolicy
+ActionMenuItem
+ActionMenuItemView
+ActionMenuPresenter
+ActionMenuView
+ActionMode
+ActionProvider
+ActivityChooserModel
+ActivityChooserView
+ActivityCompat
+ActivityInfoCompat
+ActivityManagerCompat
+ActivityOptionsCompat
+ActivityRecreator
+AIDLUdpScanService
+AlarmManagerCompat
+AlertController
+AlertDialog
+AlertDialogLayout
+AllCapsTransformationMethod

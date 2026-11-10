@@ -1,0 +1,56 @@
+package androidx.mediarouter;
+
+/* JADX INFO: loaded from: classes.dex */
+public final class R$id {
+    public static final int mr_art = 2131296743;
+    public static final int mr_cast_checkbox = 2131296744;
+    public static final int mr_cast_close_button = 2131296745;
+    public static final int mr_cast_group_icon = 2131296747;
+    public static final int mr_cast_group_name = 2131296748;
+    public static final int mr_cast_group_progress_bar = 2131296749;
+    public static final int mr_cast_header_name = 2131296750;
+    public static final int mr_cast_list = 2131296751;
+    public static final int mr_cast_meta_art = 2131296752;
+    public static final int mr_cast_meta_background = 2131296753;
+    public static final int mr_cast_meta_black_scrim = 2131296754;
+    public static final int mr_cast_meta_subtitle = 2131296755;
+    public static final int mr_cast_meta_title = 2131296756;
+    public static final int mr_cast_mute_button = 2131296757;
+    public static final int mr_cast_route_icon = 2131296758;
+    public static final int mr_cast_route_name = 2131296759;
+    public static final int mr_cast_route_progress_bar = 2131296760;
+    public static final int mr_cast_stop_button = 2131296761;
+    public static final int mr_cast_volume_layout = 2131296762;
+    public static final int mr_cast_volume_slider = 2131296763;
+    public static final int mr_chooser_list = 2131296764;
+    public static final int mr_chooser_route_desc = 2131296765;
+    public static final int mr_chooser_route_icon = 2131296766;
+    public static final int mr_chooser_route_name = 2131296767;
+    public static final int mr_chooser_title = 2131296768;
+    public static final int mr_close = 2131296769;
+    public static final int mr_control_divider = 2131296770;
+    public static final int mr_control_playback_ctrl = 2131296771;
+    public static final int mr_control_subtitle = 2131296772;
+    public static final int mr_control_title = 2131296773;
+    public static final int mr_control_title_container = 2131296774;
+    public static final int mr_custom_control = 2131296775;
+    public static final int mr_default_control = 2131296776;
+    public static final int mr_dialog_area = 2131296777;
+    public static final int mr_expandable_area = 2131296778;
+    public static final int mr_group_expand_collapse = 2131296779;
+    public static final int mr_group_volume_route_name = 2131296780;
+    public static final int mr_media_main_control = 2131296781;
+    public static final int mr_name = 2131296782;
+    public static final int mr_picker_close_button = 2131296783;
+    public static final int mr_picker_header_name = 2131296784;
+    public static final int mr_picker_list = 2131296785;
+    public static final int mr_picker_route_icon = 2131296786;
+    public static final int mr_picker_route_name = 2131296787;
+    public static final int mr_picker_route_progress_bar = 2131296788;
+    public static final int mr_playback_control = 2131296789;
+    public static final int mr_volume_control = 2131296791;
+    public static final int mr_volume_group_list = 2131296792;
+    public static final int mr_volume_item_icon = 2131296793;
+    public static final int mr_volume_slider = 2131296794;
+    public static final int volume_item_container = 2131296975;
+}

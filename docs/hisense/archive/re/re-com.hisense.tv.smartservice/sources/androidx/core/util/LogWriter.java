@@ -1,0 +1,47 @@
+package androidx.core.util;
+
+import android.util.Log;
+import androidx.annotation.RestrictTo;
+import java.io.Writer;
+
+/* JADX INFO: loaded from: classes.dex */
+@RestrictTo({RestrictTo.Scope.LIBRARY_GROUP_PREFIX})
+@Deprecated
+public class LogWriter extends Writer {
+    public StringBuilder mBuilder = new StringBuilder(128);
+    public final String mTag;
+
+    public LogWriter(String tag) {
+        this.mTag = tag;
+    }
+
+    private void flushBuilder() {
+        if (this.mBuilder.length() > 0) {
+            Log.d(this.mTag, this.mBuilder.toString());
+            StringBuilder sb = this.mBuilder;
+            sb.delete(0, sb.length());
+        }
+    }
+
+    @Override // java.io.Writer, java.io.Closeable, java.lang.AutoCloseable
+    public void close() {
+        flushBuilder();
+    }
+
+    @Override // java.io.Writer, java.io.Flushable
+    public void flush() {
+        flushBuilder();
+    }
+
+    @Override // java.io.Writer
+    public void write(char[] buf, int offset, int count) {
+        for (int i = 0; i < count; i++) {
+            char c2 = buf[offset + i];
+            if (c2 == '\n') {
+                flushBuilder();
+            } else {
+                this.mBuilder.append(c2);
+            }
+        }
+    }
+}

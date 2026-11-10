@@ -1,0 +1,37 @@
+# libmwipc.so — annotation (regenerated 2026-11-09)
+## size/arch (readelf)
+  Class:                             ELF32
+  Type:                              DYN (Shared object file)
+  Machine:                           ARM
+## exported dynamic symbols (30) — nm -D
+bufferevent_add_event_
+bufferevent_add_to_rate_limit_group
+bufferevent_base_set
+bufferevent_decref
+bufferevent_decref_and_unlock_
+bufferevent_decrement_read_buckets_
+bufferevent_decrement_read_limit
+bufferevent_decrement_write_buckets_
+bufferevent_decrement_write_limit
+bufferevent_disable
+bufferevent_disable_hard_
+bufferevent_enable
+bufferevent_enable_locking_
+bufferevent_filter_new
+bufferevent_flush
+bufferevent_free
+bufferevent_generic_adj_existing_timeouts_
+bufferevent_generic_adj_timeouts_
+bufferevent_get_base
+bufferevent_getcb
+bufferevent_get_enabled
+bufferevent_getfd
+bufferevent_get_input
+bufferevent_get_max_single_read
+bufferevent_get_max_single_write
+bufferevent_get_max_to_read
+bufferevent_get_max_to_write
+bufferevent_get_options_
+bufferevent_get_output
+bufferevent_get_priority
+## strings high-signal (floss/strings, 40)

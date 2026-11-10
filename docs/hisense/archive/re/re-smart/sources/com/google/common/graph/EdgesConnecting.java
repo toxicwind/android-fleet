@@ -1,0 +1,45 @@
+package com.google.common.graph;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.UnmodifiableIterator;
+import java.util.AbstractSet;
+import java.util.Map;
+
+/* JADX INFO: loaded from: classes.dex */
+public final class EdgesConnecting<E> extends AbstractSet<E> {
+    public final Map<?, E> nodeToOutEdge;
+    public final Object targetNode;
+
+    public EdgesConnecting(Map<?, E> map, Object obj) {
+        if (map == null) {
+            throw new NullPointerException();
+        }
+        this.nodeToOutEdge = map;
+        if (obj == null) {
+            throw new NullPointerException();
+        }
+        this.targetNode = obj;
+    }
+
+    private E getConnectingEdge() {
+        return this.nodeToOutEdge.get(this.targetNode);
+    }
+
+    @Override // java.util.AbstractCollection, java.util.Collection, java.util.Set
+    public boolean contains(Object obj) {
+        E connectingEdge = getConnectingEdge();
+        return connectingEdge != null && connectingEdge.equals(obj);
+    }
+
+    @Override // java.util.AbstractCollection, java.util.Collection, java.util.Set
+    public int size() {
+        return getConnectingEdge() == null ? 0 : 1;
+    }
+
+    @Override // java.util.AbstractCollection, java.util.Collection, java.lang.Iterable, java.util.Set
+    public UnmodifiableIterator<E> iterator() {
+        E connectingEdge = getConnectingEdge();
+        return connectingEdge == null ? ImmutableSet.of().iterator() : new Iterators.AnonymousClass9(connectingEdge);
+    }
+}

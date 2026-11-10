@@ -1,0 +1,3 @@
+Performing Streamed Install
+adb: failed to install /home/toxic/pens/fleet/devices/android-fleet/fleet-tv/app/build/outputs/apk/full/debug/app-full-armeabi-v7a-debug.apk: Failure [INSTALL_FAILED_UPDATE_INCOMPATIBLE: Package com.nuvio.livetv signatures do not match previously installed version; ignoring!]
+

@@ -1,0 +1,68 @@
+# com.vt.tv.usbota.apk — annotation (regenerated 2026-11-09, deps: aapt/apktool/jadx/dexwalk)
+## badging (aapt)
+package: name='com.vt.tv.usbota' versionCode='30' versionName='1.3.0' platformBuildVersionName='11' platformBuildVersionCode='30' compileSdkVersion='30' compileSdkVersionCodename='11'
+sdkVersion:'30'
+targetSdkVersion:'29'
+uses-permission: name='android.permission.RECOVERY'
+uses-permission: name='android.permission.REBOOT'
+uses-permission: name='android.permission.ACCESS_CACHE_FILESYSTEM'
+uses-permission: name='android.permission.SYSTEM_ALERT_WINDOW'
+uses-permission: name='android.permission.FOREGROUND_SERVICE'
+uses-permission: name='android.permission.WRITE_EXTERNAL_STORAGE'
+application-label:'System Update'
+application-icon-160:'res/drawable/ic_launcher.png'
+application-icon-240:'res/drawable-hdpi-v4/ic_launcher.png'
+application: label='System Update' icon='res/drawable/ic_launcher.png'
+uses-permission: name='android.permission.READ_EXTERNAL_STORAGE'
+uses-implied-permission: name='android.permission.READ_EXTERNAL_STORAGE' reason='requested WRITE_EXTERNAL_STORAGE'
+feature-group: label=''
+  uses-feature: name='android.hardware.faketouch'
+  uses-implied-feature: name='android.hardware.faketouch' reason='default feature for all apps'
+other-services
+supports-screens: 'small' 'normal' 'large' 'xlarge'
+supports-any-density: 'true'
+locales: '--_--'
+densities: '160' '240'
+## exported manifest surface (apktool)
+(manifest decode failed)
+## jadx tree key classes
+a
+A
+b
+B
+c
+C
+C0000a
+C0005r
+d
+D
+e
+E
+f
+g
+h
+HandlerC0003d
+i
+j
+k
+l
+m
+n
+o
+p
+q
+r
+R
+RunnableC0001b
+RunnableC0002c
+RunnableC0004e
+s
+SysUpgradeState
+t
+u
+USBOTAService
+v
+w
+x
+y
+z

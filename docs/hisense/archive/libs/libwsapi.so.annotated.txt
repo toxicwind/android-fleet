@@ -1,0 +1,23 @@
+# libwsapi.so — annotation (regenerated 2026-11-09)
+## size/arch (readelf)
+  Class:                             ELF32
+  Type:                              DYN (Shared object file)
+  Machine:                           ARM
+## exported dynamic symbols (30) — nm -D
+restore_core_regs
+_Unwind_Backtrace
+_Unwind_Complete
+_Unwind_DeleteException
+_Unwind_ForcedUnwind
+_Unwind_GetCFA
+_Unwind_GetDataRelBase
+_Unwind_GetLanguageSpecificData
+_Unwind_GetRegionStart
+_Unwind_GetTextRelBase
+_Unwind_RaiseException
+_Unwind_Resume
+_Unwind_Resume_or_Rethrow
+_Unwind_VRS_Get
+_Unwind_VRS_Pop
+_Unwind_VRS_Set
+## strings high-signal (floss/strings, 40)

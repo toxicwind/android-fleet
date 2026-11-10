@@ -1,0 +1,13 @@
+package c.a.b;
+
+/* JADX INFO: renamed from: c.a.b.ed, reason: case insensitive filesystem */
+/* JADX INFO: loaded from: classes2.dex */
+class C0111ed implements AbstractC0171qd.a {
+    public C0111ed(AbstractC0171qd abstractC0171qd) {
+    }
+
+    @Override // c.a.b.AbstractC0171qd.a
+    public void a(AbstractC0171qd.j jVar) {
+        jVar.f1441a.flush();
+    }
+}

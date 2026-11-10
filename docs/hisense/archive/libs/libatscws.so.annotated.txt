@@ -1,0 +1,7 @@
+# libatscws.so — annotation (regenerated 2026-11-09)
+## size/arch (readelf)
+  Class:                             ELF32
+  Type:                              DYN (Shared object file)
+  Machine:                           ARM
+## exported dynamic symbols (30) — nm -D
+## strings high-signal (floss/strings, 40)

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    android:versionCode="1"
+    android:versionName="1.0"
+    android:compileSdkVersion="29"
+    android:compileSdkVersionCodename="10"
+    package="com.hisense.udpserver"
+    platformBuildVersionCode="29"
+    platformBuildVersionName="10">
+    <uses-sdk
+        android:minSdkVersion="26"
+        android:targetSdkVersion="29"/>
+    <permission
+        android:name="com.hisense.syncplay.permission"
+        android:protectionLevel="signature"/>
+    <uses-permission android:name="com.hisense.syncplay.permission"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <application
+        android:theme="@style/Theme.MmSyncPlay"
+        android:label="@string/app_name"
+        android:icon="@drawable/ic_launcher"
+        android:allowBackup="true"
+        android:hardwareAccelerated="false"
+        android:supportsRtl="true"
+        android:extractNativeLibs="false"
+        android:roundIcon="@drawable/ic_launcher_round"
+        android:appComponentFactory="androidx.core.app.CoreComponentFactory">
+        <service
+            android:name="com.hisense.udpserver.AIDLUdpScanService"
+            android:permission="com.hisense.syncplay.permission"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.hisense.udpserver.AIDLUdpScanService"/>
+            </intent-filter>
+        </service>
+    </application>
+</manifest>

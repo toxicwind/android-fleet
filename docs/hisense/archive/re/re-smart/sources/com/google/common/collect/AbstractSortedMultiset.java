@@ -1,0 +1,130 @@
+package com.google.common.collect;
+
+import com.google.common.annotations.GwtCompatible;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.NavigableSet;
+
+/* JADX INFO: loaded from: classes.dex */
+@GwtCompatible(emulated = true)
+public abstract class AbstractSortedMultiset<E> extends AbstractMultiset<E> implements SortedMultiset<E> {
+
+    @GwtTransient
+    public final Comparator<? super E> comparator;
+    public transient SortedMultiset<E> descendingMultiset;
+
+    public AbstractSortedMultiset() {
+        this(Ordering.natural());
+    }
+
+    @Override // com.google.common.collect.SortedMultiset, com.google.common.collect.SortedIterable
+    public Comparator<? super E> comparator() {
+        return this.comparator;
+    }
+
+    public SortedMultiset<E> createDescendingMultiset() {
+        return new DescendingMultiset<E>() { // from class: com.google.common.collect.AbstractSortedMultiset.1DescendingMultisetImpl
+            @Override // com.google.common.collect.DescendingMultiset
+            public Iterator<Multiset.Entry<E>> entryIterator() {
+                return AbstractSortedMultiset.this.descendingEntryIterator();
+            }
+
+            @Override // com.google.common.collect.DescendingMultiset
+            public SortedMultiset<E> forwardMultiset() {
+                return AbstractSortedMultiset.this;
+            }
+
+            @Override // com.google.common.collect.DescendingMultiset, com.google.common.collect.ForwardingCollection, java.util.Collection, java.lang.Iterable, java.util.Set
+            public Iterator<E> iterator() {
+                return AbstractSortedMultiset.this.descendingIterator();
+            }
+        };
+    }
+
+    public abstract Iterator<Multiset.Entry<E>> descendingEntryIterator();
+
+    public Iterator<E> descendingIterator() {
+        return Multisets.iteratorImpl(descendingMultiset());
+    }
+
+    @Override // com.google.common.collect.SortedMultiset
+    public SortedMultiset<E> descendingMultiset() {
+        SortedMultiset<E> sortedMultiset = this.descendingMultiset;
+        if (sortedMultiset != null) {
+            return sortedMultiset;
+        }
+        SortedMultiset<E> sortedMultisetCreateDescendingMultiset = createDescendingMultiset();
+        this.descendingMultiset = sortedMultisetCreateDescendingMultiset;
+        return sortedMultisetCreateDescendingMultiset;
+    }
+
+    @Override // com.google.common.collect.SortedMultiset
+    public Multiset.Entry<E> firstEntry() {
+        Iterator<Multiset.Entry<E>> itEntryIterator = entryIterator();
+        if (itEntryIterator.hasNext()) {
+            return itEntryIterator.next();
+        }
+        return null;
+    }
+
+    @Override // com.google.common.collect.SortedMultiset
+    public Multiset.Entry<E> lastEntry() {
+        Iterator<Multiset.Entry<E>> itDescendingEntryIterator = descendingEntryIterator();
+        if (itDescendingEntryIterator.hasNext()) {
+            return itDescendingEntryIterator.next();
+        }
+        return null;
+    }
+
+    @Override // com.google.common.collect.SortedMultiset
+    public Multiset.Entry<E> pollFirstEntry() {
+        Iterator<Multiset.Entry<E>> itEntryIterator = entryIterator();
+        if (!itEntryIterator.hasNext()) {
+            return null;
+        }
+        Multiset.Entry<E> next = itEntryIterator.next();
+        Multisets.ImmutableEntry immutableEntry = new Multisets.ImmutableEntry(next.getElement(), next.getCount());
+        itEntryIterator.remove();
+        return immutableEntry;
+    }
+
+    @Override // com.google.common.collect.SortedMultiset
+    public Multiset.Entry<E> pollLastEntry() {
+        Iterator<Multiset.Entry<E>> itDescendingEntryIterator = descendingEntryIterator();
+        if (!itDescendingEntryIterator.hasNext()) {
+            return null;
+        }
+        Multiset.Entry<E> next = itDescendingEntryIterator.next();
+        Multisets.ImmutableEntry immutableEntry = new Multisets.ImmutableEntry(next.getElement(), next.getCount());
+        itDescendingEntryIterator.remove();
+        return immutableEntry;
+    }
+
+    @Override // com.google.common.collect.SortedMultiset
+    public SortedMultiset<E> subMultiset(E e2, BoundType boundType, E e3, BoundType boundType2) {
+        if (boundType == null) {
+            throw new NullPointerException();
+        }
+        if (boundType2 != null) {
+            return tailMultiset(e2, boundType).headMultiset(e3, boundType2);
+        }
+        throw new NullPointerException();
+    }
+
+    public AbstractSortedMultiset(Comparator<? super E> comparator) {
+        if (comparator == null) {
+            throw new NullPointerException();
+        }
+        this.comparator = comparator;
+    }
+
+    @Override // com.google.common.collect.AbstractMultiset
+    public NavigableSet<E> createElementSet() {
+        return new SortedMultisets.NavigableElementSet(this);
+    }
+
+    @Override // com.google.common.collect.AbstractMultiset, com.google.common.collect.Multiset
+    public NavigableSet<E> elementSet() {
+        return (NavigableSet) super.elementSet();
+    }
+}

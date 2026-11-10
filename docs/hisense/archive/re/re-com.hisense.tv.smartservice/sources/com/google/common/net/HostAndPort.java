@@ -1,0 +1,164 @@
+package com.google.common.net;
+
+import com.google.common.annotations.Beta;
+import com.google.common.annotations.GwtCompatible;
+import com.google.common.base.Objects;
+import com.google.common.base.Platform;
+import com.google.common.base.Preconditions;
+import com.google.errorprone.annotations.Immutable;
+import java.io.Serializable;
+import java.util.Arrays;
+
+/* JADX INFO: loaded from: classes.dex */
+@Immutable
+@Beta
+@GwtCompatible
+public final class HostAndPort implements Serializable {
+    public static final int NO_PORT = -1;
+    public static final long serialVersionUID = 0;
+    public final boolean hasBracketlessColons;
+    public final String host;
+    public final int port;
+
+    public HostAndPort(String str, int i, boolean z) {
+        this.host = str;
+        this.port = i;
+        this.hasBracketlessColons = z;
+    }
+
+    public static HostAndPort fromHost(String str) {
+        HostAndPort hostAndPortFromString = fromString(str);
+        Preconditions.checkArgument(!hostAndPortFromString.hasPort(), "Host has a port: %s", str);
+        return hostAndPortFromString;
+    }
+
+    public static HostAndPort fromParts(String str, int i) {
+        Preconditions.checkArgument(isValidPort(i), "Port out of range: %s", i);
+        HostAndPort hostAndPortFromString = fromString(str);
+        Preconditions.checkArgument(!hostAndPortFromString.hasPort(), "Host has a port: %s", str);
+        return new HostAndPort(hostAndPortFromString.host, i, hostAndPortFromString.hasBracketlessColons);
+    }
+
+    /* JADX WARN: Code duplicated, block: B:11:0x0033 A[DONT_INVERT] */
+    /* JADX WARN: Code duplicated, block: B:12:0x0035  */
+    public static HostAndPort fromString(String str) {
+        String strSubstring;
+        if (str == null) {
+            throw new NullPointerException();
+        }
+        String strSubstring2 = null;
+        int i = -1;
+        boolean z = false;
+        if (str.startsWith("[")) {
+            String[] hostAndPortFromBracketedHost = getHostAndPortFromBracketedHost(str);
+            strSubstring = hostAndPortFromBracketedHost[0];
+            strSubstring2 = hostAndPortFromBracketedHost[1];
+        } else {
+            int iIndexOf = str.indexOf(58);
+            if (iIndexOf >= 0) {
+                int i2 = iIndexOf + 1;
+                if (str.indexOf(58, i2) == -1) {
+                    strSubstring = str.substring(0, iIndexOf);
+                    strSubstring2 = str.substring(i2);
+                } else {
+                    z = iIndexOf >= 0;
+                    strSubstring = str;
+                }
+            } else {
+                if (iIndexOf >= 0) {
+                }
+                strSubstring = str;
+            }
+        }
+        if (!Platform.stringIsNullOrEmpty(strSubstring2)) {
+            Preconditions.checkArgument(!strSubstring2.startsWith("+"), "Unparseable port number: %s", str);
+            try {
+                i = Integer.parseInt(strSubstring2);
+                Preconditions.checkArgument(isValidPort(i), "Port number out of range: %s", str);
+            } catch (NumberFormatException unused) {
+                throw new IllegalArgumentException(str.length() != 0 ? "Unparseable port number: ".concat(str) : new String("Unparseable port number: "));
+            }
+        }
+        return new HostAndPort(strSubstring, i, z);
+    }
+
+    public static String[] getHostAndPortFromBracketedHost(String str) {
+        Preconditions.checkArgument(str.charAt(0) == '[', "Bracketed host-port string must start with a bracket: %s", str);
+        int iIndexOf = str.indexOf(58);
+        int iLastIndexOf = str.lastIndexOf(93);
+        Preconditions.checkArgument(iIndexOf > -1 && iLastIndexOf > iIndexOf, "Invalid bracketed host/port: %s", str);
+        String strSubstring = str.substring(1, iLastIndexOf);
+        int i = iLastIndexOf + 1;
+        if (i == str.length()) {
+            return new String[]{strSubstring, ""};
+        }
+        Preconditions.checkArgument(str.charAt(i) == ':', "Only a colon may follow a close bracket: %s", str);
+        int i2 = iLastIndexOf + 2;
+        for (int i3 = i2; i3 < str.length(); i3++) {
+            Preconditions.checkArgument(Character.isDigit(str.charAt(i3)), "Port must be numeric: %s", str);
+        }
+        return new String[]{strSubstring, str.substring(i2)};
+    }
+
+    public static boolean isValidPort(int i) {
+        return i >= 0 && i <= 65535;
+    }
+
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof HostAndPort)) {
+            return false;
+        }
+        HostAndPort hostAndPort = (HostAndPort) obj;
+        return Objects.equal(this.host, hostAndPort.host) && this.port == hostAndPort.port;
+    }
+
+    public String getHost() {
+        return this.host;
+    }
+
+    public int getPort() {
+        Preconditions.checkState(hasPort());
+        return this.port;
+    }
+
+    public int getPortOrDefault(int i) {
+        return hasPort() ? this.port : i;
+    }
+
+    public boolean hasPort() {
+        return this.port >= 0;
+    }
+
+    public int hashCode() {
+        return Arrays.hashCode(new Object[]{this.host, Integer.valueOf(this.port)});
+    }
+
+    public HostAndPort requireBracketsForIPv6() {
+        Preconditions.checkArgument(!this.hasBracketlessColons, "Possible bracketless IPv6 literal: %s", this.host);
+        return this;
+    }
+
+    public String toString() {
+        StringBuilder sb = new StringBuilder(this.host.length() + 8);
+        if (this.host.indexOf(58) >= 0) {
+            sb.append('[');
+            sb.append(this.host);
+            sb.append(']');
+        } else {
+            sb.append(this.host);
+        }
+        if (hasPort()) {
+            sb.append(InetAddresses.IPV6_DELIMITER);
+            sb.append(this.port);
+        }
+        return sb.toString();
+    }
+
+    public HostAndPort withDefaultPort(int i) {
+        Preconditions.checkArgument(isValidPort(i));
+        return hasPort() ? this : new HostAndPort(this.host, i, this.hasBracketlessColons);
+    }
+}
