@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="LavenderMode" parent="">
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="black">@color/LavenderPrimaryGrayBackground</item>
+        <item name="boxItemBackground">@color/LavenderItemBackground</item>
+        <item name="colorOnPrimary">@color/LavenderTextColor</item>
+        <item name="iconColor">@color/LavenderIconColor</item>
+        <item name="iconGrayBackground">@color/LavenderGrayBackground</item>
+        <item name="isLightTheme">true</item>
+        <item name="primaryBlackBackground">@color/LavenderBitDarkerGrayBackground</item>
+        <item name="primaryGrayBackground">@color/LavenderPrimaryGrayBackground</item>
+        <item name="textColor">@color/LavenderTextColor</item>
+        <item name="white">@color/LavenderTextColor</item>
+    </style>
+    <style name="LightMode" parent="">
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="black">@color/white</item>
+        <item name="boxItemBackground">@color/lightItemBackground</item>
+        <item name="colorOnPrimary">@color/blackText</item>
+        <item name="grayTextColor">@color/lightGrayTextColor</item>
+        <item name="iconGrayBackground">@color/lightGrayBackground</item>
+        <item name="isLightTheme">true</item>
+        <item name="primaryBlackBackground">@color/lightBitDarkerGrayBackground</item>
+        <item name="primaryGrayBackground">@color/lightPrimaryGrayBackground</item>
+        <item name="textColor">@color/lightTextColor</item>
+        <item name="white">@color/black</item>
+    </style>
+</resources>

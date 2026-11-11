@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="downloads_active">
+        <item quantity="zero">%d لا يوجد تنزيل نشط</item>
+        <item quantity="one">%d تنزيل واحد نشط</item>
+        <item quantity="two">%d تنزيلان نشطان</item>
+        <item quantity="few">%d تنزيلات نشطة</item>
+        <item quantity="many">%d تنزيل نشط</item>
+        <item quantity="other">%d تنزيل نشط</item>
+    </plurals>
+    <plurals name="downloads_queued">
+        <item quantity="zero">%d لا يوجد تنزيلات في قائمة الانتظار</item>
+        <item quantity="one">%d تنزيل واحد قيد الانتظار</item>
+        <item quantity="two">%d تنزيلان قيد الانتظار</item>
+        <item quantity="few">%d تنزيلات قيد الانتظار</item>
+        <item quantity="many">%d تنزيل قيد الانتظار</item>
+        <item quantity="other">%d تنزيل قيد الانتظار</item>
+    </plurals>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="zero">تقديم سريع للفيديو بمقدار %d ثانية</item>
+        <item quantity="one">تقديم سريع للفيديو بمقدار ثانية واحدة (%d)</item>
+        <item quantity="two">تقديم سريع للفيديو بمقدار ثانيتَين (%d)</item>
+        <item quantity="few">تقديم سريع للفيديو بمقدار %d ثوانٍ</item>
+        <item quantity="many">تقديم سريع للفيديو بمقدار %d ثانية</item>
+        <item quantity="other">تقديم سريع للفيديو بمقدار %d ثانية</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="zero">ترجيع الفيديو بمقدار %d ثانية</item>
+        <item quantity="one">ترجيع الفيديو بمقدار ثانية واحدة (%d)</item>
+        <item quantity="two">ترجيع الفيديو بمقدار ثانيتَين (%d)</item>
+        <item quantity="few">ترجيع الفيديو بمقدار %d ثوانٍ</item>
+        <item quantity="many">ترجيع الفيديو بمقدار %d ثانية</item>
+        <item quantity="other">ترجيع الفيديو بمقدار %d ثانية</item>
+    </plurals>
+    <plurals name="mtrl_badge_content_description">
+        <item quantity="zero">%d إشعار جديد</item>
+        <item quantity="one">إشعار جديد واحد (%d)</item>
+        <item quantity="two">إشعاران جديدان (%d)</item>
+        <item quantity="few">%d إشعارات جديدة</item>
+        <item quantity="many">%d إشعارًا جديدًا</item>
+        <item quantity="other">%d إشعار جديد</item>
+    </plurals>
+</resources>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="downloads_active">
+        <item quantity="one">%ddownload ativo</item>
+        <item quantity="many">%ddownloads ativos</item>
+        <item quantity="other">%ddownloads ativos</item>
+    </plurals>
+    <plurals name="downloads_queued">
+        <item quantity="one">%d download na sequência</item>
+        <item quantity="many">%d downloads na sequência</item>
+        <item quantity="other">%d downloads na sequência</item>
+    </plurals>
+    <plurals name="mtrl_badge_content_description">
+        <item quantity="one">%d nova notificação</item>
+        <item quantity="other">%d novas notificações</item>
+    </plurals>
+</resources>

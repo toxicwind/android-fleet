@@ -1,0 +1,50 @@
+package io.ktor.util;
+
+import io.ktor.utils.io.ByteReadChannel;
+import io.ktor.utils.io.ByteWriteChannel;
+import kotlin.Metadata;
+import kotlin.coroutines.CoroutineContext;
+import kotlin.jvm.internal.Intrinsics;
+
+/* JADX INFO: compiled from: ContentEncodersJvm.kt */
+/* JADX INFO: loaded from: classes7.dex */
+@Metadata(d1 = {"\u0000,\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0002\b\u0002\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0002\b\u0004\n\u0002\u0018\u0002\n\u0000\n\u0002\u0010\u000e\n\u0002\b\u0005\bÆ\u0002\u0018\u00002\u00020\u00012\u00020\u0002B\t\b\u0002¢\u0006\u0004\b\u0003\u0010\u0004J \u0010\t\u001a\u00020\u00052\u0006\u0010\u0006\u001a\u00020\u00052\u0006\u0010\b\u001a\u00020\u0007H\u0096\u0001¢\u0006\u0004\b\t\u0010\nJ \u0010\u000b\u001a\u00020\u00052\u0006\u0010\u0006\u001a\u00020\u00052\u0006\u0010\b\u001a\u00020\u0007H\u0096\u0001¢\u0006\u0004\b\u000b\u0010\nJ \u0010\u000b\u001a\u00020\f2\u0006\u0010\u0006\u001a\u00020\f2\u0006\u0010\b\u001a\u00020\u0007H\u0096\u0001¢\u0006\u0004\b\u000b\u0010\rR\u001a\u0010\u000f\u001a\u00020\u000e8\u0016X\u0096D¢\u0006\f\n\u0004\b\u000f\u0010\u0010\u001a\u0004\b\u0011\u0010\u0012¨\u0006\u0013"}, d2 = {"Lio/ktor/util/GZipEncoder;", "Lio/ktor/util/ContentEncoder;", "Lio/ktor/util/Encoder;", "<init>", "()V", "Lio/ktor/utils/io/ByteReadChannel;", "source", "Lkotlin/coroutines/CoroutineContext;", "coroutineContext", "decode", "(Lio/ktor/utils/io/ByteReadChannel;Lkotlin/coroutines/CoroutineContext;)Lio/ktor/utils/io/ByteReadChannel;", "encode", "Lio/ktor/utils/io/ByteWriteChannel;", "(Lio/ktor/utils/io/ByteWriteChannel;Lkotlin/coroutines/CoroutineContext;)Lio/ktor/utils/io/ByteWriteChannel;", "", "name", "Ljava/lang/String;", "getName", "()Ljava/lang/String;", "ktor-utils"}, k = 1, mv = {2, 3, 0}, xi = 48)
+public final class GZipEncoder implements ContentEncoder, Encoder {
+    public static final GZipEncoder INSTANCE = new GZipEncoder();
+    private static final String name = "gzip";
+    private final /* synthetic */ Encoder $$delegate_0 = EncodersJvmKt.getGZip();
+
+    @Override // io.ktor.util.Encoder
+    public ByteReadChannel decode(ByteReadChannel source, CoroutineContext coroutineContext) {
+        Intrinsics.checkNotNullParameter(source, "source");
+        Intrinsics.checkNotNullParameter(coroutineContext, "coroutineContext");
+        return this.$$delegate_0.decode(source, coroutineContext);
+    }
+
+    @Override // io.ktor.util.Encoder
+    public ByteReadChannel encode(ByteReadChannel source, CoroutineContext coroutineContext) {
+        Intrinsics.checkNotNullParameter(source, "source");
+        Intrinsics.checkNotNullParameter(coroutineContext, "coroutineContext");
+        return this.$$delegate_0.encode(source, coroutineContext);
+    }
+
+    @Override // io.ktor.util.Encoder
+    public ByteWriteChannel encode(ByteWriteChannel source, CoroutineContext coroutineContext) {
+        Intrinsics.checkNotNullParameter(source, "source");
+        Intrinsics.checkNotNullParameter(coroutineContext, "coroutineContext");
+        return this.$$delegate_0.encode(source, coroutineContext);
+    }
+
+    private GZipEncoder() {
+    }
+
+    @Override // io.ktor.util.ContentEncoder
+    public /* bridge */ Long predictCompressedLength(long j) {
+        return ContentEncoder.CC.$default$predictCompressedLength(this, j);
+    }
+
+    @Override // io.ktor.util.ContentEncoder
+    public String getName() {
+        return name;
+    }
+}

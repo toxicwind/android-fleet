@@ -1,0 +1,39 @@
+package com.google.android.gms.internal.cast;
+
+/* JADX INFO: compiled from: com.google.android.gms:play-services-cast@@22.1.0 */
+/* JADX INFO: loaded from: classes5.dex */
+public final class zzaaj extends zzxi implements zzym {
+    private static final zzaaj zzb;
+    private zzxn zzd = zzD();
+
+    static {
+        zzaaj zzaajVar = new zzaaj();
+        zzb = zzaajVar;
+        zzxi.zzJ(zzaaj.class, zzaajVar);
+    }
+
+    private zzaaj() {
+    }
+
+    @Override // com.google.android.gms.internal.cast.zzxi
+    protected final Object zzb(int i, Object obj, Object obj2) {
+        int i2 = i - 1;
+        if (i2 == 0) {
+            return (byte) 1;
+        }
+        if (i2 == 2) {
+            return zzG(zzb, "\u0001\u0001\u0000\u0000\u0001\u0001\u0001\u0000\u0001\u0000\u0001\u001b", new Object[]{"zzd", zzaam.class});
+        }
+        if (i2 == 3) {
+            return new zzaaj();
+        }
+        zzaai zzaaiVar = null;
+        if (i2 == 4) {
+            return new zzaah(zzaaiVar);
+        }
+        if (i2 == 5) {
+            return zzb;
+        }
+        throw null;
+    }
+}

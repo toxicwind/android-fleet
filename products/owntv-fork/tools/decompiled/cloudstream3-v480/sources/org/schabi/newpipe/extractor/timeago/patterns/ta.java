@@ -1,0 +1,24 @@
+package org.schabi.newpipe.extractor.timeago.patterns;
+
+import org.schabi.newpipe.extractor.timeago.PatternsHolder;
+
+/* JADX INFO: loaded from: classes8.dex */
+public class ta extends PatternsHolder {
+    private static final String WORD_SEPARATOR = " ";
+    private static final String[] SECONDS = {"வினாடி", "வினாடிகளுக்கு"};
+    private static final String[] MINUTES = {"நிமிடங்கள்", "நிமிடம்"};
+    private static final String[] HOURS = {"மணிநேரத்திற்கு"};
+    private static final String[] DAYS = {"நாட்களுக்கு", "நாளுக்கு"};
+    private static final String[] WEEKS = {"வாரங்களுக்கு", "வாரம்"};
+    private static final String[] MONTHS = {"மாதங்கள்", "மாதம்"};
+    private static final String[] YEARS = {"ஆண்டு", "ஆண்டுகளுக்கு"};
+    private static final ta INSTANCE = new ta();
+
+    public static ta getInstance() {
+        return INSTANCE;
+    }
+
+    private ta() {
+        super(" ", SECONDS, MINUTES, HOURS, DAYS, WEEKS, MONTHS, YEARS);
+    }
+}

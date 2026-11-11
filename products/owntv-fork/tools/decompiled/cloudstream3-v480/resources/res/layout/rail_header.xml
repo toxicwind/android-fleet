@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="1dp"
+    android:visibility="gone"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/nav_header_notification"
+        android:focusable="true"
+        android:nextFocusRight="@+id/home_preview_info_btt"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/notifications_icon_selector"
+        android:contentDescription="@string/account"
+        app:itemIconTint="@color/item_select_color"
+        app:tint="@color/item_select_color"/>
+</LinearLayout>

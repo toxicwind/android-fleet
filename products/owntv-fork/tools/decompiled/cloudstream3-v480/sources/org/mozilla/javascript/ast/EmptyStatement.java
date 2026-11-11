@@ -1,0 +1,28 @@
+package org.mozilla.javascript.ast;
+
+/* JADX INFO: loaded from: classes8.dex */
+public class EmptyStatement extends AstNode {
+    public EmptyStatement() {
+        this.type = 141;
+    }
+
+    public EmptyStatement(int i) {
+        super(i);
+        this.type = 141;
+    }
+
+    public EmptyStatement(int i, int i2) {
+        super(i, i2);
+        this.type = 141;
+    }
+
+    @Override // org.mozilla.javascript.ast.AstNode
+    public String toSource(int i) {
+        return makeIndent(i) + ";\n";
+    }
+
+    @Override // org.mozilla.javascript.ast.AstNode
+    public void visit(NodeVisitor nodeVisitor) {
+        nodeVisitor.visit(this);
+    }
+}

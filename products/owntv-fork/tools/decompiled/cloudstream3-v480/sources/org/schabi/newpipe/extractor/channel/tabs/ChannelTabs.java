@@ -1,0 +1,16 @@
+package org.schabi.newpipe.extractor.channel.tabs;
+
+/* JADX INFO: loaded from: classes8.dex */
+public final class ChannelTabs {
+    public static final String ALBUMS = "albums";
+    public static final String CHANNELS = "channels";
+    public static final String LIKES = "likes";
+    public static final String LIVESTREAMS = "livestreams";
+    public static final String PLAYLISTS = "playlists";
+    public static final String SHORTS = "shorts";
+    public static final String TRACKS = "tracks";
+    public static final String VIDEOS = "videos";
+
+    private ChannelTabs() {
+    }
+}

@@ -1,0 +1,70 @@
+package androidx.compose.ui.draganddrop;
+
+import android.graphics.Canvas;
+import android.graphics.Point;
+import android.view.View;
+import androidx.compose.ui.graphics.AndroidCanvas_androidKt;
+import androidx.compose.ui.graphics.drawscope.CanvasDrawScope;
+import androidx.compose.ui.graphics.drawscope.DrawScope;
+import androidx.compose.ui.unit.Density;
+import androidx.compose.ui.unit.LayoutDirection;
+import kotlin.Metadata;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
+import kotlin.jvm.internal.DefaultConstructorMarker;
+
+/* JADX INFO: compiled from: ComposeDragShadowBuilder.android.kt */
+/* JADX INFO: loaded from: classes.dex */
+@Metadata(d1 = {"\u00008\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0000\n\u0002\u0018\u0002\n\u0002\u0018\u0002\n\u0002\u0010\u0002\n\u0002\u0018\u0002\n\u0002\b\u0005\n\u0002\u0018\u0002\n\u0002\b\u0003\n\u0002\u0018\u0002\n\u0000\b\u0001\u0018\u00002\u00020\u0001B0\u0012\u0006\u0010\u0002\u001a\u00020\u0003\u0012\u0006\u0010\u0004\u001a\u00020\u0005\u0012\u0017\u0010\u0006\u001a\u0013\u0012\u0004\u0012\u00020\b\u0012\u0004\u0012\u00020\t0\u0007¢\u0006\u0002\b\n¢\u0006\u0004\b\u000b\u0010\fJ\u0018\u0010\u000e\u001a\u00020\t2\u0006\u0010\u000f\u001a\u00020\u00102\u0006\u0010\u0011\u001a\u00020\u0010H\u0016J\u0010\u0010\u0012\u001a\u00020\t2\u0006\u0010\u0013\u001a\u00020\u0014H\u0016R\u000e\u0010\u0002\u001a\u00020\u0003X\u0082\u0004¢\u0006\u0002\n\u0000R\u0010\u0010\u0004\u001a\u00020\u0005X\u0082\u0004¢\u0006\u0004\n\u0002\u0010\rR\u001f\u0010\u0006\u001a\u0013\u0012\u0004\u0012\u00020\b\u0012\u0004\u0012\u00020\t0\u0007¢\u0006\u0002\b\nX\u0082\u0004¢\u0006\u0002\n\u0000¨\u0006\u0015"}, d2 = {"Landroidx/compose/ui/draganddrop/ComposeDragShadowBuilder;", "Landroid/view/View$DragShadowBuilder;", "density", "Landroidx/compose/ui/unit/Density;", "decorationSize", "Landroidx/compose/ui/geometry/Size;", "drawDragDecoration", "Lkotlin/Function1;", "Landroidx/compose/ui/graphics/drawscope/DrawScope;", "", "Lkotlin/ExtensionFunctionType;", "<init>", "(Landroidx/compose/ui/unit/Density;JLkotlin/jvm/functions/Function1;Lkotlin/jvm/internal/DefaultConstructorMarker;)V", "J", "onProvideShadowMetrics", "outShadowSize", "Landroid/graphics/Point;", "outShadowTouchPoint", "onDrawShadow", "canvas", "Landroid/graphics/Canvas;", "ui_release"}, k = 1, mv = {2, 0, 0}, xi = 48)
+public final class ComposeDragShadowBuilder extends View.DragShadowBuilder {
+    public static final int $stable = 8;
+    private final long decorationSize;
+    private final Density density;
+    private final Function1<DrawScope, Unit> drawDragDecoration;
+
+    public /* synthetic */ ComposeDragShadowBuilder(Density density, long j, Function1 function1, DefaultConstructorMarker defaultConstructorMarker) {
+        this(density, j, function1);
+    }
+
+    /* JADX WARN: Multi-variable type inference failed */
+    private ComposeDragShadowBuilder(Density density, long j, Function1<? super DrawScope, Unit> function1) {
+        this.density = density;
+        this.decorationSize = j;
+        this.drawDragDecoration = function1;
+    }
+
+    @Override // android.view.View.DragShadowBuilder
+    public void onProvideShadowMetrics(Point outShadowSize, Point outShadowTouchPoint) {
+        Density density = this.density;
+        outShadowSize.set(density.mo400roundToPx0680j_4(density.mo402toDpu2uoSUM(Float.intBitsToFloat((int) (this.decorationSize >> 32)))), density.mo400roundToPx0680j_4(density.mo402toDpu2uoSUM(Float.intBitsToFloat((int) (this.decorationSize & 4294967295L)))));
+        outShadowTouchPoint.set(outShadowSize.x / 2, outShadowSize.y / 2);
+    }
+
+    @Override // android.view.View.DragShadowBuilder
+    public void onDrawShadow(Canvas canvas) {
+        CanvasDrawScope canvasDrawScope = new CanvasDrawScope();
+        Density density = this.density;
+        long j = this.decorationSize;
+        LayoutDirection layoutDirection = LayoutDirection.Ltr;
+        androidx.compose.ui.graphics.Canvas Canvas = AndroidCanvas_androidKt.Canvas(canvas);
+        Function1<DrawScope, Unit> function1 = this.drawDragDecoration;
+        CanvasDrawScope.DrawParams drawParams = canvasDrawScope.getDrawParams();
+        Density density2 = drawParams.getDensity();
+        LayoutDirection layoutDirection2 = drawParams.getLayoutDirection();
+        androidx.compose.ui.graphics.Canvas canvas2 = drawParams.getCanvas();
+        long size = drawParams.getSize();
+        CanvasDrawScope.DrawParams drawParams2 = canvasDrawScope.getDrawParams();
+        drawParams2.setDensity(density);
+        drawParams2.setLayoutDirection(layoutDirection);
+        drawParams2.setCanvas(Canvas);
+        drawParams2.m4653setSizeuvyYCjk(j);
+        Canvas.save();
+        function1.invoke(canvasDrawScope);
+        Canvas.restore();
+        CanvasDrawScope.DrawParams drawParams3 = canvasDrawScope.getDrawParams();
+        drawParams3.setDensity(density2);
+        drawParams3.setLayoutDirection(layoutDirection2);
+        drawParams3.setCanvas(canvas2);
+        drawParams3.m4653setSizeuvyYCjk(size);
+    }
+}

@@ -1,0 +1,71 @@
+package androidx.compose.material3;
+
+import androidx.compose.runtime.Composer;
+import androidx.compose.runtime.ComposerKt;
+import androidx.compose.runtime.internal.ComposableLambdaKt;
+import kotlin.Metadata;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function2;
+
+/* JADX INFO: compiled from: SearchBar.android.kt */
+/* JADX INFO: loaded from: classes.dex */
+@Metadata(k = 3, mv = {1, 8, 0}, xi = 48)
+public final class ComposableSingletons$SearchBar_androidKt {
+    public static final ComposableSingletons$SearchBar_androidKt INSTANCE = new ComposableSingletons$SearchBar_androidKt();
+
+    /* JADX INFO: renamed from: lambda-1, reason: not valid java name */
+    public static Function2<Composer, Integer, Unit> f43lambda1 = ComposableLambdaKt.composableLambdaInstance(159817819, false, new Function2<Composer, Integer, Unit>() { // from class: androidx.compose.material3.ComposableSingletons$SearchBar_androidKt$lambda-1$1
+        @Override // kotlin.jvm.functions.Function2
+        public /* bridge */ /* synthetic */ Unit invoke(Composer composer, Integer num) {
+            invoke(composer, num.intValue());
+            return Unit.INSTANCE;
+        }
+
+        public final void invoke(Composer composer, int i) {
+            ComposerKt.sourceInformation(composer, "C:SearchBar.android.kt#uh7d8r");
+            if ((i & 3) == 2 && composer.getSkipping()) {
+                composer.skipToGroupEnd();
+                return;
+            }
+            if (ComposerKt.isTraceInProgress()) {
+                ComposerKt.traceEventStart(159817819, i, -1, "androidx.compose.material3.ComposableSingletons$SearchBar_androidKt.lambda-1.<anonymous> (SearchBar.android.kt:560)");
+            }
+            if (ComposerKt.isTraceInProgress()) {
+                ComposerKt.traceEventEnd();
+            }
+        }
+    });
+
+    /* JADX INFO: renamed from: lambda-2, reason: not valid java name */
+    public static Function2<Composer, Integer, Unit> f44lambda2 = ComposableLambdaKt.composableLambdaInstance(-480309201, false, new Function2<Composer, Integer, Unit>() { // from class: androidx.compose.material3.ComposableSingletons$SearchBar_androidKt$lambda-2$1
+        @Override // kotlin.jvm.functions.Function2
+        public /* bridge */ /* synthetic */ Unit invoke(Composer composer, Integer num) {
+            invoke(composer, num.intValue());
+            return Unit.INSTANCE;
+        }
+
+        public final void invoke(Composer composer, int i) {
+            ComposerKt.sourceInformation(composer, "C:SearchBar.android.kt#uh7d8r");
+            if ((i & 3) == 2 && composer.getSkipping()) {
+                composer.skipToGroupEnd();
+                return;
+            }
+            if (ComposerKt.isTraceInProgress()) {
+                ComposerKt.traceEventStart(-480309201, i, -1, "androidx.compose.material3.ComposableSingletons$SearchBar_androidKt.lambda-2.<anonymous> (SearchBar.android.kt:899)");
+            }
+            if (ComposerKt.isTraceInProgress()) {
+                ComposerKt.traceEventEnd();
+            }
+        }
+    });
+
+    /* JADX INFO: renamed from: getLambda-1$material3_release, reason: not valid java name */
+    public final Function2<Composer, Integer, Unit> m1695getLambda1$material3_release() {
+        return f43lambda1;
+    }
+
+    /* JADX INFO: renamed from: getLambda-2$material3_release, reason: not valid java name */
+    public final Function2<Composer, Integer, Unit> m1696getLambda2$material3_release() {
+        return f44lambda2;
+    }
+}

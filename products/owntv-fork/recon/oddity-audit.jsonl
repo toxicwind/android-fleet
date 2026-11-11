@@ -1,0 +1,2428 @@
+[
+ {
+  "server": "http://117.55.202.58:8080",
+  "user": "55570100411571",
+  "auth": "yes",
+  "server_info": {
+   "url": "best4u.tn",
+   "port": "8080",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Africa/Abidjan",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "117.55.202.58 -> best4u.tn",
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 3271,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.0%",
+  "custom_sample": {
+   "name": "Portguese TV ///",
+   "sid": " -i {INPUT} -c copy -analyzeduration 300"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://117.55.202.58:8080",
+  "user": "DnWvjUwE5A",
+  "auth": "yes",
+  "server_info": {
+   "url": "best4u.tn",
+   "port": "8080",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Africa/Abidjan",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "117.55.202.58 -> best4u.tn",
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 3271,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.0%",
+  "custom_sample": {
+   "name": "Portguese TV ///",
+   "sid": " -i {INPUT} -c copy -analyzeduration 300"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://12.dragcdn.win:8080",
+  "user": "01006942890",
+  "auth": "yes",
+  "server_info": {
+   "url": "12.dragcdn.win",
+   "port": "8080",
+   "https_port": "25222",
+   "server_protocol": "http",
+   "rtmp_port": "8767",
+   "timezone": "Africa/Cairo",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 06:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25222,
+  "rtmp_port": 8767,
+  "protocol": "http",
+  "server_header": "cloudflare",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ]
+ },
+ {
+  "server": "http://195.128.27.253:2095",
+  "user": "cabtxNjD",
+  "auth": "yes",
+  "server_info": {
+   "url": "195.128.27.253",
+   "port": "2095",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Stockholm",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24",
+   "process": true
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": null,
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 23799,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "33.7%",
+  "https_works": true
+ },
+ {
+  "server": "http://1tv41.icu:8080",
+  "user": "S09CrA",
+  "auth": "yes",
+  "server_info": {
+   "url": "1xtr.icu",
+   "port": "8080",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "America/Thunder_Bay",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-10 23:34:24"
+  },
+  "host_mismatch": "1tv41.icu -> 1xtr.icu",
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 52374,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "1.4%",
+  "https_works": false
+ },
+ {
+  "server": "http://23.153.217.158:8080",
+  "user": "995258355tv",
+  "auth": "yes",
+  "server_info": {
+   "url": "myultratv.com",
+   "port": "8080",
+   "https_port": "2083",
+   "server_protocol": "http",
+   "rtmp_port": "2053",
+   "timezone": "America/Santiago",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 01:34:24"
+  },
+  "host_mismatch": "23.153.217.158 -> myultratv.com",
+  "https_port": 2083,
+  "rtmp_port": 2053,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 8701,
+  "direct_source_ratio": "31.6%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "4.4%",
+  "direct_sample": {
+   "name": "CL• MEGA (HD) »1«",
+   "direct": "https://unlimited2-cl-isp.dps.live/mega/mega.smil/playlist.m3u8?PlaylistM3UCL"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://4u.eagle4u.org:2082",
+  "user": "m5sntb5n6t",
+  "auth": "yes",
+  "server_info": {
+   "url": "4u.eagle4u.org",
+   "port": "80",
+   "https_port": "",
+   "server_protocol": "http",
+   "rtmp_port": "8001",
+   "timezone": "Africa/Casablanca",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24",
+   "process": true
+  },
+  "host_mismatch": null,
+  "https_port": null,
+  "rtmp_port": 8001,
+  "protocol": "http",
+  "server_header": null,
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ]
+ },
+ {
+  "server": "http://5tvs.xyz:8080",
+  "user": "5070044933",
+  "auth": "yes",
+  "server_info": {
+   "url": "6tvs.xyz",
+   "port": "8080",
+   "https_port": "2087",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Asia/Beirut",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 06:34:24"
+  },
+  "host_mismatch": "5tvs.xyz -> 6tvs.xyz",
+  "https_port": 2087,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "cloudflare",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 3029,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.0%",
+  "https_works": false
+ },
+ {
+  "server": "http://94.130.11.12:8080",
+  "user": "@Tv4Krestream",
+  "auth": "yes",
+  "server_info": {
+   "url": "94.130.11.12",
+   "port": "8080",
+   "https_port": "8443",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Berlin",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 8443,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 1545,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.0%",
+  "https_works": false
+ },
+ {
+  "server": "http://99gopro.org",
+  "user": "4692842534155265",
+  "auth": "yes",
+  "server_info": {
+   "url": "99gopro.org",
+   "port": "8080",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Amsterdam",
+   "timestamp_now": 1794371665,
+   "time_now": "2026-11-11 05:34:25",
+   "process": true
+  },
+  "host_mismatch": null,
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.24.0 (Ubuntu)",
+  "powered_by": "PHP/7.4.5",
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 7021,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "17.9%",
+  "direct_sample": {
+   "name": "RT FRANCE SD",
+   "direct": "https://rt-fra.gcdn.co/live/rtfrance/playlist_2500Kb.m3u8"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://a1.24tv.tn:2052",
+  "user": "2464866371038509",
+  "auth": "yes",
+  "server_info": {
+   "version": "2.3.9",
+   "url": "213.111.148.252",
+   "port": "80",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "8880",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24",
+   "timezone": "Europe/London",
+   "process": true
+  },
+  "host_mismatch": "a1.24tv.tn -> 213.111.148.252",
+  "https_port": 443,
+  "rtmp_port": 8880,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 4743,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "9.2%",
+  "https_works": false
+ },
+ {
+  "server": "http://alititv.net:80",
+  "user": "MAG78S9BY1",
+  "auth": "yes",
+  "server_info": {
+   "url": "alititv.net",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 23931,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "27.9%",
+  "https_works": false
+ },
+ {
+  "server": "http://android-iptv.com:80",
+  "user": "NTVBESTDIG",
+  "auth": "yes",
+  "server_info": {
+   "url": "ms.android-iptv.com",
+   "port": "80",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "8001",
+   "timezone": "America/Guatemala",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-10 22:34:24"
+  },
+  "host_mismatch": "android-iptv.com -> ms.android-iptv.com",
+  "https_port": 443,
+  "rtmp_port": 8001,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 2,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.0%",
+  "https_works": false
+ },
+ {
+  "server": "http://arabitv5.com:8000",
+  "user": "Aya",
+  "auth": "yes",
+  "server_info": {
+   "url": "otx.arabitv5.com",
+   "port": "8000",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Berlin",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24"
+  },
+  "host_mismatch": "arabitv5.com -> otx.arabitv5.com",
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ]
+ },
+ {
+  "server": "http://bazaruto.top:8000",
+  "user": "MIREL.SWWW57u5",
+  "auth": "yes",
+  "server_info": {
+   "url": "bazaruto.top",
+   "port": "8000",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Skopje",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.24.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 632,
+  "direct_source_ratio": "0.3%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "78.2%",
+  "direct_sample": {
+   "name": "National Geographic Wild (sw)",
+   "direct": "http://clientsportals.com:2095/EqC3z1PYRM/nssZqHtn4z/11531"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://bnxhspam.mpowerr.xyz:80",
+  "user": "NRJF9V12",
+  "auth": "yes",
+  "server_info": {
+   "url": "zzdaas.com",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "8081",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "bnxhspam.mpowerr.xyz -> zzdaas.com",
+  "https_port": 25460,
+  "rtmp_port": 8081,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 9672,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "31.4%",
+  "https_works": false
+ },
+ {
+  "server": "http://brmcuyrv.kxubv.com",
+  "user": "9738584530",
+  "auth": "yes",
+  "server_info": {
+   "url": "brmcuyrv.kxubv.com",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 28509,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "28.7%",
+  "direct_sample": {
+   "name": "✦●✦ |IR| ENTERTAINMENT✦●✦",
+   "direct": "http://www.dropbox.com/scl/fi/zroz8ny2lgc1ejo9ziita/IntroMega1080p.mp4?rlkey=f5m"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://bumtv.mrak-iptv.com:25461",
+  "user": "ZlAtkO:MKd",
+  "auth": "yes",
+  "server_info": {
+   "url": "adm.mrk-web.com",
+   "port": "25461",
+   "https_port": "8443",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Belgrade",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24"
+  },
+  "host_mismatch": "bumtv.mrak-iptv.com -> adm.mrk-web.com",
+  "https_port": 8443,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "ts"
+  ],
+  "total": 586,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "70.6%",
+  "https_works": false
+ },
+ {
+  "server": "http://cdn8k-link.xyz:80",
+  "user": "MAGNXDX2AU",
+  "auth": "yes",
+  "server_info": {
+   "url": "cdn8k-link.xyz",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 28779,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "27.0%",
+  "https_works": false
+ },
+ {
+  "server": "http://cf.tiger4k.vip",
+  "user": "b216996a3e93",
+  "auth": "yes",
+  "server_info": {
+   "url": "cf.tiger4k.vip",
+   "port": "80",
+   "https_port": "",
+   "server_protocol": "http",
+   "rtmp_port": "8001",
+   "timezone": "Europe/Amsterdam",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24",
+   "process": true
+  },
+  "host_mismatch": null,
+  "https_port": null,
+  "rtmp_port": 8001,
+  "protocol": "http",
+  "server_header": "cloudflare",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 16367,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "18.9%"
+ },
+ {
+  "server": "http://cineplay.club:2086",
+  "user": "JAIR26",
+  "auth": "yes",
+  "server_info": {
+   "url": "cineplay.club",
+   "port": "2086",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "America/Mexico_City",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-10 22:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ]
+ },
+ {
+  "server": "http://configuration.tn:8080",
+  "user": "n5I32OJVfG",
+  "auth": "yes",
+  "server_info": {
+   "url": "best4u.tn",
+   "port": "8080",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Africa/Abidjan",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "configuration.tn -> best4u.tn",
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 1870,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.1%",
+  "epg_id_ratio": "0.1%",
+  "custom_sample": {
+   "name": "Portguese TV ///",
+   "sid": " -i {INPUT} -c copy -analyzeduration 300"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://configuration.tn:8080",
+  "user": "q@W1101124",
+  "auth": "yes",
+  "server_info": {
+   "url": "best4u.tn",
+   "port": "8080",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Africa/Abidjan",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "configuration.tn -> best4u.tn",
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 3271,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.0%",
+  "custom_sample": {
+   "name": "Portguese TV ///",
+   "sid": " -i {INPUT} -c copy -analyzeduration 300"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://cord-cutter.net:8080",
+  "user": "59452816",
+  "auth": "yes",
+  "server_info": {
+   "url": "1xtr.icu",
+   "port": "8080",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "America/Thunder_Bay",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-10 23:34:24"
+  },
+  "host_mismatch": "cord-cutter.net -> 1xtr.icu",
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 52374,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "1.4%",
+  "https_works": false
+ },
+ {
+  "server": "http://deepgdn.com:80",
+  "user": "MAG87EZ4P2",
+  "auth": "yes",
+  "server_info": {
+   "url": "deepgdn.com",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 28779,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "27.0%",
+  "https_works": false
+ },
+ {
+  "server": "http://echaariktn.xyz:80",
+  "user": "2ft0imytnm",
+  "auth": "yes",
+  "server_info": {
+   "url": "echaariktn.xyz",
+   "port": "80",
+   "https_port": "",
+   "server_protocol": "http",
+   "rtmp_port": "2086",
+   "timezone": "Europe/Brussels",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24",
+   "process": true
+  },
+  "host_mismatch": null,
+  "https_port": null,
+  "rtmp_port": 2086,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 18966,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "17.7%"
+ },
+ {
+  "server": "http://falconpro.me:80",
+  "user": "YBqpkhgz",
+  "auth": "yes",
+  "server_info": {
+   "url": "falconpro.me",
+   "port": "80",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Amsterdam",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24",
+   "process": true
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": "PHP/7.4.5",
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ]
+ },
+ {
+  "server": "http://fast-smartplus.xyz:80",
+  "user": "DJPZA1A0W31TUSG",
+  "auth": "yes",
+  "server_info": {
+   "url": "whalesayblue.top",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "fast-smartplus.xyz -> whalesayblue.top",
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 11524,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "26.8%",
+  "https_works": false
+ },
+ {
+  "server": "http://fortv.cc:8080",
+  "user": "39787893",
+  "auth": "yes",
+  "server_info": {
+   "url": "1xtr.icu",
+   "port": "8080",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "America/Thunder_Bay",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-10 23:34:24"
+  },
+  "host_mismatch": "fortv.cc -> 1xtr.icu",
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 52374,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "1.4%",
+  "https_works": false
+ },
+ {
+  "server": "http://go.iptvhn.net:25461",
+  "user": "5213",
+  "auth": "yes",
+  "server_info": {
+   "url": "go.iptvhn.net",
+   "port": "25461",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "America/Managua",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-10 22:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 206,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "1.9%",
+  "https_works": true
+ },
+ {
+  "server": "http://goldenfrance.xyz:80",
+  "user": "X4C92GP56Z3TTN8",
+  "auth": "yes",
+  "server_info": {
+   "url": "ottlin8309.xyz",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "goldenfrance.xyz -> ottlin8309.xyz",
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 6612,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "27.5%",
+  "https_works": false
+ },
+ {
+  "server": "http://hardcoremedia.xyz:80",
+  "user": "C8neuwYKes",
+  "auth": "yes",
+  "server_info": {
+   "url": "hardcoremedia.xyz",
+   "port": "80",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "America/New_York",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-10 23:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 18105,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "37.2%",
+  "https_works": false
+ },
+ {
+  "server": "http://hermosud.lat:80",
+  "user": "MAGSZ95YWE",
+  "auth": "yes",
+  "server_info": {
+   "url": "skygolden.site",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "hermosud.lat -> skygolden.site",
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 9289,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "37.1%",
+  "https_works": false
+ },
+ {
+  "server": "http://ipc.proipciptv.com:8000",
+  "user": "AbuIssa1",
+  "auth": "yes",
+  "server_info": {
+   "url": "otx.arabitv5.com",
+   "port": "8000",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Berlin",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24"
+  },
+  "host_mismatch": "ipc.proipciptv.com -> otx.arabitv5.com",
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ]
+ },
+ {
+  "server": "http://ipc.proipciptv.com:8000",
+  "user": "TalaatM",
+  "auth": "yes",
+  "server_info": {
+   "url": "otx.arabitv5.com",
+   "port": "8000",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Berlin",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24"
+  },
+  "host_mismatch": "ipc.proipciptv.com -> otx.arabitv5.com",
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 7729,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "14.3%",
+  "direct_sample": {
+   "name": "AL JADEED LEBANON HD",
+   "direct": "http://176.65.146.77:8888/hls/1/index.m3u8?timeshift=1"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://iptv.icsnleb.com:25461",
+  "user": "12",
+  "auth": "yes",
+  "server_info": {
+   "url": "iptv.icsnleb.com",
+   "port": "25461",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Asia/Beirut",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 06:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 12,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.0%",
+  "https_works": true
+ },
+ {
+  "server": "http://iptvpixel.com:80",
+  "user": "Abeermoh8839",
+  "auth": "yes",
+  "server_info": {
+   "url": "iptvpixel.com",
+   "port": "80",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "8445",
+   "timezone": "Africa/Cairo",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 06:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 8445,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 1259,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "9.3%",
+  "https_works": false
+ },
+ {
+  "server": "http://iptvpremium.ink:55577",
+  "user": "extremo1890",
+  "auth": "yes",
+  "server_info": {
+   "url": "iptvpremium.ink",
+   "port": "55577",
+   "https_port": "2052",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "America/Lima",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-10 23:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 2052,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 2923,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.0%",
+  "direct_sample": {
+   "name": "AL:FILM GOLD HD",
+   "direct": "http://79.106.90.116:81/out/i/152.m3u8"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://jarodtv62000.com:8000",
+  "user": "Meslem_laho",
+  "auth": "yes",
+  "server_info": {
+   "url": "www.cameramaison.date",
+   "port": "80",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "8001",
+   "timezone": "Europe/London",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "jarodtv62000.com -> www.cameramaison.date",
+  "https_port": 25463,
+  "rtmp_port": 8001,
+  "protocol": "http",
+  "server_header": "nginx/1.24.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "ts"
+  ],
+  "total": 1333,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "22.4%",
+  "https_works": false
+ },
+ {
+  "server": "http://kenvixpro.online:8080",
+  "user": "144536352728BB",
+  "auth": "yes",
+  "server_info": {
+   "url": "kenvixpro.online",
+   "port": "8080",
+   "https_port": "2087",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 2087,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "cloudflare",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 14553,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "5.2%",
+  "https_works": false
+ },
+ {
+  "server": "http://ktvs.lol:8080",
+  "user": "337885789016",
+  "auth": "yes",
+  "server_info": {
+   "url": "ktvs.lol",
+   "port": "8080",
+   "https_port": "2087",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 2087,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "cloudflare",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 14553,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "5.2%",
+  "https_works": false
+ },
+ {
+  "server": "http://kwick.cc:8080",
+  "user": "chandler1",
+  "auth": "yes",
+  "server_info": {
+   "url": "kwick.cc",
+   "port": "80",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "8880",
+   "timezone": "America/New_York",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-10 23:34:24",
+   "process": true
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 8880,
+  "protocol": "http",
+  "server_header": null,
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 9942,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "29.1%",
+  "https_works": false
+ },
+ {
+  "server": "http://line.conex-tivi.cc:80",
+  "user": "R6GJ59",
+  "auth": "yes",
+  "server_info": {
+   "url": "line.conex-tivi.cc",
+   "port": "80",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Amsterdam",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24",
+   "process": true
+  },
+  "host_mismatch": null,
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "CDN PROXY SERVICE",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 24091,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "28.0%",
+  "https_works": false
+ },
+ {
+  "server": "http://line.mytv-zone.com",
+  "user": "fransuildriks",
+  "auth": "yes",
+  "server_info": {
+   "url": "line.mytv-zone.com",
+   "port": "80",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Amsterdam",
+   "timestamp_now": 1794371495,
+   "time_now": "2026-11-11 05:31:35"
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "cloudflare",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 19799,
+  "direct_source_ratio": "11.9%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "20.6%",
+  "direct_sample": {
+   "name": "FR ▎CATFISH TV",
+   "direct": "http://stitcher-ipv4.pluto.tv/v1/stitch/embed/hls/channel/5f8eb66537867f00071469"
+  },
+  "https_works": true
+ },
+ {
+  "server": "http://liontv.es",
+  "user": "DannyBarrantes",
+  "auth": "yes",
+  "server_info": {
+   "url": "liontv.es",
+   "port": "8080",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "8001",
+   "timezone": "America/El_Salvador",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-10 22:34:24",
+   "process": true
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 8001,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 8727,
+  "direct_source_ratio": "0.2%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "5.5%",
+  "direct_sample": {
+   "name": "CR | Repretel 11 (DIRECTO SOLO",
+   "direct": "http://186.33.25.234:8125/play/a09h/index.m3u8"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://localiptv.site:85",
+  "user": "OneTelekom285",
+  "auth": "yes",
+  "server_info": {
+   "url": "localiptv.site",
+   "port": "80",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Zagreb",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 2492,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "9.3%",
+  "https_works": false
+ },
+ {
+  "server": "http://longsat.xyz",
+  "user": "ahmedbenzekri",
+  "auth": "yes",
+  "server_info": {
+   "xui": true,
+   "version": "1.5.13",
+   "revision": null,
+   "url": "longsat.xyz",
+   "port": "80",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "8880",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24",
+   "timezone": "UTC"
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 8880,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 3812,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "41.0%",
+  "https_works": false
+ },
+ {
+  "server": "http://magtvplus.xyz",
+  "user": "6303416F4D7A7C9",
+  "auth": "yes",
+  "server_info": {
+   "url": "krythrax.com",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "magtvplus.xyz -> krythrax.com",
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 25926,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "28.5%",
+  "https_works": false
+ },
+ {
+  "server": "http://megastar06.xyz:80",
+  "user": "276324574943",
+  "auth": "yes",
+  "server_info": {
+   "url": "atlas06.xyz",
+   "port": "80",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/London",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "megastar06.xyz -> atlas06.xyz",
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "AliPacket",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ]
+ },
+ {
+  "server": "http://megatv5074.com:80",
+  "user": "MAGNHL1VAP",
+  "auth": "yes",
+  "server_info": {
+   "url": "megatv5074.com",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 8200,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "33.6%",
+  "https_works": false
+ },
+ {
+  "server": "http://mg88gg.cc:80",
+  "user": "62153891CFF6844",
+  "auth": "yes",
+  "server_info": {
+   "url": "gott-smart.net",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "mg88gg.cc -> gott-smart.net",
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 9971,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "24.6%",
+  "https_works": false
+ },
+ {
+  "server": "http://myultratv.com:8080",
+  "user": "50054300",
+  "auth": "yes",
+  "server_info": {
+   "url": "myultratv.com",
+   "port": "8080",
+   "https_port": "2083",
+   "server_protocol": "http",
+   "rtmp_port": "2053",
+   "timezone": "America/Santiago",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 01:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 2083,
+  "rtmp_port": 2053,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 8844,
+  "direct_source_ratio": "31.5%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "4.3%",
+  "direct_sample": {
+   "name": "CL• MEGA (HD) »1«",
+   "direct": "https://unlimited2-cl-isp.dps.live/mega/mega.smil/playlist.m3u8?PlaylistM3UCL"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://n2039.x.nplay.info:2082",
+  "user": "598227519641023",
+  "auth": "yes",
+  "server_info": {
+   "url": "n2039.x.nplay.info",
+   "port": "2082",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "1933",
+   "timezone": "Europe/Athens",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 1933,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "ts"
+  ],
+  "total": 8903,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.0%",
+  "https_works": false
+ },
+ {
+  "server": "http://new8k.cc:8080",
+  "user": "00:7d:3b:5e:89:b6",
+  "auth": "yes",
+  "server_info": {
+   "url": "new8k.cc",
+   "port": "8080",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "8445",
+   "timezone": "Africa/Cairo",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 06:34:24",
+   "process": true,
+   "panel": "Xtream-Masters OTT Panel",
+   "version": "3.1.370"
+  },
+  "host_mismatch": null,
+  "https_port": 25463,
+  "rtmp_port": 8445,
+  "protocol": "http",
+  "server_header": "cloudflare",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 37906,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.2%",
+  "https_works": false
+ },
+ {
+  "server": "http://otx.arabitv5.com:8000",
+  "user": "W.zimmer1",
+  "auth": "yes",
+  "server_info": {
+   "url": "otx.arabitv5.com",
+   "port": "8000",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Berlin",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 7715,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "14.3%",
+  "direct_sample": {
+   "name": "AL JADEED LEBANON HD",
+   "direct": "http://176.65.146.77:8888/hls/1/index.m3u8?timeshift=1"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://planet4k.xyz:80",
+  "user": "ynskh24_126942",
+  "auth": "yes",
+  "server_info": {
+   "url": "planet4k.xyz",
+   "port": "80",
+   "https_port": "",
+   "server_protocol": "http",
+   "rtmp_port": "8001",
+   "timezone": "Africa/Casablanca",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24",
+   "process": true
+  },
+  "host_mismatch": null,
+  "https_port": null,
+  "rtmp_port": 8001,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 18673,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "34.2%"
+ },
+ {
+  "server": "http://raeed.tv:80",
+  "user": "54:bd:79:74:36:7f",
+  "auth": "yes",
+  "server_info": {
+   "url": "raeed.tv",
+   "port": "80",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "0",
+   "timezone": "UTC",
+   "timestamp_now": 1794371611,
+   "time_now": "2026-11-11 04:33:31"
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 0,
+  "protocol": "http",
+  "server_header": "SolusV2",
+  "powered_by": null,
+  "formats": [
+   "ts",
+   "m3u8"
+  ],
+  "total": 6889,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.5%",
+  "https_works": false
+ },
+ {
+  "server": "http://s.rocketdns.info:8080",
+  "user": "protonimumtv",
+  "auth": "yes",
+  "server_info": {
+   "url": "s.rocketdns.info",
+   "port": "8080",
+   "https_port": "443",
+   "server_protocol": "https",
+   "rtmp_port": "25462",
+   "timezone": "America/New_York",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-10 23:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 25462,
+  "protocol": "https",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 3906,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "47.4%",
+  "https_works": true
+ },
+ {
+  "server": "http://s3159.spxtl.cc:4082",
+  "user": "291140290725590",
+  "auth": "yes",
+  "server_info": {
+   "url": "s3159.spxtl.cc",
+   "port": "4082",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "1933",
+   "timezone": "Europe/Athens",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 1933,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "ts"
+  ],
+  "total": 8903,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.0%",
+  "https_works": false
+ },
+ {
+  "server": "http://sat1.dragonkey.net:2082",
+  "user": "110018469074050",
+  "auth": "yes",
+  "server_info": {
+   "url": "3790.dgpls.net",
+   "port": "2082",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "8003",
+   "timezone": "Europe/Paris",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24",
+   "process": true
+  },
+  "host_mismatch": "sat1.dragonkey.net -> 3790.dgpls.net",
+  "https_port": 443,
+  "rtmp_port": 8003,
+  "protocol": "http",
+  "server_header": "openresty",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ]
+ },
+ {
+  "server": "http://smarttvplus.cc:42310",
+  "user": "U9UQJw5sZ3",
+  "auth": "yes",
+  "server_info": {
+   "xui": true,
+   "version": "1.5.13",
+   "revision": null,
+   "url": "movaloget.cc",
+   "port": "42310",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "8880",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24",
+   "timezone": "Europe/Bratislava"
+  },
+  "host_mismatch": "smarttvplus.cc -> movaloget.cc",
+  "https_port": 443,
+  "rtmp_port": 8880,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 6821,
+  "direct_source_ratio": "100.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "25.8%",
+  "direct_sample": {
+   "name": "FIREPLACE FHD",
+   "direct": "http://movaloget.cc:42310/play/8QW8JPulE5W1HdZNYACo3cMba7qTvT40zSRS55BKSSILVHx7O"
+  },
+  "custom_sample": {
+   "name": "HU|GALAXY 4",
+   "sid": "GALAXY 4"
+  },
+  "https_works": false
+ },
+ {
+  "server": "http://solution62000.mine.nu:8000",
+  "user": "boukhari_alamine",
+  "auth": "yes",
+  "server_info": {
+   "url": "www.cameramaison.date",
+   "port": "80",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "8001",
+   "timezone": "Europe/London",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "solution62000.mine.nu -> www.cameramaison.date",
+  "https_port": 25463,
+  "rtmp_port": 8001,
+  "protocol": "http",
+  "server_header": "nginx/1.24.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "ts"
+  ],
+  "total": 1333,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "22.4%",
+  "https_works": false
+ },
+ {
+  "server": "http://stream8k.store:80",
+  "user": "MAGENQ8NZK",
+  "auth": "yes",
+  "server_info": {
+   "url": "stream8k.store",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 10036,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "23.5%",
+  "https_works": false
+ },
+ {
+  "server": "http://sxx22.cc:2233",
+  "user": "762361031437662",
+  "auth": "yes",
+  "server_info": {
+   "url": "sxx22.cc",
+   "port": "2233",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "1933",
+   "timezone": "Europe/Athens",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 1933,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "ts"
+  ],
+  "total": 8903,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.0%",
+  "https_works": false
+ },
+ {
+  "server": "http://tvshafak.xyz:8880",
+  "user": "24358407398650",
+  "auth": "yes",
+  "server_info": {
+   "url": "tvshafak.xyz",
+   "port": "8080",
+   "https_port": "2087",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Asia/Beirut",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 06:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 2087,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": null,
+  "powered_by": null,
+  "formats": [
+   "m3u8"
+  ],
+  "total": 11817,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.7%",
+  "https_works": false
+ },
+ {
+  "server": "http://ultra-pro.live:8080",
+  "user": "35431411030671",
+  "auth": "yes",
+  "server_info": {
+   "url": "ultraprotv.com",
+   "port": "8080",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Berlin",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24"
+  },
+  "host_mismatch": "ultra-pro.live -> ultraprotv.com",
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "cloudflare",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 9829,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.3%",
+  "https_works": false
+ },
+ {
+  "server": "http://ultra-pro.live:8080",
+  "user": "WalidMohammad",
+  "auth": "yes",
+  "server_info": {
+   "url": "ultraprotv.com",
+   "port": "8080",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "Europe/Berlin",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24"
+  },
+  "host_mismatch": "ultra-pro.live -> ultraprotv.com",
+  "https_port": 25463,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "cloudflare",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 9829,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "0.3%",
+  "https_works": false
+ },
+ {
+  "server": "http://vca.easy747.com:80",
+  "user": "5C3655721A13121",
+  "auth": "yes",
+  "server_info": {
+   "url": "vca.easy747.com",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 8717,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "21.2%",
+  "https_works": false
+ },
+ {
+  "server": "http://velive.lat",
+  "user": "56930808023",
+  "auth": "yes",
+  "server_info": {
+   "url": "velive.lat",
+   "port": "8080",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "America/Santiago",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 01:34:24",
+   "process": true,
+   "panel": "Xtream-Masters OTT Panel",
+   "version": "3.1.370"
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": null,
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 5509,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "1.0%",
+  "https_works": true
+ },
+ {
+  "server": "http://vlcdc.org",
+  "user": "FuKRydvAS6",
+  "auth": "yes",
+  "server_info": {
+   "url": "adminapk.com",
+   "port": "80",
+   "https_port": "25463",
+   "server_protocol": "http",
+   "rtmp_port": "8001",
+   "timezone": "UTC",
+   "timestamp_now": 1794371665,
+   "time_now": "2026-11-11 04:34:25"
+  },
+  "host_mismatch": "vlcdc.org -> adminapk.com",
+  "https_port": 25463,
+  "rtmp_port": 8001,
+  "protocol": "http",
+  "server_header": "mytrade",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 3312,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "8.9%",
+  "https_works": false
+ },
+ {
+  "server": "http://wsmine.cc:80",
+  "user": "MAGC7LVSWB",
+  "auth": "yes",
+  "server_info": {
+   "url": "wsmine.cc",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 28779,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "27.0%",
+  "https_works": false
+ },
+ {
+  "server": "http://www.test123.my:80",
+  "user": "78W135BVPV8NL04",
+  "auth": "yes",
+  "server_info": {
+   "url": "fanja3006tv.net",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": "www.test123.my -> fanja3006tv.net",
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 28779,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "27.0%",
+  "https_works": false
+ },
+ {
+  "server": "http://xamora.space:80",
+  "user": "MAG7R7DLPR",
+  "auth": "yes",
+  "server_info": {
+   "url": "xamora.space",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 11915,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "24.6%",
+  "https_works": false
+ },
+ {
+  "server": "http://xdplus.site:2082",
+  "user": "jhonson01",
+  "auth": "yes",
+  "server_info": {
+   "url": "xdplus.site",
+   "port": "8880",
+   "https_port": "2053",
+   "server_protocol": "http",
+   "rtmp_port": "2052",
+   "timezone": "America/Costa_Rica",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-10 22:34:24",
+   "process": true,
+   "panel": "Xtream-Masters OTT Panel",
+   "version": "3.1.370"
+  },
+  "host_mismatch": null,
+  "https_port": 2053,
+  "rtmp_port": 2052,
+  "protocol": "http",
+  "server_header": null,
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 7394,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "13.5%",
+  "https_works": false
+ },
+ {
+  "server": "http://yltvg.com:80",
+  "user": "MAG9Z9WBQE",
+  "auth": "yes",
+  "server_info": {
+   "url": "yltvg.com",
+   "port": "80",
+   "https_port": "25460",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "UTC",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24"
+  },
+  "host_mismatch": null,
+  "https_port": 25460,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": "nginx/1.18.0 (Ubuntu)",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts"
+  ],
+  "total": 9759,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "23.9%",
+  "https_works": false
+ },
+ {
+  "server": "http://zeta.cloudf-nettv.xyz:80",
+  "user": "yahia-benkirane",
+  "auth": "yes",
+  "server_info": {
+   "url": "zeta.cloudf-nettv.xyz",
+   "port": "80",
+   "https_port": "",
+   "server_protocol": "http",
+   "rtmp_port": "2086",
+   "timezone": "Europe/Brussels",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 05:34:24",
+   "process": true
+  },
+  "host_mismatch": null,
+  "https_port": null,
+  "rtmp_port": 2086,
+  "protocol": "http",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 2002,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "30.6%"
+ },
+ {
+  "server": "http://zonacero.lat:8080",
+  "user": "56964319607",
+  "auth": "yes",
+  "server_info": {
+   "url": "zonacero.lat",
+   "port": "8080",
+   "https_port": "443",
+   "server_protocol": "http",
+   "rtmp_port": "25462",
+   "timezone": "America/Santiago",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 01:34:24",
+   "process": true,
+   "panel": "Xtream-Masters OTT Panel",
+   "version": "3.1.370"
+  },
+  "host_mismatch": null,
+  "https_port": 443,
+  "rtmp_port": 25462,
+  "protocol": "http",
+  "server_header": null,
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 5509,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "1.0%",
+  "https_works": true
+ },
+ {
+  "server": "https://reborned.cc:8443",
+  "user": "AndsRmrs",
+  "auth": "yes",
+  "server_info": {
+   "xui": true,
+   "version": "1.5.13",
+   "revision": null,
+   "url": "reborned.cc",
+   "port": "8080",
+   "https_port": "8443",
+   "server_protocol": "https",
+   "rtmp_port": "8880",
+   "timestamp_now": 1794371664,
+   "time_now": "2026-11-11 04:34:24",
+   "timezone": "UTC"
+  },
+  "host_mismatch": null,
+  "https_port": 8443,
+  "rtmp_port": 8880,
+  "protocol": "https",
+  "server_header": "nginx",
+  "powered_by": null,
+  "formats": [
+   "m3u8",
+   "ts",
+   "rtmp"
+  ],
+  "total": 5529,
+  "direct_source_ratio": "0.0%",
+  "custom_sid_ratio": "0.0%",
+  "epg_id_ratio": "20.3%",
+  "custom_sample": {
+   "name": "AMAZON 2",
+   "sid": "desierto de oro"
+  },
+  "https_works": true
+ }
+]

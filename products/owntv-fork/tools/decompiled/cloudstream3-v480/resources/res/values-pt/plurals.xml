@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="downloads_active">
+        <item quantity="one">%d download ativo</item>
+        <item quantity="many">%d downloads ativos</item>
+        <item quantity="other">%d downloads ativos</item>
+    </plurals>
+    <plurals name="downloads_queued">
+        <item quantity="one">%d download na fila</item>
+        <item quantity="many">%d downloads na fila</item>
+        <item quantity="other">%d downloads na fila</item>
+    </plurals>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">Avançar %d segundo</item>
+        <item quantity="other">Avançar %d segundos</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">Voltar %d segundo</item>
+        <item quantity="other">Voltar %d segundos</item>
+    </plurals>
+</resources>

@@ -1,0 +1,134 @@
+package org.conscrypt;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.SocketException;
+import java.security.KeyManagementException;
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocketFactory;
+
+/* JADX INFO: loaded from: classes8.dex */
+final class OpenSSLSocketFactoryImpl extends SSLSocketFactory {
+    private static boolean useEngineSocketByDefault = SSLUtils.USE_ENGINE_SOCKET_BY_DEFAULT;
+    private final IOException instantiationException;
+    private final SSLParametersImpl sslParameters;
+    private boolean useEngineSocket;
+
+    OpenSSLSocketFactoryImpl() throws KeyManagementException {
+        IOException iOException;
+        this.useEngineSocket = useEngineSocketByDefault;
+        SSLParametersImpl sSLParametersImpl = null;
+        try {
+            iOException = null;
+            sSLParametersImpl = SSLParametersImpl.getDefault();
+        } catch (KeyManagementException e) {
+            iOException = new IOException("Delayed instantiation exception:", e);
+        }
+        this.sslParameters = sSLParametersImpl;
+        this.instantiationException = iOException;
+    }
+
+    OpenSSLSocketFactoryImpl(SSLParametersImpl sSLParametersImpl) {
+        this.useEngineSocket = useEngineSocketByDefault;
+        this.sslParameters = sSLParametersImpl;
+        this.instantiationException = null;
+    }
+
+    static void setUseEngineSocketByDefault(boolean z) {
+        useEngineSocketByDefault = z;
+        SocketFactory socketFactory = SSLSocketFactory.getDefault();
+        if (socketFactory instanceof OpenSSLSocketFactoryImpl) {
+            ((OpenSSLSocketFactoryImpl) socketFactory).setUseEngineSocket(z);
+        }
+    }
+
+    void setUseEngineSocket(boolean z) {
+        this.useEngineSocket = z;
+    }
+
+    @Override // javax.net.ssl.SSLSocketFactory
+    public String[] getDefaultCipherSuites() {
+        return this.sslParameters.getEnabledCipherSuites();
+    }
+
+    @Override // javax.net.ssl.SSLSocketFactory
+    public String[] getSupportedCipherSuites() {
+        return NativeCrypto.getSupportedCipherSuites();
+    }
+
+    @Override // javax.net.SocketFactory
+    public Socket createSocket() throws IOException {
+        IOException iOException = this.instantiationException;
+        if (iOException != null) {
+            throw iOException;
+        }
+        boolean z = this.useEngineSocket;
+        SSLParametersImpl sSLParametersImpl = this.sslParameters;
+        if (z) {
+            return Platform.createEngineSocket((SSLParametersImpl) sSLParametersImpl.clone());
+        }
+        return Platform.createFileDescriptorSocket((SSLParametersImpl) sSLParametersImpl.clone());
+    }
+
+    @Override // javax.net.SocketFactory
+    public Socket createSocket(String str, int i) throws IOException {
+        boolean z = this.useEngineSocket;
+        SSLParametersImpl sSLParametersImpl = this.sslParameters;
+        if (z) {
+            return Platform.createEngineSocket(str, i, (SSLParametersImpl) sSLParametersImpl.clone());
+        }
+        return Platform.createFileDescriptorSocket(str, i, (SSLParametersImpl) sSLParametersImpl.clone());
+    }
+
+    @Override // javax.net.SocketFactory
+    public Socket createSocket(String str, int i, InetAddress inetAddress, int i2) throws IOException {
+        boolean z = this.useEngineSocket;
+        SSLParametersImpl sSLParametersImpl = this.sslParameters;
+        if (z) {
+            return Platform.createEngineSocket(str, i, inetAddress, i2, (SSLParametersImpl) sSLParametersImpl.clone());
+        }
+        return Platform.createFileDescriptorSocket(str, i, inetAddress, i2, (SSLParametersImpl) sSLParametersImpl.clone());
+    }
+
+    @Override // javax.net.SocketFactory
+    public Socket createSocket(InetAddress inetAddress, int i) throws IOException {
+        boolean z = this.useEngineSocket;
+        SSLParametersImpl sSLParametersImpl = this.sslParameters;
+        if (z) {
+            return Platform.createEngineSocket(inetAddress, i, (SSLParametersImpl) sSLParametersImpl.clone());
+        }
+        return Platform.createFileDescriptorSocket(inetAddress, i, (SSLParametersImpl) sSLParametersImpl.clone());
+    }
+
+    @Override // javax.net.SocketFactory
+    public Socket createSocket(InetAddress inetAddress, int i, InetAddress inetAddress2, int i2) throws IOException {
+        boolean z = this.useEngineSocket;
+        SSLParametersImpl sSLParametersImpl = this.sslParameters;
+        if (z) {
+            return Platform.createEngineSocket(inetAddress, i, inetAddress2, i2, (SSLParametersImpl) sSLParametersImpl.clone());
+        }
+        return Platform.createFileDescriptorSocket(inetAddress, i, inetAddress2, i2, (SSLParametersImpl) sSLParametersImpl.clone());
+    }
+
+    @Override // javax.net.ssl.SSLSocketFactory
+    public Socket createSocket(Socket socket, String str, int i, boolean z) throws IOException {
+        Preconditions.checkNotNull(socket, "socket");
+        if (!socket.isConnected()) {
+            throw new SocketException("Socket is not connected.");
+        }
+        if (!this.useEngineSocket && hasFileDescriptor(socket)) {
+            return Platform.createFileDescriptorSocket(socket, str, i, z, (SSLParametersImpl) this.sslParameters.clone());
+        }
+        return Platform.createEngineSocket(socket, str, i, z, (SSLParametersImpl) this.sslParameters.clone());
+    }
+
+    private boolean hasFileDescriptor(Socket socket) {
+        try {
+            Platform.getFileDescriptor(socket);
+            return true;
+        } catch (RuntimeException unused) {
+            return false;
+        }
+    }
+}

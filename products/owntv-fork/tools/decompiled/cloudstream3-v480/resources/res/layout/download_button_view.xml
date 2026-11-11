@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <androidx.core.widget.ContentLoadingProgressBar
+        android:layout_gravity="center"
+        android:id="@+id/progress_downloaded"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:max="100"
+        android:progress="0"
+        android:indeterminate="false"
+        android:progressDrawable="@drawable/circular_progress_bar_top_to_bottom"
+        style="?android:attr/progressBarStyleHorizontal"/>
+    <View
+        android:id="@+id/progress_downloaded_background"
+        android:background="@drawable/circle_shape_dotted"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <ImageView
+        android:layout_gravity="center"
+        android:id="@+id/image_download_status"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/ic_baseline_play_arrow_24"
+        android:scaleX="?attr/download_icon_scale"
+        android:scaleY="?attr/download_icon_scale"
+        app:tint="?attr/download_icon_color"/>
+</FrameLayout>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="downloads_active">
+        <item quantity="one">%d செயலில் பதிவிறக்கம்</item>
+        <item quantity="other">%d செயலில் உள்ள பதிவிறக்கங்கள்</item>
+    </plurals>
+    <plurals name="downloads_queued">
+        <item quantity="one">%d பதிவிறக்கம் வரிசையில் உள்ளது</item>
+        <item quantity="other">%d பதிவிறக்கங்கள் வரிசையில் உள்ளன</item>
+    </plurals>
+    <plurals name="exo_controls_fastforward_by_amount_description">
+        <item quantity="one">%d வினாடி ஃபாஸ்ட் ஃபார்வர்ட் ஆகும்</item>
+        <item quantity="other">%d வினாடிகள் ஃபாஸ்ட் ஃபார்வர்ட் ஆகும்</item>
+    </plurals>
+    <plurals name="exo_controls_rewind_by_amount_description">
+        <item quantity="one">%d வினாடி ரீவைண்ட் ஆகும்</item>
+        <item quantity="other">%d வினாடிகள் ரீவைண்ட் ஆகும்</item>
+    </plurals>
+    <plurals name="mtrl_badge_content_description">
+        <item quantity="one">%d புதிய அறிவிப்பு</item>
+        <item quantity="other">%d புதிய அறிவிப்புகள்</item>
+    </plurals>
+</resources>

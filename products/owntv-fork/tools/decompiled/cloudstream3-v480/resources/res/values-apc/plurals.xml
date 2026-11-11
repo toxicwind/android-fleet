@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="downloads_active">
+        <item quantity="one">م شي عم يتنزل</item>
+        <item quantity="other">شي واحد عم يتنزل</item>
+    </plurals>
+    <plurals name="downloads_queued">
+        <item quantity="one">مافي شي بعد بده يبلش يتنزل</item>
+        <item quantity="other">فيه شي واحد بعد بده يبلش يتنزل</item>
+    </plurals>
+</resources>

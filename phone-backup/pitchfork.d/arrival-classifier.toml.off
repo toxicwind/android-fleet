@@ -6,8 +6,8 @@
 # auto-routed — left in incoming/ for manual review.
 
 [daemons.arrival-classifier]
-run = "exec /home/toxic/.bun/bin/bun /home/toxic/estate/ranch/android-fleet/phone-backup/arrival-classifier.ts"
-dir = "/home/toxic/estate/ranch/android-fleet/phone-backup"
+run = "exec /home/toxic/.bun/bin/bun /home/toxic/pens/estate/ranch/android-fleet/phone-backup/arrival-classifier.ts"
+dir = "/home/toxic/pens/estate/ranch/android-fleet/phone-backup"
 mise = false
 retry = true
 auto = ["start"]

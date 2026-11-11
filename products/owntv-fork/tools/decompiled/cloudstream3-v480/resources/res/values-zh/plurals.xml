@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="downloads_active">
+        <item quantity="other">%d 个活跃下载</item>
+    </plurals>
+    <plurals name="downloads_queued">
+        <item quantity="other">队列中有 %d 个下载</item>
+    </plurals>
+</resources>

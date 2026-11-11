@@ -1,0 +1,24 @@
+package com.lagradost.cloudstream3.ui.result;
+
+import kotlin.Metadata;
+
+/* JADX INFO: compiled from: EpisodeAdapter.kt */
+/* JADX INFO: loaded from: classes7.dex */
+@Metadata(d1 = {"\u0000\n\n\u0000\n\u0002\u0010\b\n\u0002\b\u000f\"\u000e\u0010\u0000\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\u0002\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\u0003\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\u0004\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\u0005\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\u0006\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\u0007\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\b\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\t\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\n\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\u000b\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\f\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\r\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\u000e\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000\"\u000e\u0010\u000f\u001a\u00020\u0001X\u0086T¢\u0006\u0002\n\u0000¨\u0006\u0010"}, d2 = {"ACTION_PLAY_EPISODE_IN_PLAYER", "", "ACTION_CHROME_CAST_EPISODE", "ACTION_CHROME_CAST_MIRROR", "ACTION_DOWNLOAD_EPISODE", "ACTION_DOWNLOAD_MIRROR", "ACTION_RELOAD_EPISODE", "ACTION_SHOW_OPTIONS", "ACTION_CLICK_DEFAULT", "ACTION_SHOW_TOAST", "ACTION_SHOW_DESCRIPTION", "ACTION_DOWNLOAD_EPISODE_SUBTITLE", "ACTION_DOWNLOAD_EPISODE_SUBTITLE_MIRROR", "ACTION_MARK_AS_WATCHED", "TV_EP_SIZE", "ACTION_MARK_WATCHED_UP_TO_THIS_EPISODE", "app"}, k = 2, mv = {2, 3, 0}, xi = 48)
+public final class EpisodeAdapterKt {
+    public static final int ACTION_CHROME_CAST_EPISODE = 4;
+    public static final int ACTION_CHROME_CAST_MIRROR = 5;
+    public static final int ACTION_CLICK_DEFAULT = 11;
+    public static final int ACTION_DOWNLOAD_EPISODE = 6;
+    public static final int ACTION_DOWNLOAD_EPISODE_SUBTITLE = 13;
+    public static final int ACTION_DOWNLOAD_EPISODE_SUBTITLE_MIRROR = 14;
+    public static final int ACTION_DOWNLOAD_MIRROR = 7;
+    public static final int ACTION_MARK_AS_WATCHED = 18;
+    public static final int ACTION_MARK_WATCHED_UP_TO_THIS_EPISODE = 19;
+    public static final int ACTION_PLAY_EPISODE_IN_PLAYER = 1;
+    public static final int ACTION_RELOAD_EPISODE = 8;
+    public static final int ACTION_SHOW_DESCRIPTION = 15;
+    public static final int ACTION_SHOW_OPTIONS = 10;
+    public static final int ACTION_SHOW_TOAST = 12;
+    public static final int TV_EP_SIZE = 400;
+}

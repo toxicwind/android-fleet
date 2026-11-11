@@ -1,61 +1,81 @@
-# Sync Pipeline Refactor Audit — 129K-channel import (2026-11-11)
+# Sync Pipeline Refactor — Latency-Aware Architecture (recalibrated 2026-11-11)
 
-**Observed:** first full sync of 6 Xtream sources imported 129,451 channels +
-140,056 movies + 24,016 series in ~3 minutes. Per-chunk timing:
-`LIVE chunk raw=10000 applyMs=25087` and `applyMs=55666` — 2.5–5.5 ms/row.
+**Doctrine:** the tau latency doctrine applies to sync too — measure ttstMs /
+worstGapMs / gapP50 / gapP90 per phase, adapt to the device, never block the
+visible surface. The basic prepared-statement fix is the FLOOR, not the goal.
 
-## Bottleneck analysis
-
-The insert path for a fresh import:
+## Measured baseline (129K-channel first sync)
 
 ```
-SyncSupport.insertFresh(rows)
-  → rows.map { adapter.copyWith(it, null, adapter.hashOf(it)) }   // content hash
-  → adapter.insertAll(hashed)                                       // Room @Insert
+LIVE chunk raw=10000 applyMs=25087  (2.5 ms/row)
+LIVE chunk raw=10000 applyMs=55666  (5.6 ms/row — device under load)
+SERIES chunk raw=1094 applyMs=4178  (3.8 ms/row)
+MOVIES chunk raw=10000 applyMs=~30s (est.)
 ```
 
-`ChannelDao.insertAll` is `@Insert(onConflict = OnConflictStrategy.IGNORE)` —
-**Room generates one INSERT statement per entity**. A 10,000-row chunk becomes
-10,000 individual INSERTs inside one implicit transaction. At ~2.5–5.5 ms/row
-that's the observed 25–55 s per chunk, and 52 K channels ≈ 5 chunks ≈ 2–5 min
-just for LIVE.
+`worstGapMs` = 55.7 s between visible catalog updates on a 52K source.
+`gapP50` ≈ 25 s. That's the latency problem: the UI shows "0 channels" for
+minutes while the bulk import runs.
 
-The codebase ALREADY has the fast path: `BulkInsertHelper.usePrepared(...)`
-(used for `updateChannelStreamUrls`, the index-drop/restore machinery, and the
-FTS rebuild). The sync simply never uses it for the fresh-insert path.
+## The latency-aware design (3 layers)
 
-## Proposed refactor
+### L1 — Prepared-statement batch (the floor, already implemented)
 
-1. **Add `insertAllPrepared(table, rows, columns)` to BulkInsertHelper** — one
-   prepared INSERT statement, `bindText`/`bindLong` per column, `step()` +
-   `reset()` per row, all inside a single `immediateTransaction`. This is the
-   same shape as `updateChannelStreamUrls` which already batches.
+Single INSERT OR IGNORE statement, one immediate transaction, 10K binds.
+Expected: applyMs 25-55 s → 1-2 s per chunk. This alone fixes the floor.
 
-2. **Route `insertFresh` through it** — `SyncSupport` gets a prepared-insert
-   adapter hook (the `ContentAdapter<T>` already provides column access via
-   `copyWith`/`hashOf`; add a `writePrepared(statement, row)` lambda).
+### L2 — Adaptive chunking (AIMD, mirroring verify.ts stealth scheduler)
 
-3. **Expected gain:** 10 K rows via prepared statement ≈ 1–2 s (SQLite does
-   ~5–10 K binds/sec on a TV-class SoC in a single transaction vs 10 K
-   statement parses). Import time for 52 K channels: ~5 min → ~30–60 s.
+Chunk size is NOT constant. Track per-chunk applyMs and adapt:
 
-4. **Keep the Room `@Insert` path** for the stable/upsert path (hash-diffed
-   rows are few) and for non-optimized tables.
+```
+chunkSize = clamp(
+  chunkSize * (targetApplyMs / measuredApplyMs),   // AIMD-ish multiplicative
+  2_000, 25_000
+)
+targetApplyMs = 2_000   // 2s per chunk = visible progress every 2s
+```
 
-## Secondary observations
+- Device idle → chunks grow (25K), sync finishes fast
+- Device under load (playback, EPG parse) → chunks shrink (2K), UI stays
+  responsive, applyMs stays ≈ target
+- Report `syncLatency = { chunkP50, chunkP90, worstGapMs }` in SyncRunStats —
+  the same shape as tau's ttstMs/gapP50/gapP90, so regressions are visible
 
-- `computeContentHash()` runs per-row on the writer coroutine — could be
-  moved to the producer (parse) side, but the rendezvous channel already
-  overlaps parse/write so the win is marginal.
-- `CHUNK_FRESH = 10_000` is right for prepared inserts (fewer transactions);
-  the per-row statement count was the cost, not the chunk size.
-- Movies imported 140 K in the same window — same fix applies via
-  `MovieDao.insertAll` / `SeriesDao.insertSeries`.
+### L3 — Priority-aware scheduling (the "EPG is the moat" insight)
 
-## Status
+Don't import 52K channels in catalog order. Import in visibility order:
 
-- [ ] Implement `insertAllPrepared` in BulkInsertHelper
-- [ ] Wire `insertFresh` to use it (channels + movies + series)
-- [ ] Benchmark: re-sync source 1, compare applyMs before/after
-- [ ] Regression: favorites/history keyed to `id` must survive (INSERT OR
-      IGNORE semantics preserved — no REPLACE)
+1. **Favorites + history + resume channels FIRST** (user's actual content) —
+   the app already has `CatalogPriority`; wire it into the chunk producer so
+   the first chunk is the user's channels.
+2. **Catchup-capable channels next** (tv_archive=1) — they're the diamonds.
+3. **Everything else** in provider order.
+
+Result: the UI shows the user's channels + EPG within the FIRST chunk
+(~2 s), not after 5 minutes. `worstGapMs` for visible content ≈ 2 s.
+
+### L4 — Streaming progress (gap telemetry)
+
+`SyncCounters` already reports per-phase counts. Add:
+- `chunkLatencyMs` rolling window (last 10 chunks: p50, p90, max)
+- `estRemainingMs` (chunksLeft × chunkP90) — the import screen shows a real
+  ETA instead of an indeterminate spinner
+- Emit through the existing `CatalogSyncWorker` progress Data so the UI pill
+  shows `2.1s/chunk · ~40s left` instead of `Syncing…`
+
+## Implementation order
+
+1. [x] L1: `insertAllPrepared` (BulkInsertHelper) + channel binder + insertFresh
+       routing — DONE, needs build + benchmark
+2. [ ] L2: adaptive chunkSize in `SyncSupport.chunked` (AIMD on applyMs)
+3. [ ] L3: CatalogPriority → first-chunk favorites/catchup ordering
+4. [ ] L4: latency telemetry in SyncRunStats + progress Data + UI pill
+5. [ ] Benchmark: re-sync source 1, compare applyMs + worstGapMs before/after
+
+## Success criteria (latency, not just speed)
+
+- `worstGapMs` for the visible catalog: 55.7 s → < 3 s (L1+L2)
+- First visible content (favorites/catchup): < 5 s from sync start (L3)
+- UI pill shows real ETA from chunkP90 (L4)
+- Full 52K source: 5 min → < 60 s total (L1 floor)
