@@ -43,7 +43,7 @@ export async function handleStream(req: Request, url: URL, channels: VirtualChan
     const upstreamRes = await fetch(busted.toString(), {
       headers: { "user-agent": req.headers.get("user-agent") ?? "VLC/3.0" },
       redirect: "follow",
-      signal: AbortSignal.timeout(15_000),
+      signal: AbortSignal.timeout(config.streamConnectTimeoutMs),
     });
     if (!upstreamRes.ok && upstreamRes.status !== 206) {
       // Backoff: tell the client to retry after a short delay (OwnTV honors Retry-After

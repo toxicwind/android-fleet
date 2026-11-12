@@ -47,12 +47,12 @@ const idFor = (sourceId: string, upstreamId: string): number => {
 const matches = (candidate: string | undefined, filter?: string): boolean =>
   !filter || new RegExp(filter, "i").test(candidate ?? "");
 
-async function loadXtream(src: UpstreamSource, out: VirtualChannel[], cats: Map<string, string>): Promise<void> {
+async function loadXtream(src: UpstreamSource, out: VirtualChannel[], cats: Map<string, string>, config: Config): Promise<void> {
   const base = src.url.trimEnd("/");
   const q = `username=${encodeURIComponent(src.username ?? "")}&password=${encodeURIComponent(src.password ?? "")}`;
   const [streamsRes, catsRes] = await Promise.all([
-    fetch(`${base}/player_api.php?${q}&action=get_live_streams`, { signal: AbortSignal.timeout(30_000) }),
-    fetch(`${base}/player_api.php?${q}&action=get_live_categories`, { signal: AbortSignal.timeout(15_000) }),
+    fetch(`${base}/player_api.php?${q}&action=get_live_streams`, { signal: AbortSignal.timeout(config.fetchTimeoutMs) }),
+    fetch(`${base}/player_api.php?${q}&action=get_live_categories`, { signal: AbortSignal.timeout(config.fetchTimeoutMs) }),
   ]);
   if (!streamsRes.ok) throw new Error(`xtream ${src.id}: streams HTTP ${streamsRes.status}`);
   const streamsRaw = (await streamsRes.json()) as unknown;
@@ -117,9 +117,9 @@ async function loadXtream(src: UpstreamSource, out: VirtualChannel[], cats: Map<
   }
 }
 
-async function loadM3u(src: UpstreamSource, out: VirtualChannel[], cats: Map<string, string>): Promise<void> {
+async function loadM3u(src: UpstreamSource, out: VirtualChannel[], cats: Map<string, string>, config: Config): Promise<void> {
   const url = src.playlistUrl ?? src.url;
-  const res = await fetch(url, { signal: AbortSignal.timeout(30_000) });
+  const res = await fetch(url, { signal: AbortSignal.timeout(config.fetchTimeoutMs) });
   if (!res.ok) throw new Error(`m3u ${src.id}: HTTP ${res.status}`);
   const text = await res.text();
   const lines = text.split(/\r?\n/);
@@ -166,8 +166,8 @@ export async function loadUpstreams(config: Config): Promise<CatalogResult> {
   await Promise.all(
     config.sources.map(async (src) => {
       try {
-        if (src.kind === "xtream") await loadXtream(src, channels, cats);
-        else await loadM3u(src, channels, cats);
+        if (src.kind === "xtream") await loadXtream(src, channels, cats, config);
+        else await loadM3u(src, channels, cats, config);
       } catch (err) {
         console.error(`[provider] source ${src.id} failed:`, (err as Error).message);
       }

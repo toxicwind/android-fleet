@@ -17,6 +17,7 @@ const fmt = (ts: number) => {
 
 const cache = new Map<string, { at: number; programmes: Programme[] }>();
 const CACHE_TTL_MS = 30 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 // Per-source XMLTV fetch timeout. 10s, NOT 30s: the old 30s timeout × 27 sources
 // SEQUENTIALLY meant xmltv.php took up to 13.5 minutes to build before returning
@@ -55,7 +56,7 @@ export async function epgForChannel(channel: VirtualChannel, limit: number): Pro
     const { base, username, password, streamId } = channel.upstream;
     try {
       const q = `username=${encodeURIComponent(username ?? "")}&password=${encodeURIComponent(password ?? "")}&action=get_short_epg&stream_id=${encodeURIComponent(streamId)}&limit=${limit}`;
-      const res = await fetch(`${base}/player_api.php?${q}`, { signal: AbortSignal.timeout(10_000) });
+      const res = await fetch(`${base}/player_api.php?${q}`, { signal: AbortSignal.timeout(config.fetchTimeoutMs) });
       if (res.ok) {
         const rows = (await res.json()) as Array<{ start: string; stop: string; title: string; description?: string }>;
         if (rows.length) return rows.map((r) => ({ start: r.start, stop: r.stop, title: r.title, description: r.description }));
@@ -112,14 +113,14 @@ export async function epgXmltvStream(channels: VirtualChannel[], config: Config)
       const guides = new Map<string, Map<string, Programme[]>>();
       for (const r of settled) if (r.status === "fulfilled") guides.set(r.value[0], r.value[1]);
       const now = Date.now();
-      const horizon = now + config.epgLookaheadDays * 86400_000;
+      const horizon = now + config.epgLookaheadDays * DAY_MS;
       for (const ch of channels) {
         const guide = guides.get(ch.sourceId);
         if (!guide) continue;
         const list = guide.get(ch.epgId ?? "") ?? [];
         for (const p of list) {
           const startTs = parseXmltvTime(p.start);
-          if (!startTs || startTs < now - 86400_000 || startTs > horizon) continue;
+          if (!startTs || startTs < now - DAY_MS || startTs > horizon) continue;
           controller.enqueue(encoder.encode(
             `  <programme start="${p.start}" stop="${p.stop}" channel="${esc(ch.epgId ?? "")}">` +
               `<title>${esc(p.title)}</title>` +

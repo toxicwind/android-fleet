@@ -332,7 +332,7 @@ async function handleApi(url: URL, req: Request): Promise<Response> {
       const q = `username=${encodeURIComponent(up.username ?? "")}&password=${encodeURIComponent(up.password ?? "")}`;
       try {
         const res = await fetch(`${base}/player_api.php?${q}&action=get_series_info&series_id=${encodeURIComponent(up.seriesId)}`, {
-          signal: AbortSignal.timeout(30_000),
+          signal: AbortSignal.timeout(config.fetchTimeoutMs),
         });
         if (!res.ok) return json(new Response(), { episodes: [] });
         const info = (await res.json()) as Record<string, unknown>;
@@ -352,7 +352,7 @@ async function handleApi(url: URL, req: Request): Promise<Response> {
 
 const server = Bun.serve({
   port: config.port,
-  hostname: "0.0.0.0",
+  hostname: config.host,
   // Big get_live_streams responses (a 273K-channel catalog) take >10s to build on the
   // first hit; Bun's default idleTimeout (10s) killed those mid-flight and the TV's
   // CatalogSyncWorker stalled at ~230K channels. 120s covers the slowest category page.
@@ -422,7 +422,7 @@ async function proxyStream(req: Request, upstream: string): Promise<Response> {
     const upstreamRes = await fetch(upstream, {
       headers: { "user-agent": req.headers.get("user-agent") ?? "VLC/3.0" },
       redirect: "follow",
-      signal: AbortSignal.timeout(60_000),
+      signal: AbortSignal.timeout(config.proxyTimeoutMs),
     });
     const headers = new Headers();
     for (const [k, v] of upstreamRes.headers) {

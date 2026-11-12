@@ -39,7 +39,7 @@ export async function searchArgos(config: Config, query: string, limit = 20): Pr
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(5_000),
+      signal: AbortSignal.timeout(config.fetchTimeoutMs),
     });
     if (!res.ok) return [];
     const j = (await res.json()) as { hits?: { hits?: Array<{ _index: string; _id: string; _score?: number; _source?: Record<string, unknown> }> } };
@@ -56,11 +56,14 @@ export async function searchArgos(config: Config, query: string, limit = 20): Pr
   }
 }
 
+/** Cap per section in search results (channels/series/movies). */
+const SECTION_RESULT_CAP = 12;
+
 /** Map argos hits into the provider's search-result shape (channels first). */
 export function toProviderResults(hits: ArgosHit[]): ProviderSearchResult {
   const channels = hits
     .filter((h) => h.path?.includes("channel") || h.name)
-    .slice(0, 12)
+    .slice(0, SECTION_RESULT_CAP)
     .map((h, i) => ({
       stream_id: 900_000 + i,
       name: h.name ?? h.path?.split("/").pop() ?? `hit-${i}`,
@@ -68,7 +71,7 @@ export function toProviderResults(hits: ArgosHit[]): ProviderSearchResult {
     }));
   const series = hits
     .filter((h) => h.path?.includes("series") || h.path?.includes("movie"))
-    .slice(0, 12)
+    .slice(0, SECTION_RESULT_CAP)
     .map((h, i) => ({
       series_id: `argos-${i}`,
       name: h.name ?? h.path?.split("/").pop() ?? `hit-${i}`,

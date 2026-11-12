@@ -50,16 +50,15 @@ export interface VodSeriesCatalog {
 }
 
 const TORBOX_API = "https://api.torbox.app";
-const TORBOX_KEY = "8e35833d-2af1-474b-8031-b218299c73ae"; // fork's TorBoxCloud.DEFAULT_API_KEY
 
-async function fetchJson(url: string, timeoutMs = 30_000): Promise<unknown> {
-  const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs), headers: { Authorization: `Bearer ${TORBOX_KEY}` } });
+async function fetchJson(config: Config, url: string, timeoutMs?: number): Promise<unknown> {
+  const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs ?? config.fetchTimeoutMs), headers: { Authorization: `Bearer ${config.torboxKey}` } });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
 /** TorBox mylist → movie rows (playable video files only). */
-async function loadTorBoxMovies(cats: Map<string, { category_id: string; category_name: string }>): Promise<MovieRow[]> {
+async function loadTorBoxMovies(config: Config, cats: Map<string, { category_id: string; category_name: string }>): Promise<MovieRow[]> {
   const rows: MovieRow[] = [];
   const kindPaths: Array<[string, string]> = [
     ["torrents", "torrent"],
@@ -68,7 +67,7 @@ async function loadTorBoxMovies(cats: Map<string, { category_id: string; categor
   ];
   for (const [plural, kind] of kindPaths) {
     try {
-      const j = (await fetchJson(`${TORBOX_API}/v1/api/${plural}/mylist`)) as { success?: boolean; data?: Array<Record<string, unknown>> };
+      const j = (await fetchJson(config, `${TORBOX_API}/v1/api/${plural}/mylist`)) as { success?: boolean; data?: Array<Record<string, unknown>> };
       const items = Array.isArray(j.data) ? j.data : [];
       for (const item of items) {
         const itemId = String(item.id ?? "");
@@ -83,7 +82,7 @@ async function loadTorBoxMovies(cats: Map<string, { category_id: string; categor
           if (!/^video\//.test(mime) && !/\.(mp4|mkv|avi|mov|m4v|webm|ts|m2ts|flv|wmv|divx|ogm|ogv|mpeg|mpg|mts|3gp|3g2)$/i.test(fileName)) continue;
           const catKey = "tb:" + plural;
           if (!cats.has(catKey)) cats.set(catKey, { category_id: catKey, category_name: `My Cloud · ${plural}` });
-          const requestUrl = `${TORBOX_API}/v1/api/${plural}/requestdl?${kind}_id=${encodeURIComponent(itemId)}&file_id=${encodeURIComponent(fileId)}&token=${encodeURIComponent(TORBOX_KEY)}`;
+          const requestUrl = `${TORBOX_API}/v1/api/${plural}/requestdl?${kind}_id=${encodeURIComponent(itemId)}&file_id=${encodeURIComponent(fileId)}&token=${encodeURIComponent(config.torboxKey)}`;
           rows.push({
             movie_id: `tb:${itemId}:${fileId}`,
             name: fileName,
@@ -105,7 +104,7 @@ async function loadTorBoxMovies(cats: Map<string, { category_id: string; categor
 async function loadXtreamVod(config: Config, srcIndex: number, src: { url: string; username?: string; password?: string }, cats: Map<string, { category_id: string; category_name: string }>): Promise<MovieRow[]> {
   const base = src.url.trimEnd("/");
   const q = `username=${encodeURIComponent(src.username ?? "")}&password=${encodeURIComponent(src.password ?? "")}`;
-  const res = await fetch(`${base}/player_api.php?${q}&action=get_vod_streams`, { signal: AbortSignal.timeout(60_000) });
+  const res = await fetch(`${base}/player_api.php?${q}&action=get_vod_streams`, { signal: AbortSignal.timeout(config.fetchTimeoutMs) });
   if (!res.ok) throw new Error(`vod HTTP ${res.status}`);
   const raw = (await res.json()) as Array<Record<string, unknown>>;
   const rows: MovieRow[] = [];
@@ -134,7 +133,7 @@ async function loadXtreamVod(config: Config, srcIndex: number, src: { url: strin
 async function loadXtreamSeries(config: Config, srcIndex: number, src: { url: string; username?: string; password?: string }, cats: Map<string, { category_id: string; category_name: string }>): Promise<SeriesRow[]> {
   const base = src.url.trimEnd("/");
   const q = `username=${encodeURIComponent(src.username ?? "")}&password=${encodeURIComponent(src.password ?? "")}`;
-  const res = await fetch(`${base}/player_api.php?${q}&action=get_series`, { signal: AbortSignal.timeout(60_000) });
+  const res = await fetch(`${base}/player_api.php?${q}&action=get_series`, { signal: AbortSignal.timeout(config.fetchTimeoutMs) });
   if (!res.ok) throw new Error(`series HTTP ${res.status}`);
   const raw = (await res.json()) as Array<Record<string, unknown>>;
   const rows: SeriesRow[] = [];
@@ -191,7 +190,7 @@ export async function loadVodSeriesCatalog(config: Config): Promise<VodSeriesCat
   await Promise.all(srcTasks);
 
   // 2. TorBox cloud as movies
-  for (const m of await loadTorBoxMovies(movieCats)) {
+  for (const m of await loadTorBoxMovies(config, movieCats)) {
     const key = normName(m.name);
     if (!movies.has(key)) movies.set(key, m);
   }

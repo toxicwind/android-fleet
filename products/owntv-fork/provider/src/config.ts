@@ -39,7 +39,16 @@ export interface Config {
   argosUrl: string;
   /** Argos index to search across (defaults to live channel index). */
   argosIndex: string;
+  /** TorBox API key for the VOD/series requestdl lane (env: PROVIDER_TORBOX_KEY). */
+  torboxKey: string;
+  /** Upstream fetch timeouts (ms). All panel/EPG fetches share these — no magic literals. */
+  fetchTimeoutMs: number;
+  streamConnectTimeoutMs: number;
+  proxyTimeoutMs: number;
 }
+
+// Repo root = provider/ parent, so the default velvet path works on any checkout.
+const REPO_ROOT = new URL("..", import.meta.url).pathname;
 
 export function defineConfig(env: Record<string, string | undefined>): Config {
   return {
@@ -52,9 +61,14 @@ export function defineConfig(env: Record<string, string | undefined>): Config {
     epgRefreshMs: Number(env.PROVIDER_EPG_REFRESH_MS ?? 6 * 60 * 60 * 1000),
     epgLookaheadDays: Number(env.PROVIDER_EPG_LOOKAHEAD_DAYS ?? 2),
     sources: parseSources(env.PROVIDER_SOURCES ?? ""),
-    velvetPluginsPath: env.PROVIDER_VELVET_PLUGINS ?? "/home/toxic/pens/fleet/devices/android-fleet/products/owntv-fork/velvet/plugins.json",
+    velvetPluginsPath: env.PROVIDER_VELVET_PLUGINS ?? `${REPO_ROOT}velvet/plugins.json`,
     argosUrl: env.PROVIDER_ARGOS_URL ?? "http://127.0.0.1:25254",
     argosIndex: env.PROVIDER_ARGOS_INDEX ?? "hisense-intel-docs",
+    // Fork's TorBoxCloud.DEFAULT_API_KEY is the fallback; real deployments override via env.
+    torboxKey: env.PROVIDER_TORBOX_KEY ?? "8e35833d-2af1-474b-8031-b218299c73ae",
+    fetchTimeoutMs: Number(env.PROVIDER_FETCH_TIMEOUT_MS ?? 30_000),
+    streamConnectTimeoutMs: Number(env.PROVIDER_STREAM_CONNECT_TIMEOUT_MS ?? 15_000),
+    proxyTimeoutMs: Number(env.PROVIDER_PROXY_TIMEOUT_MS ?? 60_000),
   };
 }
 
