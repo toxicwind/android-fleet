@@ -12,6 +12,14 @@ export interface VirtualChannel {
   icon?: string;
   epgId?: string;
   catchup: boolean;
+  /** Full catchup contract OwnTV reads from the panel (dex: CatchupUrl.kt). */
+  catchupType?: string;      // "default" | "append" | "timeshift" | "disable"
+  catchupSource?: string;    // URL template with {utc}/{start}/{end}/{duration}
+  catchupDays?: number;
+  catchupCorrectionMin?: number;
+  catchupOffsetMin?: number;
+  catchupTimezone?: string;
+  catchupPhpAvailable?: boolean;
   addedAt: number;
   /** Where the stream actually lives (panel URL, playlist URL). */
   upstream: {
@@ -47,18 +55,38 @@ async function loadXtream(src: UpstreamSource, out: VirtualChannel[], cats: Map<
     fetch(`${base}/player_api.php?${q}&action=get_live_categories`, { signal: AbortSignal.timeout(15_000) }),
   ]);
   if (!streamsRes.ok) throw new Error(`xtream ${src.id}: streams HTTP ${streamsRes.status}`);
-  const streams = (await streamsRes.json()) as Array<Record<string, unknown>>;
+  const streamsRaw = (await streamsRes.json()) as unknown;
+  // Same guard as categories: a panel can return an object (auth error / overload) instead of
+  // an array. raw.map on that crashed the source every refresh.
+  const streams = Array.isArray(streamsRaw) ? (streamsRaw as Array<Record<string, unknown>>) : [];
+  // Guard: a panel returns an OBJECT (error body {user_info:...}) instead of an array on
+  // bad creds / overload — raw.map crashed the whole source every refresh. Treat non-array
+  // as zero categories (channels still import under "Uncategorized").
   let categoryMap: Record<string, string> = {};
   if (catsRes.ok) {
-    const raw = (await catsRes.json()) as Array<{ category_id?: string; category_name?: string }>;
-    categoryMap = Object.fromEntries(raw.map((c) => [c.category_id ?? "", c.category_name ?? c.category_id ?? ""]));
+    const raw = (await catsRes.json()) as unknown;
+    if (Array.isArray(raw)) {
+      categoryMap = Object.fromEntries(
+        (raw as Array<{ category_id?: string; category_name?: string }>)
+          .map((c) => [c.category_id ?? "", c.category_name ?? c.category_id ?? ""]),
+      );
+    } else {
+      console.error(`[provider] xtream ${src.id}: get_live_categories returned non-array (${typeof raw})`);
+    }
   }
   for (const s of streams) {
     const name = String(s.name ?? "").replace(/^#EXTINF:0,\s*/, "");
     if (!name || !matches(name, src.filter)) continue;
     const streamId = String(s.stream_id ?? "");
-    const categoryId = String(s.category_id ?? "0");
-    if (!cats.has(categoryId)) cats.set(categoryId, categoryMap[categoryId] ?? "Uncategorized");
+    // SOURCE-SCOPED category id: raw panel category_ids collide across 27 feeds
+    // (every panel has its own "3"/"4"/"5"...). Namespace with the source id so
+    // categories stay distinct per feed — the "same number across feeds" anomaly.
+    const rawCategoryId = String(s.category_id ?? "0");
+    const categoryId = idFor(`${src.id}:cat`, rawCategoryId).toString();
+    if (!cats.has(categoryId)) cats.set(categoryId, categoryMap[rawCategoryId] ?? "Uncategorized");
+    const tvArchive = Number(s.tv_archive ?? 0) === 1;
+    // Full catchup contract from the panel (OwnTV CatchupUrl.kt reads these).
+    const catchupType = String(s.catchup_type ?? s.catchup ?? "").trim() || (tvArchive ? "default" : undefined);
     out.push({
       id: idFor(src.id, streamId),
       sourceId: src.id,
@@ -68,7 +96,14 @@ async function loadXtream(src: UpstreamSource, out: VirtualChannel[], cats: Map<
       categoryName: cats.get(categoryId)!,
       icon: s.stream_icon ? String(s.stream_icon) : undefined,
       epgId: s.epg_channel_id ? String(s.epg_channel_id) : undefined,
-      catchup: Number(s.tv_archive ?? 0) === 1,
+      catchup: tvArchive,
+      catchupType,
+      catchupSource: s.catchup_source ? String(s.catchup_source) : undefined,
+      catchupDays: s.tv_archive_duration ? Number(s.tv_archive_duration) || undefined : undefined,
+      catchupCorrectionMin: s.catchup_correction_min != null ? Number(s.catchup_correction_min) : undefined,
+      catchupOffsetMin: s.catchup_offset_min != null ? Number(s.catchup_offset_min) : undefined,
+      catchupTimezone: s.catchup_timezone ? String(s.catchup_timezone) : undefined,
+      catchupPhpAvailable: s.catchup_php_available != null ? Number(s.catchup_php_available) === 1 : undefined,
       addedAt: Number(s.added ?? 0) * 1000 || Date.now(),
       upstream: {
         kind: "xtream",

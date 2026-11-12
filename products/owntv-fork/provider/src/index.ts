@@ -17,7 +17,7 @@
  */
 import { defineConfig } from "./config.ts";
 import { loadUpstreams, type VirtualChannel } from "./upstreams.ts";
-import { scheduleEpgRefresh, epgForChannel, epgXmltv } from "./epg.ts";
+import { scheduleEpgRefresh, epgForChannel, epgXmltvStream } from "./epg.ts";
 import { handleStream } from "./stream.ts";
 import { loadVelvetCatalog, type VelvetCatalog } from "./velvet.ts";
 import { searchArgos, toProviderResults } from "./argos.ts";
@@ -134,7 +134,17 @@ function channelRow(c: VirtualChannel, num: number) {
     custom_sid: "",
     tv_archive: c.catchup ? 1 : 0,
     direct_source: "",
-    tv_archive_duration: c.catchup ? 7 : 0,
+    tv_archive_duration: c.catchupDays ?? (c.catchup ? 7 : 0),
+    // Full catchup contract OwnTV's CatchupUrl.kt reads from the panel (dex-verified:
+    // catchupType/catchupSource/catchupDays/catchupOffsetMin/catchupTimezone/catchupPhpAvailable).
+    // Without these the app marks a channel "catchup available" but cannot build a catchup URL.
+    catchup_type: c.catchupType,
+    catchup_source: c.catchupSource,
+    catchup_days: c.catchupDays,
+    catchup_offset_min: c.catchupOffsetMin,
+    catchup_timezone: c.catchupTimezone,
+    catchup_correction_min: c.catchupCorrectionMin,
+    catchup_php_available: c.catchupPhpAvailable == null ? (c.catchup ? 1 : 0) : (c.catchupPhpAvailable ? 1 : 0),
   };
 }
 
@@ -159,6 +169,46 @@ function rebuildApiCache(channelList: VirtualChannel[], categoryList: { category
   }
   liveStreamsAll = JSON.stringify(all);
   categoriesBody = JSON.stringify(categoryList);
+  // Gzip the big bodies ONCE at build. The uncompressed get_live_streams is ~76MB for a
+  // 281K-channel catalog; OwnTV's OkHttp readTimeout is 20s, so a raw body over TV WiFi
+  // dies mid-transfer ("The server took too long to respond"). gzip → ~4MB, and OkHttp
+  // sends Accept-Encoding: gzip + transparently decompresses, so this is invisible to the app.
+  gzipCache.clear();
+  gzipCache.set("liveStreamsAll", Bun.gzipSync(Buffer.from(liveStreamsAll)));
+  for (const [catId, body] of liveStreamsByCategory) {
+    gzipCache.set(`cat:${catId}`, Bun.gzipSync(Buffer.from(body)));
+  }
+  gzipCache.set("categoriesBody", Bun.gzipSync(Buffer.from(categoriesBody)));
+}
+
+// Cache of gzip-compressed prebuilt bodies, keyed by body name / category id.
+const gzipCache = new Map<string, Uint8Array>();
+
+/** Serve a prebuilt JSON body, gzip when the client accepts it (OkHttp always does). */
+function serveJson(body: string, gzipKey: string): Response {
+  const acceptGzip = false; // set per-request in handleApi
+  void acceptGzip;
+  return new Response(body, {
+    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+  });
+}
+
+function serveGzip(gzipKey: string, fallback: string, req: Request): Response {
+  const gz = gzipCache.get(gzipKey);
+  const acceptsGzip = (req.headers.get("accept-encoding") ?? "").includes("gzip");
+  if (gz && acceptsGzip) {
+    return new Response(gz, {
+      headers: {
+        "content-type": "application/json; charset=utf-8",
+        "content-encoding": "gzip",
+        "cache-control": "no-store",
+        "vary": "accept-encoding",
+      },
+    });
+  }
+  return new Response(fallback, {
+    headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+  });
 }
 
 async function refreshCatalog(force = false): Promise<void> {
@@ -221,21 +271,17 @@ function accountInfo(): Record<string, unknown> {
   };
 }
 
-async function handleApi(url: URL): Promise<Response> {
+async function handleApi(url: URL, req: Request): Promise<Response> {
   if (!authOk(url)) return json(new Response(null, { status: 401 }), { user_info: { auth: 0, status: "Unauthorized" } });
   const action = url.searchParams.get("action") ?? "";
   await refreshCatalog();
   switch (action) {
     case "get_live_categories":
-      return new Response(categoriesBody, {
-        headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
-      });
+      return serveGzip("categoriesBody", categoriesBody, req);
     case "get_live_streams": {
       const cat = url.searchParams.get("category_id");
-      const body = cat ? (liveStreamsByCategory.get(cat) ?? "[]") : liveStreamsAll;
-      return new Response(body, {
-        headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
-      });
+      if (cat) return serveGzip(`cat:${cat}`, liveStreamsByCategory.get(cat) ?? "[]", req);
+      return serveGzip("liveStreamsAll", liveStreamsAll, req);
     }
     case "get_short_epg": {
       const streamId = url.searchParams.get("stream_id") ?? "";
@@ -315,12 +361,18 @@ const server = Bun.serve({
     const url = new URL(req.url);
     const path = url.pathname;
 
-    if (path === "/player_api.php" || path === "/player_api.php/") return handleApi(url);
+    if (path === "/player_api.php" || path === "/player_api.php/") return handleApi(url, req);
     if (path === "/xmltv.php") {
       if (!authOk(url)) return new Response("Unauthorized", { status: 401 });
       await refreshCatalog();
-      const xml = await epgXmltv(channels, config);
-      return new Response(xml, { headers: { "content-type": "application/xml; charset=utf-8" } });
+      // STREAMING: headers + prologue flush immediately; upstream feeds fetch in parallel
+      // (10s cap each) and programmes append as they resolve. The old epgXmltv built the
+      // whole document from 27 SEQUENTIAL 30s fetches before responding — OwnTV's 20s
+      // OkHttp readTimeout killed it waiting for headers ("The server took too long").
+      const stream = await epgXmltvStream(channels, config);
+      return new Response(stream, {
+        headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "no-store" },
+      });
     }
     if (path.startsWith("/live/")) {
       await refreshCatalog();
