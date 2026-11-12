@@ -52,7 +52,7 @@ const tools: Tool[] = [
     name: "sql",
     description: "Run raw SQL against the app's live owntv.db (via the Lua lane). SELECT returns rows keyed by column name; other statements execute and return ok.",
     inputSchema: { type: "object", properties: { query: { type: "string", description: "SQL statement" } }, required: ["query"] },
-    run: (a) => luaRun(`local rows = sql(${JSON.stringify(String(a.query ?? ""))}) local out = {} for i=1,#rows do local r = rows[i] local parts = {} for k,v in pairs(r) do parts[#parts+1] = k .. "=" .. tostring(v) end out[#out+1] = table.concat(parts, " ") end return table.concat(out, "\\n")`),
+    run: (a) => luaRun(`local rows = sql(${JSON.stringify(String(a.query ?? ""))}) local out = {} for i=1,#rows do local r = rows[i] local parts = {} for k,v in pairs(r) do parts[#parts+1] = k .. "=" .. tostring(v) end out[#out+1] = table.concat(parts, " ") end log(table.concat(out, "\\n")) return #rows`),
   },
   {
     name: "adb",
