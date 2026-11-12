@@ -62,13 +62,19 @@ export function defineConfig(env: Record<string, string | undefined>): Config {
 export function parseSources(spec: string): UpstreamSource[] {
   if (!spec.trim()) return [];
   return spec.split(";").map((part) => {
-    const fields = Object.fromEntries(
-      part.split("|").map((kv) => {
-        const i = kv.indexOf("=");
-        return i < 0 ? [kv.trim(), "true"] : [kv.slice(0, i).trim(), kv.slice(i + 1).trim()];
-      }),
-    );
-    const kind = (fields.kind ?? "xtream") as UpstreamSource["kind"];
+    const fields: Record<string, string> = {};
+    let positionalKind: string | undefined;
+    part.split("|").forEach((kv, idx) => {
+      const i = kv.indexOf("=");
+      if (i < 0) {
+        if (idx === 0) positionalKind = kv.trim();
+        else fields[kv.trim()] = "true";
+      } else {
+        // trimStart only: values may carry meaningful trailing whitespace (e.g. "US · " prefix)
+        fields[kv.slice(0, i).trim()] = kv.slice(i + 1).trimStart();
+      }
+    });
+    const kind = (fields.kind ?? positionalKind ?? "xtream") as UpstreamSource["kind"];
     if (kind === "m3u") {
       return {
         id: fields.id ?? "m3u",
