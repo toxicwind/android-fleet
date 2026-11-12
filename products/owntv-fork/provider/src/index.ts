@@ -22,6 +22,7 @@ import { handleStream } from "./stream.ts";
 import { loadVelvetCatalog, type VelvetCatalog } from "./velvet.ts";
 import { searchArgos, toProviderResults } from "./argos.ts";
 import { runLua } from "./lua-runner.ts";
+import { loadVodSeriesCatalog, movieStreamUrl, seriesStreamUrl, type MovieRow, type SeriesRow } from "./vod-series.ts";
 
 const config = defineConfig(process.env);
 const log = (msg: string, ...rest: unknown[]) =>
@@ -34,6 +35,132 @@ let categories: { category_id: string; category_name: string; parent_id: number 
 let loadedAt = 0;
 let loading: Promise<void> | null = null;
 
+// Precomputed Xtream API bodies. The app syncs 722 categories sequentially, and each
+// category request used to re-filter + re-map + re-serialize the whole 281K-channel
+// catalog on the fly — O(N) per request, which is what blew the 10s idleTimeout and
+// stalled the TV's CatalogSyncWorker at ~230K channels. Building the serialized JSON
+// once at catalog load makes every get_live_streams request O(1) (a string slice).
+let liveStreamsByCategory = new Map<string, string>();
+let liveStreamsAll = "[]";
+let categoriesBody = "[]";
+
+// Merged VOD + series catalog (upstream Xtream VOD/series + TorBox cloud + velvet).
+// Precomputed serialized bodies like the live cache, so OwnTV's Movies/Series sync
+// (which fetches per category) is O(1) per request.
+let movies: MovieRow[] = [];
+let series: SeriesRow[] = [];
+let moviesByCategory = new Map<string, string>();
+let moviesAll = "[]";
+let movieCategoriesBody = "[]";
+let seriesByCategory = new Map<string, string>();
+let seriesAll = "[]";
+let seriesCategoriesBody = "[]";
+let vodSeriesLoadedAt = 0;
+let vodSeriesLoading: Promise<void> | null = null;
+
+async function refreshVodSeries(force = false): Promise<void> {
+  if (vodSeriesLoading) return vodSeriesLoading;
+  if (!force && vodSeriesLoadedAt && Date.now() - vodSeriesLoadedAt < config.catalogTtlMs) return;
+  vodSeriesLoading = (async () => {
+    try {
+      const t0 = Date.now();
+      const cat = await loadVodSeriesCatalog(config);
+      movies = cat.movies;
+      series = cat.series;
+      movieCategoriesBody = JSON.stringify(cat.movieCategories);
+      seriesCategoriesBody = JSON.stringify(cat.seriesCategories);
+      const mByCat = new Map<string, unknown[]>();
+      const mAll: unknown[] = [];
+      for (const m of cat.movies) {
+        const row = {
+          movie_id: m.movie_id,
+          name: m.name,
+          stream_icon: m.stream_icon ?? "",
+          rating: m.rating ?? 0,
+          plot: m.plot ?? "",
+          category_id: m.category_id,
+          container_extension: m.container_extension ?? "",
+          added: m.added ?? String(Math.floor(Date.now() / 1000)),
+        };
+        mAll.push(row);
+        let arr = mByCat.get(m.category_id);
+        if (!arr) { arr = []; mByCat.set(m.category_id, arr); }
+        arr.push(row);
+      }
+      moviesByCategory = new Map([...mByCat].map(([k, v]) => [k, JSON.stringify(v)]));
+      moviesAll = JSON.stringify(mAll);
+      const sByCat = new Map<string, unknown[]>();
+      const sAll: unknown[] = [];
+      for (const s of cat.series) {
+        const row = {
+          series_id: s.series_id,
+          name: s.name,
+          cover: s.cover ?? "",
+          plot: s.plot ?? "",
+          rating: s.rating ?? 0,
+          category_id: s.category_id,
+          year: s.year ?? 0,
+          added: s.added ?? String(Math.floor(Date.now() / 1000)),
+          last_modified: s.last_modified ?? String(Math.floor(Date.now() / 1000)),
+        };
+        sAll.push(row);
+        let arr = sByCat.get(s.category_id);
+        if (!arr) { arr = []; sByCat.set(s.category_id, arr); }
+        arr.push(row);
+      }
+      seriesByCategory = new Map([...sByCat].map(([k, v]) => [k, JSON.stringify(v)]));
+      seriesAll = JSON.stringify(sAll);
+      vodSeriesLoadedAt = Date.now();
+      log(`vod/series: ${movies.length} movies / ${series.length} series / ${cat.movieCategories.length} movie cats / ${cat.seriesCategories.length} series cats in ${Date.now() - t0}ms`);
+    } catch (err) {
+      log("vod/series catalog refresh failed", err);
+    } finally {
+      vodSeriesLoading = null;
+    }
+  })();
+  return vodSeriesLoading;
+}
+
+function channelRow(c: VirtualChannel, num: number) {
+  return {
+    num,
+    name: c.name,
+    stream_type: "live",
+    stream_id: c.id,
+    stream_icon: c.icon ?? "",
+    epg_channel_id: c.epgId ?? null,
+    added: String(Math.floor(c.addedAt / 1000)),
+    category_id: c.categoryId,
+    custom_sid: "",
+    tv_archive: c.catchup ? 1 : 0,
+    direct_source: "",
+    tv_archive_duration: c.catchup ? 7 : 0,
+  };
+}
+
+function rebuildApiCache(channelList: VirtualChannel[], categoryList: { category_id: string; category_name: string; parent_id: number }[]): void {
+  const perCat = new Map<string, unknown[]>();
+  let all: unknown[] = [];
+  let num = 0;
+  for (const c of channelList) {
+    num++;
+    const row = channelRow(c, num);
+    all.push(row);
+    let arr = perCat.get(c.categoryId);
+    if (!arr) {
+      arr = [];
+      perCat.set(c.categoryId, arr);
+    }
+    arr.push(row);
+  }
+  liveStreamsByCategory = new Map();
+  for (const [catId, rows] of perCat) {
+    liveStreamsByCategory.set(catId, JSON.stringify(rows));
+  }
+  liveStreamsAll = JSON.stringify(all);
+  categoriesBody = JSON.stringify(categoryList);
+}
+
 async function refreshCatalog(force = false): Promise<void> {
   if (loading) return loading;
   if (!force && loadedAt && Date.now() - loadedAt < config.catalogTtlMs) return;
@@ -42,6 +169,7 @@ async function refreshCatalog(force = false): Promise<void> {
       const result = await loadUpstreams(config);
       channels = result.channels;
       categories = result.categories;
+      rebuildApiCache(channels, categories);
       loadedAt = Date.now();
       log(`catalog: ${channels.length} channels / ${categories.length} categories from ${config.sources.length} source(s)`);
     } catch (err) {
@@ -99,26 +227,15 @@ async function handleApi(url: URL): Promise<Response> {
   await refreshCatalog();
   switch (action) {
     case "get_live_categories":
-      return json(new Response(), categories);
+      return new Response(categoriesBody, {
+        headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+      });
     case "get_live_streams": {
       const cat = url.searchParams.get("category_id");
-      const rows = channels
-        .filter((c) => !cat || c.categoryId === cat)
-        .map((c, i) => ({
-          num: i + 1,
-          name: c.name,
-          stream_type: "live",
-          stream_id: c.id,
-          stream_icon: c.icon ?? "",
-          epg_channel_id: c.epgId ?? null,
-          added: String(Math.floor(c.addedAt / 1000)),
-          category_id: c.categoryId,
-          custom_sid: "",
-          tv_archive: c.catchup ? 1 : 0,
-          direct_source: "",
-          tv_archive_duration: c.catchup ? 7 : 0,
-        }));
-      return json(new Response(), rows);
+      const body = cat ? (liveStreamsByCategory.get(cat) ?? "[]") : liveStreamsAll;
+      return new Response(body, {
+        headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+      });
     }
     case "get_short_epg": {
       const streamId = url.searchParams.get("stream_id") ?? "";
@@ -128,12 +245,56 @@ async function handleApi(url: URL): Promise<Response> {
       const programmes = await epgForChannel(channel, limit);
       return json(new Response(), programmes);
     }
-    case "get_vod_categories":
-    case "get_vod_streams":
-    case "get_series_categories":
-    case "get_series":
-    case "get_series_info":
-      return json(new Response(), []);
+    case "get_vod_categories": {
+      await refreshVodSeries();
+      return new Response(movieCategoriesBody, {
+        headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+      });
+    }
+    case "get_vod_streams": {
+      await refreshVodSeries();
+      const cat = url.searchParams.get("category_id");
+      const body = cat ? (moviesByCategory.get(cat) ?? "[]") : moviesAll;
+      return new Response(body, {
+        headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+      });
+    }
+    case "get_series_categories": {
+      await refreshVodSeries();
+      return new Response(seriesCategoriesBody, {
+        headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+      });
+    }
+    case "get_series": {
+      await refreshVodSeries();
+      const cat = url.searchParams.get("category_id");
+      const body = cat ? (seriesByCategory.get(cat) ?? "[]") : seriesAll;
+      return new Response(body, {
+        headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+      });
+    }
+    case "get_series_info": {
+      await refreshVodSeries();
+      const seriesId = url.searchParams.get("series_id") ?? "";
+      // Only upstream Xtream series have episodes; velvet/TorBox rows have none.
+      const s = series.find((x) => x.series_id === seriesId);
+      if (!s?.upstream || s.upstream.kind !== "xtream") {
+        return json(new Response(), { episodes: [] });
+      }
+      const up = s.upstream;
+      const base = up.base;
+      const q = `username=${encodeURIComponent(up.username ?? "")}&password=${encodeURIComponent(up.password ?? "")}`;
+      try {
+        const res = await fetch(`${base}/player_api.php?${q}&action=get_series_info&series_id=${encodeURIComponent(up.seriesId)}`, {
+          signal: AbortSignal.timeout(30_000),
+        });
+        if (!res.ok) return json(new Response(), { episodes: [] });
+        const info = (await res.json()) as Record<string, unknown>;
+        return json(new Response(), info);
+      } catch {
+        return json(new Response(), { episodes: [] });
+      }
+    }
     case "":
       return json(new Response(), accountInfo());
     default:
@@ -146,6 +307,10 @@ async function handleApi(url: URL): Promise<Response> {
 const server = Bun.serve({
   port: config.port,
   hostname: "0.0.0.0",
+  // Big get_live_streams responses (a 273K-channel catalog) take >10s to build on the
+  // first hit; Bun's default idleTimeout (10s) killed those mid-flight and the TV's
+  // CatalogSyncWorker stalled at ~230K channels. 120s covers the slowest category page.
+  idleTimeout: 120,
   async fetch(req) {
     const url = new URL(req.url);
     const path = url.pathname;
@@ -157,9 +322,25 @@ const server = Bun.serve({
       const xml = await epgXmltv(channels, config);
       return new Response(xml, { headers: { "content-type": "application/xml; charset=utf-8" } });
     }
-    if (path.startsWith("/live/") || path.startsWith("/movie/") || path.startsWith("/series/")) {
+    if (path.startsWith("/live/")) {
       await refreshCatalog();
       return handleStream(req, url, channels, config);
+    }
+    if (path.startsWith("/movie/") || path.startsWith("/series/")) {
+      await refreshVodSeries();
+      const segments = url.pathname.split("/").filter(Boolean); // movie|series, user, pass, id.ext
+      const idPart = segments[segments.length - 1] ?? "";
+      const rawId = decodeURIComponent(idPart.split(".")[0]);
+      if (path.startsWith("/movie/")) {
+        const m = movies.find((x) => x.movie_id === rawId);
+        const upstream = m ? movieStreamUrl(m) : null;
+        if (!upstream) return new Response("unknown movie", { status: 404 });
+        return proxyStream(req, upstream);
+      }
+      const s = series.find((x) => x.series_id === rawId);
+      const upstream = s ? seriesStreamUrl(s) : null;
+      if (!upstream) return new Response("unknown series", { status: 404 });
+      return proxyStream(req, upstream);
     }
     if (path === "/health") {
       return new Response(JSON.stringify({ ok: true, channels: channels.length, loadedAt }), {
@@ -180,4 +361,25 @@ const server = Bun.serve({
 
 await refreshCatalog(true);
 scheduleEpgRefresh(config, () => refreshCatalog(false));
+refreshVodSeries(true);
 log(`master provider on :${config.port} — ${config.sources.length} upstream(s), ${config.clientUsername}@${config.host}`);
+
+/** Minimal passthrough for movie/series upstream URLs (VOD panels answer full URLs). */
+async function proxyStream(req: Request, upstream: string): Promise<Response> {
+  try {
+    const upstreamRes = await fetch(upstream, {
+      headers: { "user-agent": req.headers.get("user-agent") ?? "VLC/3.0" },
+      redirect: "follow",
+      signal: AbortSignal.timeout(60_000),
+    });
+    const headers = new Headers();
+    for (const [k, v] of upstreamRes.headers) {
+      if (k.toLowerCase() === "content-length" || k.toLowerCase() === "transfer-encoding") continue;
+      headers.set(k, v);
+    }
+    headers.set("access-control-allow-origin", "*");
+    return new Response(upstreamRes.body, { status: upstreamRes.status, headers });
+  } catch (err) {
+    return new Response(`upstream error: ${(err as Error).message}`, { status: 502 });
+  }
+}

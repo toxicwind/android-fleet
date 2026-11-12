@@ -62,12 +62,24 @@ const tools: Tool[] = [
   },
   {
     name: "ui_dump",
-    description: "uiautomator dump of the current screen (full, not --compressed — Compose clickable attrs need it). Returns the XML hierarchy.",
+    description: "DEPRECATED — use view() instead. uiautomator dump of the current screen (slow, flaky on Compose, generic nodes). Kept for legacy only.",
     inputSchema: { type: "object", properties: {} },
     run: () => {
       adb(["shell", "uiautomator dump /sdcard/ui.xml"], 15000);
       return adb(["shell", "cat /sdcard/ui.xml"], 15000);
     },
+  },
+  {
+    name: "view",
+    description: "App-native UI awareness (via the Lua lane view()): the REAL Compose view hierarchy — class, resource id, visibility, focused, bounds, text for every node. Fast, no uiautomator. Use this for all UI state.",
+    inputSchema: { type: "object", properties: { maxDepth: { type: "number", description: "Optional depth limit" } } },
+    run: (a) => luaRun(`local t = view() local out = {} local function walk(v, d, lim) if not v then return end if d > (lim or 99) then return end local line = string.rep("  ", d) .. tostring(v.class or "") .. " id=" .. tostring(v.id or "") .. " vis=" .. tostring(v.vis or "") .. " focused=" .. tostring(v.focused or "false") .. " bounds=" .. tostring(v.bounds or "") if v.text and v.text ~= "" then line = line .. " text=" .. v.text end out[#out+1] = line if v.children then for i=1,#v.children do walk(v.children[i], d+1, lim) end end end walk(t[1], 0, ${Number((a as any)?.maxDepth ?? 99)}) log(table.concat(out, "\\n")) return #out`),
+  },
+  {
+    name: "focused",
+    description: "App-native: what the user's cursor/focus is on right now (class, id, text, bounds) via the Lua lane focused().",
+    inputSchema: { type: "object", properties: {} },
+    run: () => luaRun(`local t = focused() log(string.format("class=%s id=%s text=%s bounds=%s", tostring(t.class or ""), tostring(t.id or ""), tostring(t.text or ""), tostring(t.bounds or ""))) return "ok"`),
   },
   {
     name: "input",
