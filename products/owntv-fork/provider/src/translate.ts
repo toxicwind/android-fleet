@@ -114,8 +114,6 @@ export async function translateBatch(
   // Batch the uncached lines.
   const chunks = chunkTexts(uncached.map((u) => u.text));
   let ok = false;
-  const key = config.torboxKey; // the provider already carries a freeinference-capable key lane
-  void key;
 
   for (const chunk of chunks) {
     try {
@@ -124,7 +122,7 @@ export async function translateBatch(
         method: "POST",
         headers: {
           "content-type": "application/json",
-          authorization: `Bearer ${config.torboxKey}`,
+          authorization: `Bearer ${config.freeinferenceKey}`,
         },
         body: JSON.stringify({
           model: "deepseek-v4-flash",

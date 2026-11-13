@@ -3,7 +3,7 @@
 export interface UpstreamSource {
   /** Unique id; also the EPG namespace prefix for merged guides. */
   id: string;
-  kind: "xtream" | "m3u";
+  kind: "xtream" | "m3u" | "stalker";
   /** Display name shown in OwnTV's source list. */
   name: string;
   /** Base URL without trailing slash (xtream: http://host:port). */
@@ -15,6 +15,8 @@ export interface UpstreamSource {
   playlistUrl?: string;
   /** Optional XMLTV URL for this source (m3u); xtream EPG comes from the API. */
   epgUrl?: string;
+  /** Stalker portal MAC (defaults to a deterministic fake like a MAG250). */
+  mac?: string;
   /** Per-source stream connection cap (defaults to global). */
   maxConnections?: number;
   /** Channel name prefix, e.g. "US · " — empty for none. */
@@ -41,6 +43,8 @@ export interface Config {
   argosIndex: string;
   /** TorBox API key for the VOD/series requestdl lane (env: PROVIDER_TORBOX_KEY). */
   torboxKey: string;
+  /** FreeInference API key for the translate/embed lanes (env: PROVIDER_FREEINFERENCE_KEY). */
+  freeinferenceKey: string;
   /** Upstream fetch timeouts (ms). All panel/EPG fetches share these — no magic literals. */
   fetchTimeoutMs: number;
   streamConnectTimeoutMs: number;
@@ -66,6 +70,7 @@ export function defineConfig(env: Record<string, string | undefined>): Config {
     argosIndex: env.PROVIDER_ARGOS_INDEX ?? "hisense-intel-docs",
     // Fork's TorBoxCloud.DEFAULT_API_KEY is the fallback; real deployments override via env.
     torboxKey: env.PROVIDER_TORBOX_KEY ?? "8e35833d-2af1-474b-8031-b218299c73ae",
+    freeinferenceKey: env.PROVIDER_FREEINFERENCE_KEY ?? "",
     fetchTimeoutMs: Number(env.PROVIDER_FETCH_TIMEOUT_MS ?? 30_000),
     streamConnectTimeoutMs: Number(env.PROVIDER_STREAM_CONNECT_TIMEOUT_MS ?? 15_000),
     proxyTimeoutMs: Number(env.PROVIDER_PROXY_TIMEOUT_MS ?? 60_000),
@@ -97,6 +102,18 @@ export function parseSources(spec: string): UpstreamSource[] {
         url: fields.url ?? "",
         playlistUrl: fields.playlist ?? fields.url,
         epgUrl: fields.epg ?? undefined,
+        prefix: fields.prefix ?? undefined,
+        filter: fields.filter ?? undefined,
+        maxConnections: fields.max ? Number(fields.max) : undefined,
+      };
+    }
+    if (kind === "stalker") {
+      return {
+        id: fields.id ?? "stalker",
+        kind,
+        name: fields.name ?? "Stalker",
+        url: fields.url ?? "",
+        mac: fields.mac ?? undefined,
         prefix: fields.prefix ?? undefined,
         filter: fields.filter ?? undefined,
         maxConnections: fields.max ? Number(fields.max) : undefined,
