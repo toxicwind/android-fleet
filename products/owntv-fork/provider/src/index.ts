@@ -136,6 +136,9 @@ function channelRow(c: VirtualChannel, num: number) {
     custom_sid: "",
     tv_archive: c.catchup ? 1 : 0,
     direct_source: "",
+    // Live audio-language filter lane: parsed from name tags, never filters
+    // unknown. OwnTV's audio-language filter (VOD) can now extend to live rows.
+    audio_languages: c.audioLanguages?.join(",") ?? "",
     tv_archive_duration: c.catchupDays ?? (c.catchup ? 7 : 0),
     // Full catchup contract OwnTV's CatchupUrl.kt reads from the panel (dex-verified:
     // catchupType/catchupSource/catchupDays/catchupOffsetMin/catchupTimezone/catchupPhpAvailable).

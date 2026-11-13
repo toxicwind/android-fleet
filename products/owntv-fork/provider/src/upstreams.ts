@@ -21,6 +21,10 @@ export interface VirtualChannel {
   catchupOffsetMin?: number;
   catchupTimezone?: string;
   catchupPhpAvailable?: boolean;
+  /** Audio languages parsed from name tags (|ES|, [ES-ESP], (Audio: ES)) — the
+   *  live-channel audio filter lane. Xtream spec has no per-stream audio field,
+   *  so the name is the only signal; missing = unknown, never filtered out. */
+  audioLanguages?: string[];
   addedAt: number;
   /** Where the stream actually lives (panel URL, playlist URL). */
   upstream: {
@@ -53,6 +57,41 @@ const idFor = (sourceId: string, upstreamId: string): number => {
 
 const matches = (candidate: string | undefined, filter?: string): boolean =>
   !filter || new RegExp(filter, "i").test(candidate ?? "");
+
+/** Parse audio-language hints from a channel name. Signals (in priority order):
+ *   (Audio: ES) / (Audio ES) / (Multi-Audio) — explicit panel convention
+ *   [ES-ESP] / [EN] / [MULTI] — bracketed language tags
+ *   |ES| / |FR-4K| — the language-tag convention (metadata.ts languageOf)
+ * Returns ISO-639-1 codes (2 letters); unknown → undefined (never filtered).
+ */
+export function audioLanguagesOf(name: string): string[] | undefined {
+  const out = new Set<string>();
+  // (Audio: ES) / (Audio: ES,EN) / (Multi-Audio)
+  const audio = name.match(/\(audio:?\s*([^)]+)\)/i);
+  if (audio) {
+    const langs = audio[1].split(/[,/&+]/).map((s) => s.trim().toUpperCase()).filter(Boolean);
+    for (const l of langs) {
+      if (l === "MULTI" || l === "MULTI-AUDIO") continue;
+      const m = l.match(/^[A-Z]{2}/);
+      if (m) out.add(m[0]);
+    }
+  }
+  // [ES-ESP] / [EN] / [MULTI] — bracketed tags
+  const bracket = name.match(/\[([A-Z]{2}(?:-[A-Z]{2,4})?)\]/i);
+  if (bracket) {
+    const tag = bracket[1].toUpperCase();
+    if (tag !== "MULTI" && tag !== "SUB") out.add(tag.slice(0, 2));
+  }
+  // |ES| / |FR-4K| — the language-tag convention. A tag is language-only if it
+  // starts with a 2-letter code; |4K| alone (no language prefix) is quality-only.
+  const pipe = name.match(/\|([A-Za-z]{2}(?:-[A-Za-z0-9]{1,4})?)\|/);
+  if (pipe) {
+    const tag = pipe[1].toUpperCase();
+    const langCode = tag.match(/^[A-Z]{2}/)?.[0];
+    if (langCode && !/^(4K|8K|UHD|HD|SD|HDR|DV)$/.test(langCode)) out.add(langCode);
+  }
+  return out.size > 0 ? [...out] : undefined;
+}
 
 async function loadXtream(src: UpstreamSource, out: VirtualChannel[], cats: Map<string, string>, config: Config): Promise<void> {
   const base = src.url.trimEnd("/");
@@ -104,6 +143,7 @@ async function loadXtream(src: UpstreamSource, out: VirtualChannel[], cats: Map<
     const categoryId = idFor(`${src.id}:cat`, rawCategoryId).toString();
     if (!cats.has(categoryId)) cats.set(categoryId, categoryMap[rawCategoryId] ?? "Uncategorized");
     const tvArchive = Number(s.tv_archive ?? 0) === 1;
+    const audioLanguages = audioLanguagesOf(name);
     // Full catchup contract from the panel (OwnTV CatchupUrl.kt reads these).
     const catchupType = String(s.catchup_type ?? s.catchup ?? "").trim() || (tvArchive ? "default" : undefined);
     out.push({
@@ -123,6 +163,7 @@ async function loadXtream(src: UpstreamSource, out: VirtualChannel[], cats: Map<
       catchupOffsetMin: s.catchup_offset_min != null ? Number(s.catchup_offset_min) : undefined,
       catchupTimezone: s.catchup_timezone ? String(s.catchup_timezone) : undefined,
       catchupPhpAvailable: s.catchup_php_available != null ? Number(s.catchup_php_available) === 1 : undefined,
+      audioLanguages,
       addedAt: Number(s.added ?? 0) * 1000 || Date.now(),
       upstream: {
         kind: "xtream",
