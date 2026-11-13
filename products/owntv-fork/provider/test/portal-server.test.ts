@@ -72,4 +72,24 @@ describe("portal.php serving surface", () => {
     expect(body.js).toHaveLength(2);
     expect(body.js[0]).toEqual({ id: "cat1", title: "UK" });
   });
+
+  test("get_ordered_list pages with totals (client-walkable)", async () => {
+    const hs = await portal("http://x/portal.php?type=stb&action=handshake&mac=AA:BB:CC:DD:EE:00").json() as any;
+    const token = hs.js.token;
+    const res = portal(`http://x/portal.php?type=itv&action=get_ordered_list&genre=cat1&p=1&token=${token}`);
+    const body = await res.json() as any;
+    expect(body.js.total_items).toBe(1); // only BBC One is cat1
+    expect(body.js.max_page_items).toBe(14);
+    expect(body.js.data).toHaveLength(1);
+    expect(body.js.data[0].name).toBe("BBC One");
+  });
+
+  test("get_ordered_list page 2 returns empty data with correct totals", async () => {
+    const hs = await portal("http://x/portal.php?type=stb&action=handshake&mac=AA:BB:CC:DD:EE:00").json() as any;
+    const token = hs.js.token;
+    const res = portal(`http://x/portal.php?type=itv&action=get_ordered_list&genre=*&p=2&token=${token}`);
+    const body = await res.json() as any;
+    expect(body.js.total_items).toBe(2);
+    expect(body.js.data).toHaveLength(0); // 2 channels, page 2 of 14 → empty
+  });
 });

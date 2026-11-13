@@ -106,6 +106,34 @@ export function handlePortal(
       }));
       return js(out);
     }
+    case "itv:get_ordered_list": {
+      // Paged channel list — real Stalker clients (OwnTV, MAG boxes) walk
+      // pages of ~14 instead of pulling the whole catalog. get_all_channels
+      // on a 687k-channel portal is ~179MB: unusable on a TV. This page
+      // endpoint keeps the wire format identical (js.data + totals) so the
+      // same client parser handles both.
+      const genre = url.searchParams.get("genre") ?? "";
+      const page = Math.max(1, Number(url.searchParams.get("p") ?? "1") || 1);
+      const PAGE_SIZE = 14;
+      const filtered = genre && genre !== "*"
+        ? channels.filter((c) => c.categoryId === genre)
+        : channels;
+      const total = filtered.length;
+      const start = (page - 1) * PAGE_SIZE;
+      const slice = filtered.slice(start, start + PAGE_SIZE);
+      const data = slice.map((c, i) => ({
+        id: String(c.id),
+        name: c.name,
+        number: String(start + i + 1),
+        cmd: `${liveBase}/${c.id}.m3u8`,
+        logo: c.icon ?? "",
+        xmltv_id: c.epgId ?? "",
+        tv_genre_id: c.categoryId,
+        tv_archive: c.catchup ? 1 : 0,
+        tv_archive_duration: c.catchupDays ?? 0,
+      }));
+      return js({ total_items: total, max_page_items: PAGE_SIZE, data });
+    }
     case "itv:create_link": {
       const cmd = url.searchParams.get("cmd");
       if (!cmd) return js({ cmd: "" });
