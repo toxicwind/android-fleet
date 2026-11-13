@@ -336,10 +336,64 @@ async function handleApi(url: URL, req: Request): Promise<Response> {
         });
         if (!res.ok) return json(new Response(), { episodes: [] });
         const info = (await res.json()) as Record<string, unknown>;
+        // Source-encode episode ids (s{idx}:{episodeId}) so the client's
+        // /series/{u}/{p}/{episodeId}.ext playback routes back to this provider,
+        // which can then find the owning upstream. Raw upstream episode ids are
+        // ambiguous across panels (same id = different stream on another source).
+        const prefix = s.series_id.split(":")[0];
+        const episodes = info.episodes;
+        if (episodes && typeof episodes === "object") {
+          for (const key of Object.keys(episodes)) {
+            const arr = (episodes as Record<string, unknown>)[key];
+            if (Array.isArray(arr)) {
+              for (const ep of arr) {
+                if (ep && typeof ep === "object" && "id" in ep) {
+                  (ep as Record<string, unknown>).id = `${prefix}:${String((ep as Record<string, unknown>).id)}`;
+                }
+              }
+            }
+          }
+        }
         return json(new Response(), info);
       } catch {
         return json(new Response(), { episodes: [] });
       }
+    }
+    case "get_vod_info": {
+      await refreshVodSeries();
+      // LG app sends vod_id; OwnTV sends movie_id. Accept both.
+      const movieId = url.searchParams.get("vod_id") ?? url.searchParams.get("movie_id") ?? "";
+      if (!movieId) return json(new Response(), { status: 404 });
+      const m = movies.find((x) => x.movie_id === movieId);
+      if (!m) return json(new Response(), { status: 404 });
+      const streamUrl = movieStreamUrl(m);
+      if (!streamUrl) return json(new Response(), { status: 404 });
+      // Xtream get_vod_info contract: { info: {...}, movie_data: {...} } — the
+      // LG app reads data.info (plot/cast/director/genre/releaseDate/poster).
+      return json(new Response(), {
+        info: {
+          movie_image: m.stream_icon ?? "",
+          name: m.name,
+          plot: m.plot ?? "",
+          rating: m.rating ?? 0,
+          duration_secs: 0,
+          genre: "",
+          cast: "",
+          director: "",
+          releasedate: m.added ?? "",
+          subtitles: [],
+        },
+        movie_data: {
+          stream_id: m.movie_id,
+          name: m.name,
+          container_extension: m.container_extension ?? "mp4",
+          category_id: m.category_id,
+          stream_icon: m.stream_icon ?? "",
+          rating: m.rating ?? 0,
+          plot: m.plot ?? "",
+          added: m.added ?? String(Math.floor(Date.now() / 1000)),
+        },
+      });
     }
     case "":
       return json(new Response(), accountInfo());
@@ -389,10 +443,68 @@ const server = Bun.serve({
         if (!upstream) return new Response("unknown movie", { status: 404 });
         return proxyStream(req, upstream);
       }
+      // series/{u}/{p}/{episodeId.ext} — episode ids are source-encoded
+      // (s{idx}:{episodeId}) by get_series_info so we can find the owning
+      // upstream; raw upstream episode ids are ambiguous across panels.
       const s = series.find((x) => x.series_id === rawId);
-      const upstream = s ? seriesStreamUrl(s) : null;
-      if (!upstream) return new Response("unknown series", { status: 404 });
-      return proxyStream(req, upstream);
+      if (s) {
+        const upstream = seriesStreamUrl(s);
+        if (!upstream) return new Response("unknown series", { status: 404 });
+        return proxyStream(req, upstream);
+      }
+      const episodeMatch = rawId.match(/^(s\d+):(.+)$/);
+      if (episodeMatch) {
+        const [, srcPrefix, episodeId] = episodeMatch;
+        const owner = series.find((x) => x.series_id.startsWith(`${srcPrefix}:`) && x.upstream?.kind === "xtream");
+        if (owner?.upstream?.kind === "xtream") {
+          const up = owner.upstream;
+          const ext = idPart.split(".")[1] ?? "mp4";
+          const upstream = `${up.base}/series/${up.username}/${up.password}/${episodeId}.${ext}`;
+          return proxyStream(req, upstream);
+        }
+      }
+      return new Response("unknown series", { status: 404 });
+    }
+    if (path === "/get.php" || path === "/get.php/") {
+      if (!authOk(url)) return new Response("Unauthorized", { status: 401 });
+      await refreshCatalog();
+      const type = url.searchParams.get("type") ?? "m3u_plus";
+      const output = url.searchParams.get("output") ?? "ts";
+      if (type !== "m3u_plus") return new Response("unsupported type", { status: 400 });
+      // Build M3U playlist
+      let m3u = "#EXTM3U\n";
+      for (const c of channels) {
+        const attrs = [
+          `tvg-id="${c.id}"`,
+          c.icon ? `tvg-logo="${c.icon}"` : "",
+          c.group ? `group-title="${c.group}"` : "",
+          c.catchup ? `catchup="append" catchup-days="${c.catchupDays ?? 7}"` : "",
+        ].filter(Boolean).join(" ");
+        m3u += `#EXTINF:-1 ${attrs},${c.name}\n`;
+        m3u += `${url.origin}/live/${config.clientUsername}/${config.clientPassword}/${c.id}.${output}\n`;
+      }
+      return new Response(m3u, {
+        headers: { "content-type": "application/vnd.apple.mpegurl", "cache-control": "no-store" },
+      });
+    }
+    if (path.startsWith("/timeshift/") || path === "/streaming/timeshift.php") {
+      await refreshCatalog();
+      // /timeshift/{user}/{pass}/{duration}/{start}/{id}.ts|.m3u8 or
+      // /streaming/timeshift.php?username={u}&password={p}&stream={id}&start={ts}&duration={dur}
+      let streamId: string | null = null;
+      if (path.startsWith("/timeshift/")) {
+        const segs = url.pathname.split("/").filter(Boolean);
+        if (segs.length >= 6) streamId = segs[5].replace(/\..+$/, "");
+      } else {
+        streamId = url.searchParams.get("stream");
+      }
+      if (!streamId) return new Response("missing stream id", { status: 400 });
+      const channel = channels.find((c) => String(c.id) === streamId);
+      if (!channel || !channel.catchup) return new Response("no catchup", { status: 404 });
+      // Serve catchup via the live stream URL (catchup proxy passthrough). Use
+      // the request origin, not config.host (0.0.0.0 is not client-reachable).
+      const catchupUrl = `${url.origin}/live/${config.clientUsername}/${config.clientPassword}/${streamId}.ts`;
+      return proxyStream(req, catchupUrl);
     }
     if (path === "/health") {
       return new Response(JSON.stringify({ ok: true, channels: channels.length, loadedAt }), {
