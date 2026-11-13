@@ -49,7 +49,7 @@ export function qualityTierOf(name: string): EnrichedTitle["qualityTier"] {
 
 /** Parse language tag from the |XX| or [XX-SUB] conventions. */
 export function languageOf(name: string): string | undefined {
-  const m = name.match(/\|([A-Za-z]{2}(?:-[A-Za-z]{2,4})?)\|/);
+  const m = name.match(/\|([A-Za-z]{2}(?:-[A-Za-z0-9]{1,4})?)\|/);
   return m?.[1]?.toUpperCase();
 }
 
