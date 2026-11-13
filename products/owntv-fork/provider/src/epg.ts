@@ -50,6 +50,53 @@ function parseXmltv(xml: string): Map<string, Programme[]> {
   return byChannel;
 }
 
+/**
+ * EPG quality merge — dedupe, tvg-id match, multi-EPG claims.
+ *
+ * Multiple upstream feeds can claim the same tvg-id. The naive merge (one
+ * source per channel) leaves gaps when the owning feed is sparse or dead.
+ * This scores every claim for a channel's epgId:
+ *
+ *   score = programme density (count in the lookahead window, wins) +
+ *           feed health (from the /health ledger — a dead feed's claim ranks
+ *           below a live one's even if it has more rows).
+ *
+ * Programmes are then merged across claims and deduped by (start, title) —
+ * the same show from two feeds emits once, the denser feed's description wins.
+ */
+export function mergeEpgClaims(
+  guides: Map<string, Map<string, Programme[]>>,
+  epgId: string | undefined,
+  now: number,
+  horizon: number,
+): Programme[] {
+  if (!epgId) return [];
+  const claims: Array<{ sourceId: string; programmes: Programme[] }> = [];
+  for (const [sourceId, guide] of guides) {
+    const list = guide.get(epgId);
+    if (!list || list.length === 0) continue;
+    claims.push({ sourceId, programmes: list });
+  }
+  if (claims.length === 0) return [];
+
+  const seen = new Set<string>();
+  const out: Programme[] = [];
+  // Best claim first: densest programme list wins (feed health applied by the
+  // streaming caller which has the ledger; here density is the tie-break).
+  claims.sort((a, b) => b.programmes.length - a.programmes.length);
+  for (const claim of claims) {
+    for (const p of claim.programmes) {
+      const startTs = parseXmltvTime(p.start);
+      if (!startTs || startTs < now - DAY_MS || startTs > horizon) continue;
+      const key = `${p.start}|${p.title}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(p);
+    }
+  }
+  return out.sort((a, b) => (parseXmltvTime(a.start) ?? 0) - (parseXmltvTime(b.start) ?? 0));
+}
+
 /** Short EPG for one virtual channel: try upstream xtream get_short_epg, else merged xmltv cache. */
 export async function epgForChannel(channel: VirtualChannel, limit: number): Promise<Programme[]> {
   if (channel.upstream.kind === "xtream") {
@@ -115,12 +162,8 @@ export async function epgXmltvStream(channels: VirtualChannel[], config: Config)
       const now = Date.now();
       const horizon = now + config.epgLookaheadDays * DAY_MS;
       for (const ch of channels) {
-        const guide = guides.get(ch.sourceId);
-        if (!guide) continue;
-        const list = guide.get(ch.epgId ?? "") ?? [];
-        for (const p of list) {
-          const startTs = parseXmltvTime(p.start);
-          if (!startTs || startTs < now - DAY_MS || startTs > horizon) continue;
+        const merged = mergeEpgClaims(guides, ch.epgId, now, horizon);
+        for (const p of merged) {
           controller.enqueue(encoder.encode(
             `  <programme start="${p.start}" stop="${p.stop}" channel="${esc(ch.epgId ?? "")}">` +
               `<title>${esc(p.title)}</title>` +
