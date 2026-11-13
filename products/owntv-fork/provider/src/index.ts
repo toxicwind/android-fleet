@@ -20,6 +20,7 @@ import { loadUpstreams, type VirtualChannel } from "./upstreams.ts";
 import { scheduleEpgRefresh, epgForChannel, epgXmltvStream } from "./epg.ts";
 import { handlePortal } from "./portal-server.ts";
 import { snapshotHealth, degradedCount } from "./health.ts";
+import { parseCapabilities, negotiateRow } from "./capabilities.ts";
 import { handleStream } from "./stream.ts";
 import { loadVelvetCatalog, type VelvetCatalog } from "./velvet.ts";
 import { searchArgos, toProviderResults } from "./argos.ts";
@@ -284,9 +285,21 @@ async function handleApi(url: URL, req: Request): Promise<Response> {
     case "get_live_categories":
       return serveGzip("categoriesBody", categoriesBody, req);
     case "get_live_streams": {
+      const capsParam = url.searchParams.get("capabilities");
       const cat = url.searchParams.get("category_id");
-      if (cat) return serveGzip(`cat:${cat}`, liveStreamsByCategory.get(cat) ?? "[]", req);
-      return serveGzip("liveStreamsAll", liveStreamsAll, req);
+      // Fast path: no capability negotiation → serve the precomputed gzip body
+      // (687k rows, ~4MB gzipped). Negotiation only when the client asks for it.
+      if (!capsParam) {
+        if (cat) return serveGzip(`cat:${cat}`, liveStreamsByCategory.get(cat) ?? "[]", req);
+        return serveGzip("liveStreamsAll", liveStreamsAll, req);
+      }
+      const caps = parseCapabilities(capsParam);
+      if (cat) {
+        const rows = JSON.parse(liveStreamsByCategory.get(cat) ?? "[]") as Array<Record<string, unknown>>;
+        return serveGzip(`cat:${cat}`, JSON.stringify(rows.map((r) => negotiateRow(r, caps))), req);
+      }
+      const rows = JSON.parse(liveStreamsAll) as Array<Record<string, unknown>>;
+      return serveGzip("liveStreamsAll", JSON.stringify(rows.map((r) => negotiateRow(r, caps))), req);
     }
     case "get_short_epg": {
       const streamId = url.searchParams.get("stream_id") ?? "";
