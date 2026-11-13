@@ -19,6 +19,7 @@ import { defineConfig } from "./config.ts";
 import { loadUpstreams, type VirtualChannel } from "./upstreams.ts";
 import { scheduleEpgRefresh, epgForChannel, epgXmltvStream } from "./epg.ts";
 import { handlePortal } from "./portal-server.ts";
+import { snapshotHealth, degradedCount } from "./health.ts";
 import { handleStream } from "./stream.ts";
 import { loadVelvetCatalog, type VelvetCatalog } from "./velvet.ts";
 import { searchArgos, toProviderResults } from "./argos.ts";
@@ -416,6 +417,19 @@ const server = Bun.serve({
     const url = new URL(req.url);
     const path = url.pathname;
 
+    if (path === "/health" || path === "/health/") {
+      // Upstream health ledger — the failure signal the catalog log never had.
+      // Anomaly #3: 16/123 panels return object bodies; this endpoint makes
+      // degraded-vs-correct visible instead of hidden behind "687k channels".
+      const h = snapshotHealth();
+      return json(new Response(null), {
+        ok: true,
+        upstreams: Object.keys(h).length,
+        degraded: degradedCount(),
+        channels: channels.length,
+        health: h,
+      });
+    }
     if (path === "/player_api.php" || path === "/player_api.php/") return handleApi(url, req);
     if (path === "/portal.php" || path === "/portal.php/" || path === "/stalker_portal/server/load.php" || path === "/server/load.php") {
       // Stalker/MAG surface: handshake → get_profile → get_all_channels → create_link.
