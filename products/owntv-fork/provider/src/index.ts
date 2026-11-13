@@ -18,6 +18,7 @@
 import { defineConfig } from "./config.ts";
 import { loadUpstreams, type VirtualChannel } from "./upstreams.ts";
 import { scheduleEpgRefresh, epgForChannel, epgXmltvStream } from "./epg.ts";
+import { handlePortal } from "./portal-server.ts";
 import { handleStream } from "./stream.ts";
 import { loadVelvetCatalog, type VelvetCatalog } from "./velvet.ts";
 import { searchArgos, toProviderResults } from "./argos.ts";
@@ -416,6 +417,12 @@ const server = Bun.serve({
     const path = url.pathname;
 
     if (path === "/player_api.php" || path === "/player_api.php/") return handleApi(url, req);
+    if (path === "/portal.php" || path === "/portal.php/" || path === "/stalker_portal/server/load.php" || path === "/server/load.php") {
+      // Stalker/MAG surface: handshake → get_profile → get_all_channels → create_link.
+      // load.php is the alternate API base real portals serve; treat it identically.
+      await refreshCatalog();
+      return handlePortal(url, req, channels, config);
+    }
     if (path === "/xmltv.php") {
       if (!authOk(url)) return new Response("Unauthorized", { status: 401 });
       await refreshCatalog();
