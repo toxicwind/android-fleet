@@ -21,6 +21,7 @@ import { scheduleEpgRefresh, epgForChannel, epgXmltvStream } from "./epg.ts";
 import { handlePortal } from "./portal-server.ts";
 import { snapshotHealth, degradedCount } from "./health.ts";
 import { parseCapabilities, negotiateRow } from "./capabilities.ts";
+import { translateBatch } from "./translate.ts";
 import { handleStream } from "./stream.ts";
 import { loadVelvetCatalog, type VelvetCatalog } from "./velvet.ts";
 import { searchArgos, toProviderResults } from "./argos.ts";
@@ -433,6 +434,20 @@ const server = Bun.serve({
     const url = new URL(req.url);
     const path = url.pathname;
 
+    if (path === "/translate") {
+      // Live subtitle translation backend. POST {texts, target, source?}.
+      // Fail-open: original text on any LLM error — the player never blanks.
+      if (req.method !== "POST") return new Response("POST only", { status: 405 });
+      try {
+        const body = (await req.json()) as { texts?: string[]; target?: string; source?: string };
+        const texts = Array.isArray(body.texts) ? body.texts.filter((t) => typeof t === "string") : [];
+        const target = body.target ?? "en";
+        const result = await translateBatch(config, texts, target, body.source);
+        return json(new Response(), result);
+      } catch (e) {
+        return json(new Response(null, { status: 400 }), { error: (e as Error).message });
+      }
+    }
     if (path === "/health" || path === "/health/") {
       // Upstream health ledger — the failure signal the catalog log never had.
       // Anomaly #3: 16/123 panels return object bodies; this endpoint makes
