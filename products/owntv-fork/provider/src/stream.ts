@@ -7,10 +7,47 @@ import type { VirtualChannel } from "./upstreams.ts";
 const active = new Map<number, number>(); // channelId -> open upstream fetches
 const retries = new Map<number, number>(); // channelId -> consecutive failures
 
+/** Stalker/Ministra create_link: resolve a portal cmd to a short-lived stream URL.
+ *  Mirrors OwnTV core's StalkerClient.createLink — the returned cmd may carry an
+ *  `ffmpeg `/`ffrt*`/`auto ` prefix, which is stripped (the URL itself is playable). */
+const MAG_UA =
+  "Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) MAG200 stbapp ver: 4 rev: 2721 Safari/533.3";
+
+async function stalkerCreateLink(channel: VirtualChannel, config: Config): Promise<string> {
+  const { apiBase, mac, token, cmd, streamId } = channel.upstream;
+  if (!apiBase || !mac || !token || !cmd) throw new Error("stalker channel missing portal state");
+  const url = `${apiBase}?type=itv&action=create_link&cmd=${encodeURIComponent(cmd)}&forced_storage=0&disable_ad=0&JsHttpRequest=1-xml`;
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent": MAG_UA,
+      Cookie: `mac=${encodeURIComponent(mac)}; stb_lang=en; timezone=UTC`,
+      "X-User-Agent": "Model: MAG250; Link: WiFi",
+      Referer: `${channel.upstream.base}/c/`,
+      Authorization: `Bearer ${token}`,
+    },
+    redirect: "follow",
+    signal: AbortSignal.timeout(config.streamConnectTimeoutMs),
+  });
+  if (!res.ok) throw new Error(`stalker create_link HTTP ${res.status}`);
+  const text = await res.text();
+  let js: unknown;
+  try { js = (JSON.parse(text) as { js?: unknown }).js; } catch { throw new Error("stalker create_link non-JSON"); }
+  const raw = (js as { cmd?: string } | null)?.cmd;
+  if (!raw) throw new Error(`stalker create_link returned no cmd for ${streamId} (token may have expired)`);
+  return raw.trim().replace(/^(ffmpeg\s+|ffrt\s+|auto\s+)/i, "");
+}
+
+/** Test-only export: lets the protocol test drive create_link directly. */
+export const stalkerCreateLinkForTest = stalkerCreateLink;
+
 function upstreamUrlFor(channel: VirtualChannel, url: URL): string {
   const ext = url.pathname.endsWith(".m3u8") ? "m3u8" : "ts";
   if (channel.upstream.kind === "xtream") {
     return `${channel.upstream.base}/live/${channel.upstream.username}/${channel.upstream.password}/${channel.upstream.streamId}.${ext}`;
+  }
+  if (channel.upstream.kind === "stalker") {
+    // Resolved lazily by handleStream (async create_link); upstreamUrlFor stays sync.
+    return "";
   }
   // m3u: passthrough the resolved playlist URL; if the client asked for .ts but
   // the playlist is HLS, the panel's own redirect logic applies upstream.
@@ -31,7 +68,16 @@ export async function handleStream(req: Request, url: URL, channels: VirtualChan
   }
   active.set(id, current + 1);
 
-  const upstream = upstreamUrlFor(channel, url);
+  // Stalker channels resolve their playable URL lazily via create_link (short-lived token).
+  let upstream = upstreamUrlFor(channel, url);
+  if (channel.upstream.kind === "stalker") {
+    try {
+      upstream = await stalkerCreateLink(channel, config);
+    } catch (err) {
+      active.delete(id);
+      return new Response(`stalker create_link failed: ${(err as Error).message}`, { status: 502 });
+    }
+  }
   const attempt = (retries.get(id) ?? 0) + 1;
   retries.set(id, attempt);
   // Route-bust: vary the request per attempt so a dead panel edge/CDN cache cannot
