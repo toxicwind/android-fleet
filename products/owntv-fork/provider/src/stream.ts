@@ -19,6 +19,19 @@ const uaForResponse = new WeakMap<Response, string>();
 // channelId -> the UA that successfully fetched this channel's playlist. Segments
 // reuse it (single request) and only fall back to the full race if it fails.
 const cachedUa = new Map<number, string>();
+// channelId -> the resolved upstream playlist URL (after redirects, e.g. a CDN
+// edge). HLS segments are relative to THIS origin, not the panel base, so we
+// remember it and use it to reconstruct segment URLs + Referer.
+const cdnPlaylistUrlForChannel = new Map<number, string>();
+
+// Test-only: clear per-channel caches (winning UA + CDN playlist URL). The unit
+// tests reuse one synthetic channel id across independent mock upstreams, so the
+// module-level caches must be reset between tests to avoid cross-test pollution
+// (a stale CDN origin pointing at a stopped mock server → 502).
+export function __resetChannelCachesForTest() {
+  cachedUa.clear();
+  cdnPlaylistUrlForChannel.clear();
+}
 
 // Many Xtream panels sit behind Cloudflare and UA-filter non-browser clients
 // (ffmpeg/mpv/exoplayer UAs get 403/502). Upstream requests always use a
@@ -236,10 +249,15 @@ export function rewriteHlsPlaylist(
     if (/^https?:\/\//i.test(trimmed)) {
       return trimmed;
     }
-    // Already in our /hls/{user}/{pass}/{streamId}/ shape → pass through; the
+    // Already in OUR /hls/{user}/{pass}/{streamId}/ shape → pass through; the
     // /hls/ route proxies it back to the owning upstream.
-    if (trimmed.startsWith("/hls/")) {
+    if (trimmed.startsWith(segPrefix + "/")) {
       return trimmed;
+    }
+    // Upstream-tokenized /hls/ path (e.g. /hls/{token}/{streamId}_n.ts) →
+    // route through us so the /hls/ handler can reconstruct the upstream URL.
+    if (trimmed.startsWith("/hls/")) {
+      return `${segPrefix}${trimmed}`;
     }
     // Other relative path (starts with /) → route through us.
     if (trimmed.startsWith("/")) {
@@ -273,11 +291,20 @@ export async function handleHlsSegment(
       c.upstream.streamId === decodeURIComponent(streamId),
   );
   if (!channel) return new Response("unknown hls segment", { status: 404 });
-  const upstreamPath = `/hls/${decodeURIComponent(user)}/${decodeURIComponent(pass)}/${decodeURIComponent(streamId)}/` + rest.map((s) => decodeURIComponent(s)).join("/");
-  const upstream = `${channel.upstream.base}${upstreamPath}`;
-  // The upstream 403s HLS segments unless we present a Referer matching its
-  // live playlist URL (verified: segment 403 without referer, 200 with it).
-  const referer = `${channel.upstream.base}/live/${channel.upstream.username}/${channel.upstream.password}/${channel.upstream.streamId}.m3u8`;
+  // Reconstruct the upstream path. If the original segment was an upstream-tokenized
+  // /hls/{token}/... path (rewritten through us as /hls/{user}/{pass}/{streamId}/hls/{token}/...),
+  // the rest begins with "hls" and IS the full upstream path. Otherwise (panel-format
+  // /hls/{user}/{pass}/{streamId}/...), the rest is the part after the streamId and we
+  // re-prefix it.
+  const upstreamPath = rest[0]?.startsWith("hls")
+    ? "/" + rest.join("/")
+    : `/hls/${decodeURIComponent(user)}/${decodeURIComponent(pass)}/${decodeURIComponent(streamId)}/` + rest.map((s) => decodeURIComponent(s)).join("/");
+  const playlistUrl = cdnPlaylistUrlForChannel.get(channel.id);
+  const base = playlistUrl ? new URL(playlistUrl).origin : channel.upstream.base;
+  // Preserve the query string (e.g. ?token=... on tokenized CDN segments) — it is
+  // part of the signed URL and dropping it makes the CDN reject the segment.
+  const upstream = `${base}${upstreamPath}${url.search}`;
+  const referer = playlistUrl ?? `${channel.upstream.base}/live/${channel.upstream.username}/${channel.upstream.password}/${channel.upstream.streamId}.m3u8`;
   // Reuse the winning UA from the playlist fetch (single request) so segments
   // don't re-race all 7 UAs — that would amplify upstream load ~7× on the hot
   // segment path. Fall back to the full race only if the cached UA fails.
@@ -301,7 +328,6 @@ export async function handleHlsSegment(
   headers.set("access-control-allow-origin", "*");
   return new Response(res.body, { status: res.status, headers });
 }
-
 const TS_PACKET_BYTES = 188;
 const TS_SYNC_BYTE = 0x47;
 
@@ -312,19 +338,80 @@ const TS_SYNC_BYTE = 0x47;
  * continuous stream: the cut is invisible (no ENDED, no spinner). If a refetch
  * fails, the stream just ends and the client's own reconnect ladder takes over.
  */
-function spliceLiveTsStream(
+export function spliceLiveTsStream(
   firstBody: ReadableStream<Uint8Array>,
   refetch: () => Promise<ReadableStream<Uint8Array> | null>,
+  opts: { prefetchTimeMs?: number; prefetchBytes?: number } = {},
 ): ReadableStream<Uint8Array> {
-  // A segment that ends without yielding a single full TS packet is either a
-  // broken/empty upstream or non-TS data — refetching it would loop forever.
-  // Give up after a few such empty segments and let the client's ladder handle it.
   const MAX_EMPTY_SEGMENTS = 3;
+  const MIN_ROTATE_MS = opts.prefetchTimeMs ?? 2_000;
   let reader = firstBody.getReader();
   let tail = new Uint8Array(0);
   let ended = false;
   let emptySegments = 0;
   let segmentProducedPackets = false;
+  let segmentStart = Date.now();
+  let prefetched: { reader: ReadableStreamDefaultReader<Uint8Array>; firstChunk: Uint8Array } | null = null;
+  let prefetchPromise: Promise<void> | null = null;
+
+  function ensurePrefetch() {
+    if (prefetched || prefetchPromise) return;
+    prefetchPromise = (async () => {
+      try {
+        const body = await refetch();
+        if (!body) { prefetched = null; return; }
+        const r = body.getReader();
+        const first = await r.read();
+        if (first.done) {
+          try { r.releaseLock(); } catch { /* ignore */ }
+          prefetched = null;
+        } else {
+          prefetched = { reader: r, firstChunk: first.value };
+        }
+      } catch {
+        prefetched = null;
+      } finally {
+        prefetchPromise = null;
+      }
+    })();
+  }
+
+  function tryRotate(): boolean {
+    if (!prefetched) return false;
+    const p = prefetched;
+    prefetched = null;
+    try { reader.releaseLock(); } catch { /* ignore */ }
+    reader = p.reader;
+    tail = new Uint8Array(0);
+    segmentProducedPackets = false;
+    emptySegments = 0;
+    segmentStart = Date.now();
+    return true;
+  }
+
+  // Merge a chunk into the TS packet buffer and enqueue complete 188-byte
+  // packets. Returns true if at least one packet was enqueued.
+  function processChunk(value: Uint8Array, controller: ReadableStreamDefaultController<Uint8Array>): boolean {
+    const merged = new Uint8Array(tail.length + value.length);
+    merged.set(tail, 0);
+    merged.set(value, tail.length);
+    tail = merged;
+    let off = 0;
+    let enqueued = false;
+    while (tail.length - off >= TS_PACKET_BYTES) {
+      if (tail[off] === TS_SYNC_BYTE) {
+        controller.enqueue(tail.slice(off, off + TS_PACKET_BYTES));
+        enqueued = true;
+        off += TS_PACKET_BYTES;
+      } else {
+        let i = off + 1;
+        while (i < tail.length && tail[i] !== TS_SYNC_BYTE) i++;
+        off = i;
+      }
+    }
+    tail = tail.slice(off);
+    return enqueued;
+  }
 
   return new ReadableStream({
     async pull(controller) {
@@ -334,6 +421,13 @@ function spliceLiveTsStream(
       }
       try {
         while (true) {
+          if (prefetched && Date.now() - segmentStart >= MIN_ROTATE_MS) {
+            const chunk = prefetched.firstChunk;
+            tryRotate();
+            if (!processChunk(chunk, controller)) continue;
+            ensurePrefetch();
+            return;
+          }
           const { value, done } = await reader.read();
           if (done) {
             if (!segmentProducedPackets) {
@@ -345,40 +439,32 @@ function spliceLiveTsStream(
             } else {
               emptySegments = 0;
             }
-            const next = await refetch();
-            if (!next) {
-              ended = true;
-              controller.close();
+            if (prefetched) {
+              const chunk = prefetched.firstChunk;
+              tryRotate();
+              if (!processChunk(chunk, controller)) continue;
+              ensurePrefetch();
               return;
             }
+            if (prefetchPromise) await prefetchPromise;
+            if (prefetched) {
+              const chunk = prefetched.firstChunk;
+              tryRotate();
+              if (!processChunk(chunk, controller)) continue;
+              ensurePrefetch();
+              return;
+            }
+            const next = await refetch();
+            if (!next) { ended = true; controller.close(); return; }
             reader.releaseLock();
             reader = next.getReader();
-            tail = new Uint8Array(0); // drop the partial packet; the new segment realigns
+            tail = new Uint8Array(0);
             segmentProducedPackets = false;
             continue;
           }
-          const merged = new Uint8Array(tail.length + value.length);
-          merged.set(tail, 0);
-          merged.set(value, tail.length);
-          tail = merged;
-          let off = 0;
-          let enqueued = false;
-          while (tail.length - off >= TS_PACKET_BYTES) {
-            if (tail[off] === TS_SYNC_BYTE) {
-              controller.enqueue(tail.slice(off, off + TS_PACKET_BYTES));
-              enqueued = true;
-              off += TS_PACKET_BYTES;
-            } else {
-              let i = off + 1;
-              while (i < tail.length && tail[i] !== TS_SYNC_BYTE) i++;
-              off = i;
-            }
-          }
-          tail = tail.slice(off);
-          if (enqueued) {
-            segmentProducedPackets = true;
-            return;
-          }
+          segmentProducedPackets = true;
+          ensurePrefetch();
+          if (processChunk(value, controller)) return;
         }
       } catch {
         ended = true;
@@ -390,7 +476,6 @@ function spliceLiveTsStream(
     },
   });
 }
-
 export async function handleStream(req: Request, url: URL, channels: VirtualChannel[], config: Config): Promise<Response> {
   const segments = url.pathname.split("/").filter(Boolean); // live, user, pass, id.ext
   const idPart = segments[segments.length - 1] ?? "";
@@ -403,15 +488,24 @@ export async function handleStream(req: Request, url: URL, channels: VirtualChan
   if (channel.upstream.streamStatus === "no-streams") {
     return new Response("source has no playable streams (no-streams)", { status: 502 });
   }
+  // The connection cap throttles long-lived progressive .ts streams (one open
+  // upstream fetch per client connection). HLS playlist fetches are brief
+  // control-plane requests — the player polls them continuously — so they must
+  // NEVER count against the cap, or normal playback gets throttled (429 → broken
+  // picture). Only .ts stream bodies hold a connection open long enough to matter.
+  const isHlsPlaylist = url.pathname.endsWith(".m3u8");
   const cap = config.maxConnections;
-  const current = active.get(id) ?? 0;
-  if (current >= cap) {
-    return new Response("connection limit reached for channel", { status: 429 });
+  if (!isHlsPlaylist) {
+    const current = active.get(id) ?? 0;
+    if (current >= cap) {
+      return new Response("connection limit reached for channel", { status: 429 });
+    }
+    active.set(id, current + 1);
   }
-  active.set(id, current + 1);
 
   // Stalker channels resolve their playable URL lazily via create_link (short-lived token).
   let upstream = upstreamUrlFor(channel, url);
+  console.error(`[dbg] channel ${id} upstream=${upstream}`);
   if (channel.upstream.kind === "stalker") {
     try {
       upstream = await stalkerCreateLink(channel, config);
@@ -463,6 +557,18 @@ export async function handleStream(req: Request, url: URL, channels: VirtualChan
       (upstreamRes.headers.get("content-type") ?? "").includes("m3u8");
     if (isHls) {
       const playlist = await upstreamRes.text();
+      // Guard: only rewrite if the body is actually an HLS playlist. Some panels
+      // answer a .m3u8 URL with an HTML error page (e.g. XUI.one STREAM_OFFLINE)
+      // while still returning 200 — rewriting that garbage would emit a mangled
+      // "playlist" and hide the real upstream state. Detect a genuine playlist
+      // (#EXTM3U / #EXTINF) and otherwise pass the upstream response through so
+      // the client sees the true status/body.
+      if (!/^#EXTM3U/m.test(playlist) && !/#EXTINF/.test(playlist)) {
+        return new Response(playlist, { status: upstreamRes.status, headers });
+      }
+      // Remember the resolved playlist URL (after redirects) so HLS segments are
+      // fetched from the same origin (CDN edge) the playlist came from.
+      cdnPlaylistUrlForChannel.set(channel.id, upstreamRes.url);
       const rewritten = rewriteHlsPlaylist(playlist, channel, config);
       headers.set("content-type", "application/x-mpegurl");
       return new Response(rewritten, { status: 200, headers });
@@ -477,7 +583,10 @@ export async function handleStream(req: Request, url: URL, channels: VirtualChan
         retries.set(id, nextAttempt);
         const bustedNext = new URL(upstream);
         bustedNext.searchParams.set("_r", `${Date.now()}-${nextAttempt}`);
+        const t0 = Date.now();
         const nextRes = await fetchUpstreamWithCachedUa(channel.id, bustedNext.toString(), config);
+        const dt = Date.now() - t0;
+        console.log(`[splice] refetch #${nextAttempt} took ${dt}ms -> ${nextRes ? nextRes.status : "null"} cachedUa=${cachedUa.has(channel.id)}`);
         if (!nextRes || (!nextRes.ok && nextRes.status !== 206)) return null;
         return nextRes.body;
       });
@@ -489,6 +598,8 @@ export async function handleStream(req: Request, url: URL, channels: VirtualChan
     retries.set(id, attempt);
     return new Response(`upstream error: ${msg}`, { status: 502, headers: { "retry-after": "2" } });
   } finally {
-    active.set(id, (active.get(id) ?? 1) - 1);
+    if (!isHlsPlaylist) {
+      active.set(id, (active.get(id) ?? 1) - 1);
+    }
   }
 }

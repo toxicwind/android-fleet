@@ -48,7 +48,7 @@ describe("defineConfig", () => {
     const c = defineConfig({});
     expect(c.port).toBe(25818);
     expect(c.clientUsername).toBe("master");
-    expect(c.maxConnections).toBe(4);
+    expect(c.maxConnections).toBe(16);
     expect(c.catalogTtlMs).toBe(600000);
     expect(c.epgRefreshMs).toBe(21600000);
     expect(c.epgLookaheadDays).toBe(2);

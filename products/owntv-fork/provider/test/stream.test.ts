@@ -7,10 +7,10 @@
  * The actual bound port is read from `server.port` and threaded into the
  * channel/config so the code under test talks to the right server.
  */
-import { test, expect } from "bun:test";
+import { test, expect, beforeEach } from "bun:test";
 import { defineConfig } from "../src/config.ts";
 import type { Config } from "../src/config.ts";
-import { handleStream, handleHlsSegment, rewriteHlsPlaylist, BROWSER_UA } from "../src/stream.ts";
+import { handleStream, handleHlsSegment, rewriteHlsPlaylist, spliceLiveTsStream, BROWSER_UA, __resetChannelCachesForTest } from "../src/stream.ts";
 import type { VirtualChannel } from "../src/upstreams.ts";
 
 function makeChannel(port: number, overrides: Partial<VirtualChannel> = {}): VirtualChannel {
@@ -43,6 +43,13 @@ function makeConfig(port: number): Config {
     PROVIDER_MAX_CONNECTIONS: "4",
   });
 }
+
+beforeEach(() => {
+  // The module-level per-channel caches (winning UA + CDN playlist URL) are keyed
+  // by channel.id, which the tests reuse across independent mock upstreams. Reset
+  // them so one test's cached CDN origin doesn't leak into the next (→ 502).
+  __resetChannelCachesForTest();
+});
 
 test("rewriteHlsPlaylist routes relative segment paths through /hls/", () => {
   const channel = makeChannel(38992);
@@ -290,6 +297,142 @@ test("spliceLiveTsStream hides upstream cuts (re-fetches and splices)", async ()
     expect(got.slice(0, 2)).toEqual([0, 1]);
     expect(got.slice(2)).toEqual([100, 101, 102]);
     expect(fetches).toBeGreaterThanOrEqual(2);
+  } finally {
+    upstream.stop();
+  }
+});
+
+
+test("spliceLiveTsStream pre-fetches the next token before the cut (zero-gap)", async () => {
+  const packet = (n: number) => {
+    const p = new Uint8Array(188);
+    p[0] = 0x47;
+    p[1] = n & 0xff;
+    return p;
+  };
+  let refetchCalls = 0;
+  let refetchBeforeEnd = false;
+  let firstEnded = false;
+
+  // First body: exactly enough packets to cross a tiny byte threshold, then stays
+  // open until we release it — so we can prove the refetch fires BEFORE the cut.
+  let releaseFirst: () => void;
+  const firstEndedP = new Promise<void>((r) => (releaseFirst = r));
+  const firstBody = new ReadableStream({
+    start(c) {
+      c.enqueue(packet(0));
+      c.enqueue(packet(1));
+      c.enqueue(packet(2));
+      firstEndedP.then(() => c.close());
+    },
+  });
+
+  const secondBody = new ReadableStream({
+    start(c) {
+      c.enqueue(packet(200));
+      c.close();
+    },
+  });
+
+  const spliced = spliceLiveTsStream(firstBody, async () => {
+    refetchCalls++;
+    if (!firstEnded) refetchBeforeEnd = true;
+    return secondBody;
+  }, { prefetchBytes: 188 * 3 }); // cross the threshold after 3 packets
+
+  const reader = spliced.getReader();
+  // Drain the first segment's 3 packets (crosses the threshold).
+  for (let i = 0; i < 3; i++) {
+    const { value } = await reader.read();
+    expect(value!.length).toBe(188);
+    expect(value![0]).toBe(0x47);
+    expect(value![1]).toBe(i);
+  }
+  // Give the background prefetch a chance to run.
+  await new Promise((r) => setTimeout(r, 50));
+  // The refetch must have fired while the first segment was still open.
+  expect(refetchCalls).toBe(1);
+  expect(refetchBeforeEnd).toBe(true);
+  // Now end the first segment; the handoff should use the prefetched body.
+  firstEnded = true;
+  releaseFirst!();
+  const second = await reader.read();
+  expect(second.done).toBe(false);
+  expect(second.value!.length).toBe(188);
+  expect(second.value![1]).toBe(200);
+  const third = await reader.read();
+  expect(third.done).toBe(true);
+});
+
+
+test("handleHlsSegment reconstructs tokenized /hlsr/ segment paths (no double-prefix)", async () => {
+  // Upstream emits tokenized segments: /hlsr/{token}/{user}/{pass}/{streamId}/{md5}/{streamId}_n.ts
+  const TOKEN = "SUFYUhJfEF9DAAdQWlFQAQoKUwMDUVAIB1VXDAJQVFECAAYAVgdWAARETxdLEBZQUlQ5XAVEDgxQBAEBTxYTQ1cRb1oFFQhHV1VVAxpIRkFaVAMXW1YYGhJYUBtZFlQEBFEGEU0VVx0VAxFbWQg7UVZPD1YERA5WF11YFUFbCG9WBl1SD1MQX0NWQRkaDRdFEQMIQA0KGBoAWEBLAkADEghBAgtSDhBJQwUMQFYQFkwRA0RgMkQYGgdJQFwNRw9fXEEKEQwER11DSkFcSzsWUEBNFFAAC1FKQAsWCUEYRF1TG29QDllcAAISClpWF0YPEQtEGUMLW1YLRVtLPEQPVBBZEgBYBAZHHA==";
+  const ORIG = `/hlsr/${TOKEN}/5213/52132021/836/4b264f155e8939528d82570a01b8a0a0/836_7.ts`;
+  let upstreamSeen = false;
+  const upstream = Bun.serve({
+    port: 0,
+    async fetch(req) {
+      const url = new URL(req.url);
+      if (url.pathname === ORIG) {
+        upstreamSeen = true;
+        return new Response("tokenized-segment-bytes", {
+          status: 200,
+          headers: { "content-type": "video/mp2t" },
+        });
+      }
+      return new Response(`wrong path: ${url.pathname}`, { status: 404 });
+    },
+  });
+
+  try {
+    const channel = makeChannel(upstream.port);
+    const config = makeConfig(upstream.port);
+    // The client fetches the REWRITTEN path (segPrefix + original).
+    const rewritten = `/hls/5213/52132021/836${ORIG}`;
+    const url = new URL(`http://127.0.0.1:25818${rewritten}`);
+    const res = await handleHlsSegment(new Request(url), url, [channel], config);
+    expect(res.status).toBe(200);
+    expect(upstreamSeen).toBe(true);
+    expect(await res.text()).toBe("tokenized-segment-bytes");
+  } finally {
+    upstream.stop();
+  }
+});
+
+test("handleHlsSegment forwards the query string (?token=...) on segment paths", async () => {
+  // Upstream emits query-tokenized segments: /hls/{streamId}_n.ts?token=...
+  let upstreamSeen = false;
+  let seenQuery = "";
+  const upstream = Bun.serve({
+    port: 0,
+    async fetch(req) {
+      const url = new URL(req.url);
+      if (url.pathname === "/hls/836_7.ts") {
+        upstreamSeen = true;
+        seenQuery = url.search;
+        if (url.searchParams.get("token") === "abc123") {
+          return new Response("query-token-segment-bytes", {
+            status: 200,
+            headers: { "content-type": "video/mp2t" },
+          });
+        }
+        return new Response("missing token", { status: 401 });
+      }
+      return new Response(`wrong path: ${url.pathname}`, { status: 404 });
+    },
+  });
+
+  try {
+    const channel = makeChannel(upstream.port);
+    const config = makeConfig(upstream.port);
+    const rewritten = "/hls/5213/52132021/836/hls/836_7.ts?token=abc123";
+    const url = new URL(`http://127.0.0.1:25818${rewritten}`);
+    const res = await handleHlsSegment(new Request(url), url, [channel], config);
+    expect(res.status).toBe(200);
+    expect(upstreamSeen).toBe(true);
+    expect(seenQuery).toBe("?token=abc123");
+    expect(await res.text()).toBe("query-token-segment-bytes");
   } finally {
     upstream.stop();
   }

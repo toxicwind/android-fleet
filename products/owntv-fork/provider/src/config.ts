@@ -64,7 +64,7 @@ export function defineConfig(env: Record<string, string | undefined>): Config {
     host: env.PROVIDER_HOST ?? "0.0.0.0",
     clientUsername: env.PROVIDER_USER ?? "master",
     clientPassword: env.PROVIDER_PASS ?? "master",
-    maxConnections: Number(env.PROVIDER_MAX_CONNECTIONS ?? "4"),
+    maxConnections: Number(env.PROVIDER_MAX_CONNECTIONS ?? "16"),
     catalogTtlMs: Number(env.PROVIDER_CATALOG_TTL_MS ?? 10 * 60 * 1000),
     epgRefreshMs: Number(env.PROVIDER_EPG_REFRESH_MS ?? 6 * 60 * 60 * 1000),
     epgLookaheadDays: Number(env.PROVIDER_EPG_LOOKAHEAD_DAYS ?? 2),
