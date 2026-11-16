@@ -3,7 +3,7 @@ import { handlePortal } from "../src/portal-server.ts";
 import type { VirtualChannel } from "../src/upstreams.ts";
 
 const config = {
-  port: 8081,
+  port: 25818,
   host: "0.0.0.0",
   clientUsername: "master",
   clientPassword: "master",

@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test";
 import { DeviceRegistry, CANONICAL_ESTATE_DEVICES, type DeviceProfile } from "./registry";
 
 describe("android-fleet: DeviceRegistry & Multi-Device Profiles", () => {
-  it("registers canonical estate devices (Pixel + Hisense TV)", () => {
+  it("registers canonical Pens devices (Pixel + Hisense TV)", () => {
     const reg = new DeviceRegistry(CANONICAL_ESTATE_DEVICES);
     const list = reg.list();
     expect(list.length).toBe(2);

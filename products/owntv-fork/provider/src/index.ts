@@ -22,7 +22,8 @@ import { handlePortal } from "./portal-server.ts";
 import { snapshotHealth, degradedCount } from "./health.ts";
 import { parseCapabilities, negotiateRow } from "./capabilities.ts";
 import { translateBatch } from "./translate.ts";
-import { handleStream } from "./stream.ts";
+import { handleStream, handleHlsSegment, fetchUpstreamWithUaRetry, BROWSER_UA } from "./stream.ts";
+import { createCatalogRoute } from "./api/catalog-route.ts";
 import { loadVelvetCatalog, type VelvetCatalog } from "./velvet.ts";
 import { searchArgos, toProviderResults } from "./argos.ts";
 import { runLua } from "./lua-runner.ts";
@@ -35,6 +36,10 @@ const log = (msg: string, ...rest: unknown[]) =>
 // --- shared state -----------------------------------------------------------
 
 let channels: VirtualChannel[] = [];
+
+// Native paginated catalog route. Rebuilt whenever the catalog is replaced so
+// the paginator never pages a stale array.
+let catalogRoute = createCatalogRoute([] as never[]);
 let categories: { category_id: string; category_name: string; parent_id: number }[] = [];
 let loadedAt = 0;
 let loading: Promise<void> | null = null;
@@ -227,6 +232,10 @@ async function refreshCatalog(force = false): Promise<void> {
       channels = result.channels;
       categories = result.categories;
       rebuildApiCache(channels, categories);
+      // Rebuild the paginator against the new array and re-tag, so a 304 can
+      // never be served for a catalog that changed underneath the client.
+      catalogRoute = createCatalogRoute(channels as never[]);
+      catalogRoute.revalidate();
       loadedAt = Date.now();
       log(`catalog: ${channels.length} channels / ${categories.length} categories from ${config.sources.length} source(s)`);
     } catch (err) {
@@ -453,13 +462,27 @@ const server = Bun.serve({
       // Anomaly #3: 16/123 panels return object bodies; this endpoint makes
       // degraded-vs-correct visible instead of hidden behind "687k channels".
       const h = snapshotHealth();
+      // Count sources whose API answers but whose streams are flagged unplayable
+      // (VLC-audit streamStatus=no-streams). Distinct from degraded: the catalog
+      // loads them but playback fails fast. Makes the invisible 608K→~real gap loud.
+      let noStreams = 0;
+      for (const v of Object.values(h)) if (v.status === "no-streams") noStreams++;
       return json(new Response(null), {
         ok: true,
         upstreams: Object.keys(h).length,
         degraded: degradedCount(),
+        no_streams_sources: noStreams,
+        playable_channels: channels.filter((c) => c.upstream.streamStatus !== "no-streams").length,
         channels: channels.length,
         health: h,
       });
+    }
+    if (path === "/api/v1/catalog" || path === "/api/v1/catalog/" || path === "/api/v1/catalog/delta" || path.startsWith("/api/v1/catalog/")) {
+      // Native paginated catalog. Exists because the Xtream shape pushes the
+      // whole catalog in ONE response (measured 80 MB for 180k channels), and a
+      // client that cannot drain it wedges the socket with megabytes stuck in
+      // Send-Q. Pages are bounded; a resumed client re-issues one request.
+      return catalogRoute.handle(path, url, req.headers.get("if-none-match"));
     }
     if (path === "/player_api.php" || path === "/player_api.php/") return handleApi(url, req);
     if (path === "/portal.php" || path === "/portal.php/" || path === "/stalker_portal/server/load.php" || path === "/server/load.php") {
@@ -479,6 +502,12 @@ const server = Bun.serve({
       return new Response(stream, {
         headers: { "content-type": "application/xml; charset=utf-8", "cache-control": "no-store" },
       });
+    }
+    if (path.startsWith("/hls/")) {
+      // HLS segment proxying: the client fetches playlist segments from us
+      // (/hls/{user}/{pass}/{streamId}/...) and we proxy them back upstream.
+      await refreshCatalog();
+      return handleHlsSegment(req, url, channels, config);
     }
     if (path.startsWith("/live/")) {
       await refreshCatalog();
@@ -583,11 +612,12 @@ log(`master provider on :${config.port} — ${config.sources.length} upstream(s)
 /** Minimal passthrough for movie/series upstream URLs (VOD panels answer full URLs). */
 async function proxyStream(req: Request, upstream: string): Promise<Response> {
   try {
-    const upstreamRes = await fetch(upstream, {
-      headers: { "user-agent": req.headers.get("user-agent") ?? "VLC/3.0" },
-      redirect: "follow",
-      signal: AbortSignal.timeout(config.proxyTimeoutMs),
-    });
+    const upstreamRes = await fetchUpstreamWithUaRetry(upstream, config);
+    if (!upstreamRes) return new Response("upstream unreachable after UA retries", { status: 502 });
+    if (!upstreamRes.ok && upstreamRes.status !== 206) {
+      const status = upstreamRes.status === 403 || upstreamRes.status === 404 ? 502 : upstreamRes.status;
+      return new Response(`upstream ${upstreamRes.status}`, { status });
+    }
     const headers = new Headers();
     for (const [k, v] of upstreamRes.headers) {
       if (k.toLowerCase() === "content-length" || k.toLowerCase() === "transfer-encoding") continue;

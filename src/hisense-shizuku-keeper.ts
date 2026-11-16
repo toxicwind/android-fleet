@@ -11,7 +11,7 @@
 // one-liner on each transition to REACHABLE. One initial ensure pass covers
 // "TV already up, server dead".
 //
-// Logs: JSON lines with stable event keys (estate structured-log doctrine).
+// Logs: JSON lines with stable event keys (Pens structured-log doctrine).
 
 export interface AdbResult {
   code: number;

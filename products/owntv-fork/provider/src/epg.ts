@@ -1,6 +1,7 @@
 /** EPG: per-channel short guide (get_short_epg) + merged xmltv.php from upstreams. */
 import type { Config, UpstreamSource } from "./config.ts";
 import type { VirtualChannel } from "./upstreams.ts";
+import { BROWSER_UA } from "./stream.ts";
 
 interface Programme {
   start: string; // "YYYY-MM-DD HH:MM:SS"
@@ -26,7 +27,12 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const XMLTV_FETCH_TIMEOUT_MS = 10_000;
 
 async function fetchXmltv(url: string): Promise<string> {
-  const res = await fetch(url, { signal: AbortSignal.timeout(XMLTV_FETCH_TIMEOUT_MS) });
+  // Cloudflare-fronted panels UA-filter non-browser clients (403 error 1010),
+  // so EPG fetches use the same browser identity as stream proxying.
+  const res = await fetch(url, {
+    signal: AbortSignal.timeout(XMLTV_FETCH_TIMEOUT_MS),
+    headers: { "user-agent": BROWSER_UA },
+  });
   if (!res.ok) throw new Error(`xmltv HTTP ${res.status}`);
   return res.text();
 }
@@ -103,7 +109,10 @@ export async function epgForChannel(channel: VirtualChannel, limit: number): Pro
     const { base, username, password, streamId } = channel.upstream;
     try {
       const q = `username=${encodeURIComponent(username ?? "")}&password=${encodeURIComponent(password ?? "")}&action=get_short_epg&stream_id=${encodeURIComponent(streamId)}&limit=${limit}`;
-      const res = await fetch(`${base}/player_api.php?${q}`, { signal: AbortSignal.timeout(config.fetchTimeoutMs) });
+      const res = await fetch(`${base}/player_api.php?${q}`, {
+        signal: AbortSignal.timeout(config.fetchTimeoutMs),
+        headers: { "user-agent": BROWSER_UA },
+      });
       if (res.ok) {
         const rows = (await res.json()) as Array<{ start: string; stop: string; title: string; description?: string }>;
         if (rows.length) return rows.map((r) => ({ start: r.start, stop: r.stop, title: r.title, description: r.description }));

@@ -20,7 +20,8 @@ export type UpstreamHealth =
   | { status: "auth-failed"; keys: string[]; at: number }
   | { status: "overloaded"; keys: string[]; at: number }
   | { status: "malformed"; keys: string[]; at: number }
-  | { status: "error"; message: string; at: number };
+  | { status: "error"; message: string; at: number }
+  | { status: "no-streams"; channels: number; at: number };
 
 const health = new Map<string, UpstreamHealth>();
 
@@ -39,6 +40,12 @@ export function recordHealth(sourceId: string, h: UpstreamHealth): void {
 
 export function recordError(sourceId: string, message: string): void {
   health.set(sourceId, { status: "error", message, at: Date.now() });
+}
+/** Record a source whose API responds but whose streams are flagged unplayable
+ *  (VLC-audit streamStatus=no-streams). Distinct from error: the catalog loads,
+ *  but playback on its channels fail-fasts. */
+export function recordNoStreams(sourceId: string, channels: number): void {
+  health.set(sourceId, { status: "no-streams", channels, at: Date.now() });
 }
 
 export function snapshotHealth(): Record<string, UpstreamHealth> {

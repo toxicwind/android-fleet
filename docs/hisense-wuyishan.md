@@ -37,7 +37,7 @@ adb connect 10.0.0.225:5555     # standard ATV port; persists across reboots
   prompt appeared once on TV and was accepted).
 - Connection survives TV power-cycle as long as USB debugging stays enabled.
 - Keepalive (if needed): simple `adb connect 10.0.0.225:5555` retry loop, no
-  port scan — see `estate/pixel-adb-keepalive` for the pattern; TV variant can
+  port scan — see `Pens/pixel-adb-keepalive` for the pattern; TV variant can
   be a one-liner since the port never rotates.
 
 ## Open network ports (scanned 2026-10-28)
@@ -400,11 +400,11 @@ not a one-shot grant tool.
 
 **4. Persistence: supervised keeper daemon (permanent).** The server dies at
 every TV reboot (locked build; manager BootCompleteReceiver can't exec
-app_process as shell). New daemon `estate/hisense-shizuku-keeper`
+app_process as shell). New daemon `Pens/hisense-shizuku-keeper`
 (`src/hisense-shizuku-keeper.ts` + `test/`, TDD 15 unit + 4 live green):
 event-driven — blocks on `ip monitor neigh` netlink (NOTE: object is
 `neigh`, NOT `neighbor`) and re-runs the one-liner the moment the TV turns
-REACHABLE after a boot; NO sleep-polling loops. Registered in the estate
+REACHABLE after a boot; NO sleep-polling loops. Registered in the Pens
 monolith `pitchfork.toml`.
 
 **5. Fresh liveness (2026-11-08):** uptime ~4.96 d, `/data` (dm-15) 3.9G/6.0G

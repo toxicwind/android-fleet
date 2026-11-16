@@ -46,7 +46,7 @@ describe("parseSources", () => {
 describe("defineConfig", () => {
   test("applies defaults", () => {
     const c = defineConfig({});
-    expect(c.port).toBe(8081);
+    expect(c.port).toBe(25818);
     expect(c.clientUsername).toBe("master");
     expect(c.maxConnections).toBe(4);
     expect(c.catalogTtlMs).toBe(600000);

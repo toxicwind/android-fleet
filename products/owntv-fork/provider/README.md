@@ -1,4 +1,4 @@
-# Master Xtream provider gateway (:8081)
+# Master Xtream provider gateway (:25818)
 
 Universal IPTV gateway that fronts any Xtream client (OwnTV, LG webos-iptv-player,
 Nuvio) with one clean panel. Behind it: 56 upstream Xtream panels aggregated from
@@ -12,7 +12,7 @@ cd products/owntv-fork/provider
 PROVIDER_SOURCES="xtream|id=s1|name=Main|url=http://1tv41.icu:8080|user=VMh8na|pass=793530" ./launch.sh
 ```
 
-Defaults: `master/master` on `0.0.0.0:8081`. Log: `/tmp/provider.log` (override
+Defaults: `master/master` on `0.0.0.0:25818`. Log: `provider/provider.log` (override
 `PROVIDER_LOG`). All knobs are `PROVIDER_*` env vars — see `src/config.ts`.
 
 ## Xtream surface (LG app contract)
@@ -38,9 +38,9 @@ Defaults: `master/master` on `0.0.0.0:8081`. Log: `/tmp/provider.log` (override
 ## Verify
 
 ```bash
-curl -s http://127.0.0.1:8081/health
-curl -s "http://127.0.0.1:8081/player_api.php?username=master&password=master&action=get_live_streams"
-curl -s "http://127.0.0.1:8081/get.php?username=master&password=master&type=m3u_plus&output=ts"
+curl -s http://127.0.0.1:25818/health
+curl -s "http://127.0.0.1:25818/player_api.php?username=master&password=master&action=get_live_streams"
+curl -s "http://127.0.0.1:25818/get.php?username=master&password=master&type=m3u_plus&output=ts"
 ```
 
 ## Notes

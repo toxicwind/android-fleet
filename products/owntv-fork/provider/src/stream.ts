@@ -99,6 +99,34 @@ function upstreamUrlFor(channel: VirtualChannel, url: URL): string {
  * UA on the stream path but accept a VLC/MAG UA. We try each UA in order and
  * return the first 2xx (or 206). Returns null if every UA fails.
  */
+/**
+ * Fetch an upstream URL reusing the cached winning UA for this channel when we
+ * have one (set after the first successful race). A single-UA fetch avoids the
+ * 7-way parallel race on every re-fetch — the CDN cuts multi-connection clients
+ * short (~2s) but streams 6-13s to a single connection, so this both reduces
+ * upstream load and makes each segment last much longer. Falls back to the full
+ * race if the cached UA is rejected.
+ */
+async function fetchUpstreamWithCachedUa(
+  channelId: number,
+  url: string,
+  config: Config,
+): Promise<Response | null> {
+  const ua = cachedUa.get(channelId);
+  if (ua) {
+    try {
+      const res = await fetch(url, {
+        headers: { "user-agent": ua },
+        redirect: "follow",
+        signal: AbortSignal.timeout(config.streamConnectTimeoutMs),
+      });
+      if (res.ok || res.status === 206) return res;
+      try { await res.body?.cancel(); } catch { /* ignore */ }
+    } catch { /* fall through to the race */ }
+  }
+  return fetchUpstreamWithUaRetry(url, config);
+}
+
 export async function fetchUpstreamWithUaRetry(
   url: string,
   config: Config,
@@ -449,7 +477,7 @@ export async function handleStream(req: Request, url: URL, channels: VirtualChan
         retries.set(id, nextAttempt);
         const bustedNext = new URL(upstream);
         bustedNext.searchParams.set("_r", `${Date.now()}-${nextAttempt}`);
-        const nextRes = await fetchUpstreamWithUaRetry(bustedNext.toString(), config);
+        const nextRes = await fetchUpstreamWithCachedUa(channel.id, bustedNext.toString(), config);
         if (!nextRes || (!nextRes.ok && nextRes.status !== 206)) return null;
         return nextRes.body;
       });

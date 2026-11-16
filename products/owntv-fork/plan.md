@@ -70,3 +70,66 @@ Bridges: `datastoreEdit(key,kind,val)`, `enqueueEpg(sourceId)`, `enqueueSync(sou
 ## Recursive todo doctrine
 Every error → verbose todo (details + notes + error line). Every feature emergence → new todo.
 Board = goal state; goal completes only when board is green and APK is deployed + verified.
+
+---
+
+# Refactor: drop the Xtream protocol on the owntv↔provider path (2026-11-16)
+
+## Root cause (measured, not guessed)
+
+The provider serves Xtream Codes endpoints — `/player_api.php`, `/get.php`, `/xmltv.php`
+— and the app speaks them back. That protocol is a 2015 PHP panel API with no
+pagination, no cursor, no delta, no ETag:
+
+```
+GET /player_api.php?action=get_live_streams
+  raw:  80,609,712 bytes   (228,829 channels, one JSON array)
+  gzip:  7,366,043 bytes
+```
+
+On the TV that means: 80 MB over Wi-Fi → parse 228k JSON objects → upsert 228k Room
+rows → then build the EPG index. The EPG worker never finishes inside its window, so
+it RETRYs forever, so Home renders empty rails. One cause, three symptoms.
+
+Xtream stays for **third-party players** (that's what it's for). It must stop being the
+**internal** app↔provider protocol, because we own both ends.
+
+## New provider classes — TypeScript / Bun, ES2023
+
+| File | Class | Job |
+|---|---|---|
+| `provider/src/catalog/paginator.ts` | `Paginator` | Stable id-ordered cursor over the catalog; `page(cursor, limit) → { items, nextCursor }` |
+| `provider/src/catalog/change-feed.ts` | `ChangeFeed` | Per-source monotonic change log; `since(seq) → { changed, removed, seq }` |
+| `provider/src/api/etag.ts` | `EtagStore` | Weak ETag from source mtime/size; `match(ifNoneMatch) → 304 \| null` |
+| `provider/src/api/catalog-route.ts` | `CatalogRoute` | `GET /api/v1/catalog?cursor&limit` → ~200 KB pages |
+| `provider/src/api/catalog-delta.ts` | `CatalogDelta` | `GET /api/v1/catalog/delta?since` → incremental |
+| `provider/src/api/catalog-single.ts` | `CatalogSingle` | `GET /api/v1/catalog/:id` → one channel (deep link / player handoff) |
+
+Stream pages with `Bun.serve` + `ReadableStream`; never materialise a full-catalog string.
+
+## New app classes — Kotlin
+
+| File | Class | Job |
+|---|---|---|
+| `core/parser/NativeCatalogClient.kt` | `NativeCatalogClient` | Paginated + delta GET, `If-None-Match` → 304, decode page envelope |
+| `core/sync/NativeCatalogSyncer.kt` | `NativeCatalogSyncer` | Page loop → prepared upsert; then delta catch-up |
+| `core/sync/SyncSourceKind.kt` | `SyncSourceKind` | `NATIVE_CATALOG` vs `XTREAM`; selects the path per source |
+
+`SyncManager.kt:136` picks by kind. `XtreamSyncer` untouched for real panels.
+
+## Steps — one at a time, verify each before the next
+
+1. `Paginator` + `GET /api/v1/catalog` (no client yet). Verify: `curl` 500-row pages, cursor terminates.
+2. `EtagStore` + 304. Verify: second identical request returns 304, zero body.
+3. `ChangeFeed` + `/delta`. Verify: unchanged catalog → empty `changed`.
+4. `NativeCatalogClient` + unit tests. Verify: `bun test` / `gradlew test`.
+5. `NativeCatalogSyncer` behind a flag. Verify: sync time vs Xtream on the same source.
+6. Point the owntv source at native. Keep Xtream for third-party.
+7. Verify: sync time, Home rails populate on cold start, EPG worker stops RETRYing.
+
+## Acceptance
+
+- Cold sync p95 **< 15 s** on 52 K channels (today: 25–55 s per 10 K chunk).
+- No-change launch costs **1 RTT + 304**, not 80 MB.
+- Home renders non-hero rails on a cold start.
+- Third-party Xtream panels still sync through `XtreamSyncer`.

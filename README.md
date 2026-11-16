@@ -4,7 +4,7 @@
 
 <div align="center">
 
-[![license: MIT](https://img.shields.io/badge/license-MIT%20%2B%20upstream-blue?style=for-the-badge)](https://github.com/toxicwind/estate-scripts-projects#license)
+[![license: MIT](https://img.shields.io/badge/license-MIT%20%2B%20upstream-blue?style=for-the-badge)](https://github.com/toxicwind/pens-scripts-projects#license)
 [![pixel: wireless](https://img.shields.io/badge/pixel%20wireless%20debug-OK-22c55e?style=for-the-badge)]()
 [![hisense: owntv](https://img.shields.io/badge/hisense%20owntv-v99.99.99-22c55e?style=for-the-badge)](products/owntv-fork/)
 [![flotilla mcp](https://img.shields.io/badge/flotilla%20mcp%20%3A25245-live-6e56cf?style=for-the-badge)](docs/flotilla-mcp-tools.md)
@@ -112,7 +112,7 @@ rail had `focusGroup()`, zero `testTag`, zero `testTagsAsResourceId`. We fixed i
 
 ## 🧿 MCP surface — flotilla
 
-`flotilla/mcp/server.ts` on `:25245`, federated into the estate's MCP gateway
+`flotilla/mcp/server.ts` on `:25245`, federated into the pens's MCP gateway
 (thresher `:25127`).
 
 | Tier | Tools |
@@ -128,7 +128,7 @@ rail had `focusGroup()`, zero `testTag`, zero `testTagsAsResourceId`. We fixed i
 ## ⚔️ The arsenal (rebranded black-tier tooling)
 
 > "Black" is a color, not a verdict. These are the non-mainstream, hacker-tier
-> utilities the estate **actually uses** — renamed into the fleet so the name
+> utilities the pens **actually uses** — renamed into the fleet so the name
 > never leaks the original's bad reputation, and wired for the Architect's own
 > devices only.
 

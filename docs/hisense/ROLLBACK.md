@@ -11,7 +11,7 @@ forced state that can't be undon. Checkpoints before risky steps.
 | screen/brightness | settings writes only | `adb shell settings put system screen_brightness 120` + `cmd display set-brightness 0.6` |
 | Shizuku server start | process only | dies on TV reboot automatically |
 | Shizuku APK | installed app | `adb uninstall moe.shizuku.privileged.api` |
-| Keeper daemon | awrawr-pc pitchfork daemon | `pitchfork stop estate/hisense-shizuku-keeper` |
+| Keeper daemon | awrawr-pc pitchfork daemon | `pitchfork stop Pens/hisense-shizuku-keeper` |
 | Billboard overlay (pending) | future feature | OFF default; auto-clear |
 
 ## Root-lane safety (USB factory remount / cvt)
@@ -29,7 +29,7 @@ forced state that can't be undon. Checkpoints before risky steps.
 ## Verify-after-failure (the reflex)
 1. `adb devices` — adbd up.
 2. `dumpsys power` — expected wakefulness.
-3. `pitiful` — no; `pitchfork status estate/hisense-shizuku-keeper` — running.
+3. `pitiful` — no; `pitchfork status Pens/hisense-shizuku-keeper` — running.
 4. If nuvio misbehaves: `am force-stop` + relaunch; worst case `install -r` same APK.
 ## Monadic framing (2026-11-09)
 Every risky step in ROOT-APPLY.md is a monadic effect: on failure, the LIFO

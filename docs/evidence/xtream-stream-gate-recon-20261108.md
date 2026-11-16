@@ -14,7 +14,7 @@ Required** with `N1-Backend: Echo` + random `N1-Request` ids. Proxies/geo were r
 ## Verdict
 1. Xtream `/live` is fronted by a **player-gated edge** (N1 on cabtx, token-LB on android-iptv). API auth does NOT grant stream access; the panel mints per-request tokens/redirects bound to a privileged client (real players: nuvio/ExoPlayer on the TV).
 2. Bare-curl / proxy-curl will never unlock player-gated edges -> the proxy-rotator saga was a red herring for THIS class.
-3. The estate's privileged client = nuvio on the Hisense TV (its ExoPlayer flow is what the panel accepts).
+3. The Pens's privileged client = nuvio on the Hisense TV (its ExoPlayer flow is what the panel accepts).
 
 ## Actionable
 - Stream classification (api-ok/stream-ok/stream-407) must be part of portal audits; ONE portal is stream-ok today (android-iptv.com).

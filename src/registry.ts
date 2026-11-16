@@ -98,7 +98,7 @@ export class DeviceRegistry {
   }
 }
 
-/** Pre-configured canonical estate device profiles. */
+/** Pre-configured canonical Pens device profiles. */
 export const CANONICAL_ESTATE_DEVICES: readonly DeviceProfile[] = [
   {
     id: "pixel-9-pro-xl",

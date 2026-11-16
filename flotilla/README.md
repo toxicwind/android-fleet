@@ -144,9 +144,9 @@ device ops (no shell-splicing). Reflects the current 11-tool surface; the old
 | `flotilla:flotilla_float` | freeform PiP float — **keyboard-surviving** launch via `mcp/freeform.ts` (PortalPad port): gates + new-task flag + settle + re-assert `set-windowing-mode 5` by task id |
 | `flotilla:pixel_floaty` | keyboard-safe DepartureMono message card over any app (the to-the-user channel) |
 
-Daemon: pitchfork `estate/flotilla-mcp`, `:25245` (`FLOTILLA_MCP_PORT` in
+Daemon: pitchfork `Pens/flotilla-mcp`, `:25245` (`FLOTILLA_MCP_PORT` in
 ports.env), registered in the LIVE thresher config — registration walkthrough:
-`estate/docs/mcp-guide-thresher.md`. Verified live 2026-10-30: sessioned MCP
+`Pens/docs/mcp-guide-thresher.md`. Verified live 2026-10-30: sessioned MCP
 init + tools/list (11 tools) via the SDK transport; device resolved to the
 live serial; `restore_focus` round-trip proven (capture lands, foreground app
 restored). Focus doctrine: `input tap/text` lands on the focused window; read

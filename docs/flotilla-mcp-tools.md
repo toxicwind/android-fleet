@@ -39,7 +39,7 @@
 ## Development notes
 
 - New tool = add to the `tools` array in `server.ts`; restart daemon
-  (`pitchfork restart estate/flotilla-mcp`; stale PID on :25245 needs a kill —
+  (`pitchfork restart Pens/flotilla-mcp`; stale PID on :25245 needs a kill —
   latest known gap, fixed by kill+start).
 - Port SSOT: `FLOTILLA_MCP_PORT=25245` in `config/ports.env`.
 - Rebuild check: `bun build flotilla/mcp/server.ts --target=bun`.

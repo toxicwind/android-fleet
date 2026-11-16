@@ -34,7 +34,7 @@ Step / inverse:
 | 4 | start shizuku-root server | kill server (dies itself on next reboot) |
 | verify | `id`/`mount` | n/a |
 
-Effect-style (estate standard):
+Effect-style (Pens standard):
 ```typescript
 const applyRoot = Effect.gen(function* () {
   yield* Effect.tryPromise({ try: () => plantCvt(stick), catch: (e) => rollback(STEP1, e) });

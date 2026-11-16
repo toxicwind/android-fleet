@@ -13,4 +13,4 @@ Deployed lane: **nuvio-default** (toxicwind/nuvio-webos-lg) — space.nuvio.webo
 | NuvioTVWebOS | toxicwind/NuvioTVWebOS | webOS experiments |
 | homelessbrian-NuvioTV | homelessbrian/NuvioTV | VENDORED UPSTREAM BASE — never deploy, reference only |
 
-Stale ranch-level dupes archived: estate/archive/2026-11-05-nuvio-organization/.
+Stale ranch-level dupes archived: Pens/archive/2026-11-05-nuvio-organization/.

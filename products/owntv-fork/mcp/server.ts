@@ -9,6 +9,10 @@
  * Transport: stdio JSON-RPC (MCP). Run: `bun mcp/server.ts` (registered in thresher).
  */
 import { spawnSync } from "node:child_process";
+import { mkdirSync } from "node:fs";
+import { join } from "node:path";
+
+const ROOT = join(import.meta.dir, "..");
 
 const SERIAL = "10.0.0.225:5555";
 const LUA = "http://127.0.0.1:38383/run";
@@ -112,8 +116,11 @@ const tools: Tool[] = [
     run: (a) => {
       const name = String(a.name ?? "shot.png");
       adb(["shell", `screencap -p /sdcard/${name}`], 15000);
-      const pull = adb(["pull", `/sdcard/${name}`, `/tmp/${name}`], 30000);
-      return { ...pull, path: `/tmp/${name}` };
+      const outDir = join(ROOT, "recon", "shots");
+      mkdirSync(outDir, { recursive: true });
+      const outPath = join(outDir, name);
+      const pull = adb(["pull", `/sdcard/${name}`, outPath], 30000);
+      return { ...pull, path: outPath };
     },
   },
   {
@@ -124,10 +131,10 @@ const tools: Tool[] = [
   },
   {
     name: "provider_health",
-    description: "Health of the master Xtream provider gateway on :8081 (channel/category counts).",
+    description: "Health of the master Xtream provider gateway on :25818 (channel/category counts).",
     inputSchema: { type: "object", properties: {} },
     run: () => {
-      const r = spawnSync("curl", ["-s", "-m", "4", "http://127.0.0.1:8081/health"], { encoding: "utf8", timeout: 8000 });
+      const r = spawnSync("curl", ["-s", "-m", "4", "http://127.0.0.1:25818/health"], { encoding: "utf8", timeout: 8000 });
       return r.stdout || "provider unreachable";
     },
   },

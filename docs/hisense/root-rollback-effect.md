@@ -1,14 +1,14 @@
 # ROOT-APPLY rollback — canonical `effect` primitives
 
-No custom monad: use the estate-standard `effect` library
-(`pens/estate/docs/typescript-monadic-standard.md`). The primitives:
+No custom monad: use the Pens-standard `effect` library
+(`pens/Pens/docs/typescript-monadic-standard.md`). The primitives:
 
 - `Effect.gen` — sequential steps.
 - `Effect.tryPromise` — step with labeled error.
 - `Effect.acquireRelease(acquire, release)` — step + its inverse; release runs
   automatically on failure (the "monadic catch" primitive).
 - `Effect.scoped` — wraps the whole pipeline; on ANY failure the scope's
-  finalizers run **LIFO** (the estate's rollback-on-fail order).
+  finalizers run **LIFO** (the Pens's rollback-on-fail order).
 
 ```typescript
 import { Effect } from "effect";
@@ -45,7 +45,7 @@ const applyRoot = Effect.gen(function* () {
 const run = Effect.runPromise(Effect.scoped(applyRoot));
 ```
 
-Behavior on failure (verified by the estate standard):
+Behavior on failure (verified by the Pens standard):
 1. The failing step's `acquireRelease` release runs immediately.
 2. `Effect.scoped` then runs the outer finalizers LIFO (deepest first).
 3. Errors are labeled (`<step> failed`), never swallowed — log tag `monadicRollback`.

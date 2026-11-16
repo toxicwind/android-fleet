@@ -23,7 +23,11 @@ export interface UpstreamSource {
   prefix?: string;
   /** Only include channels whose name matches this regex (curation). */
   filter?: string;
-}
+  /** Stream capability from the VLC-audit SSOT column. "no-streams" = answers
+   *  the API but serves no playable streams — catalog loads, playback fail-fasts.
+   *  "stream-ok" = verified playable. undefined = unknown (assume playable). */
+  streamStatus?: "stream-ok" | "no-streams";
+ }
 
 export interface Config {
   port: number;
@@ -56,7 +60,7 @@ const REPO_ROOT = new URL("..", import.meta.url).pathname;
 
 export function defineConfig(env: Record<string, string | undefined>): Config {
   return {
-    port: Number(env.PROVIDER_PORT ?? "8081"),
+    port: Number(env.PROVIDER_PORT ?? "25818"),
     host: env.PROVIDER_HOST ?? "0.0.0.0",
     clientUsername: env.PROVIDER_USER ?? "master",
     clientPassword: env.PROVIDER_PASS ?? "master",
@@ -119,6 +123,10 @@ export function parseSources(spec: string): UpstreamSource[] {
         maxConnections: fields.max ? Number(fields.max) : undefined,
       };
     }
+    const streamStatus =
+      fields.status === "stream-ok" || fields.status === "no-streams"
+        ? (fields.status as "stream-ok" | "no-streams")
+        : undefined;
     return {
       id: fields.id ?? "xtream",
       kind,
@@ -126,6 +134,7 @@ export function parseSources(spec: string): UpstreamSource[] {
       url: fields.url ?? "",
       username: fields.user,
       password: fields.pass,
+      streamStatus,
       prefix: fields.prefix ?? undefined,
       filter: fields.filter ?? undefined,
       maxConnections: fields.max ? Number(fields.max) : undefined,

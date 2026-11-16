@@ -30,8 +30,8 @@ Borrowed from:
 |---|---|
 | ADB binary | `/usr/bin/adb` on yote |
 | Phone endpoint | `10.0.0.77:<port>` — **port rotates**; keepalive daemon rediscovers it |
-| Keepalive | `estate-scripts/projects/android-fleet/bin/pixel-adb-keepalive.sh` (pitchfork) |
-| Canonical project | `estate-scripts/projects/android-fleet/phone-backup/` |
+| Keepalive | `Pens-scripts/projects/android-fleet/bin/pixel-adb-keepalive.sh` (pitchfork) |
+| Canonical project | `Pens-scripts/projects/android-fleet/phone-backup/` |
 | Fast pull script | `.../phone-backup/bin/fast-pull.sh` |
 | Speed shootout | `.../phone-backup/bin/speed-race.sh` (8 methods, keeps the winner) |
 | Archive root | `/mnt/8TB/phone-archive/` (7.3T drive, was 13% used 2026-09-30) |
@@ -85,10 +85,10 @@ On-device tar + separate pull is a different animal and wins for small files.)
 
 ```bash
 # one-shot, default source set (~20GB code/archives/repos/docs):
-/home/toxic/pens/estate/ranch/android-fleet/phone-backup/bin/fast-pull.sh /mnt/8TB/phone-archive
+/home/toxic/pens/Pens/ranch/android-fleet/phone-backup/bin/fast-pull.sh /mnt/8TB/phone-archive
 
 # re-run the 8-method speed shootout (small-file torture + 300MB blob):
-/home/toxic/pens/estate/ranch/android-fleet/phone-backup/bin/speed-race.sh /tmp/speed-race
+/home/toxic/pens/Pens/ranch/android-fleet/phone-backup/bin/speed-race.sh /tmp/speed-race
 ```
 
 Each run writes a timestamped manifest (`pull-manifest-*.txt`) with per-dir
@@ -118,7 +118,7 @@ Shell gotchas learned the hard way:
 | `Movies/` | 13.8G | personal media — ask the Architect before touching |
 | `Pictures/` | 13G | **photos — ignore** |
 | `Documents/` | 259M | pull → archive |
-| `ik_llama.cpp-main/` | 115M | repo → archive, then decide: estate-scripts or standalone |
+| `ik_llama.cpp-main/` | 115M | repo → archive, then decide: Pens-scripts or standalone |
 | `Export/`, `1openfang/`, `Tasker/`, `House/` | ~150M | pull → archive |
 
 `Download/` heavies: `base/` 2.1G, `Unchained/` 1.4G, `YTDLnis/` 905M,
@@ -128,8 +128,8 @@ Shell gotchas learned the hard way:
 
 `/mnt/8TB/phone-archive/` receives the raw pull. Then triage:
 
-- `repos/` — git checkouts (e.g. `ik_llama.cpp-main`) → decide estate-scripts
-  (`estate-scripts/projects/…`) vs standalone project folder.
+- `repos/` — git checkouts (e.g. `ik_llama.cpp-main`) → decide Pens-scripts
+  (`Pens-scripts/projects/…`) vs standalone project folder.
 - `archives/` — zips/tar.gz/apks, including misnamed ones (`*.tar.gz.pdf`,
   `*.zip.pdf` — detect by magic bytes, not suffix; see phone-sweeps).
 - `code/` — loose scripts, configs, Tasker exports.
@@ -148,7 +148,7 @@ alive; `rclone/rclone` 60k, alive; `google/adb-sync` archived/dead.
 
 Verdict: **Syncthing phone → yote/8TB continuous sync** is the future-forward
 lane — files land on the archive as they're created, event-driven, no batch
-jobs, no timers (matches the estate doctrine). `fast-pull.sh` remains the
+jobs, no timers (matches the Pens doctrine). `fast-pull.sh` remains the
 one-shot/backfill tool. Next build: Syncthing on the Pixel (official Android
 app) + yote sidecar writing to `/mnt/8TB/phone-archive/incoming/`, with the
 triage classifier (section 4) running on arrival.

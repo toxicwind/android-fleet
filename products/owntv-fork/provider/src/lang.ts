@@ -47,7 +47,7 @@ const PREFIX_LANG: Record<string, Lang> = {
 };
 
 /** Prefixes that positively identify a NON-kept language (drop fast). */
-const PREFIX_DROP = new Set([
+export const PREFIX_DROP = new Set([
   "PT", "ES", "SP", "BR", "MX", "AR", "ARG", "CL", "CO", "PE", "CR", "EC", "VE", "UY", "BO", "PY",
   "DE", "FR", "IT", "NL", "BE", "SE", "NO", "DK", "FI", "PL", "CZ", "SK", "HU", "RO", "BG", "GR",
   "RU", "RUS", "UA", "TR", "IN", "PK", "BD", "AF", "IR", "IQ", "SA", "AE", "EG", "MA", "DZ", "TN",
@@ -60,7 +60,7 @@ const PREFIX_DROP = new Set([
 const CAT_EN = /(usa|united states|canada|australia|uk\b|britain|english|america|pluto tv usa|usa_tv)/i;
 const CAT_JP = /(japan|japanese|日本|日本語)/i;
 const CAT_KR = /(korea|korean|한국|대한)/i;
-const CAT_DROP = /(portugal|brasil|brazil|españ|spanish|mexico|argentina|chile|colombia|peru|venezuela|ecuador|uruguay|paraguay|bolivia|cuba|dominican|puerto rico|francia|france|french|alemania|german|italia|italy|russia|rusia|romania|india|turkey|turquía|arab|egipt|iraq|iran|china|chinese|taiwan|thailand|vietnam|indonesia|philippines|poland|polonia|greek|grecia|hungary|hungría|czech|checa|slovak|ukraine|ucrania|belarus|serbia|serbia|croatia|bosnia|albania|macedonia|slovenia|bulgaria|netherlands|holanda|belgium|belgica|sweden|suecia|norway|noruega|denmark|dinamarca|finland|finlandia|switzerland|suiza|austria|ireland|irlanda|scotland|wales|israel|pakistan|bangladesh|sri lanka|nepal|myanmar|cambodia|laos|mongolia|kazakh|uzbek|georgia|armenia|azerbaijan|nigeria|ghana|kenya|south africa|etiopia|filipino|tagalog|indonesia|malaysia|vietnam)/i;
+export const CAT_DROP = /(portugal|brasil|brazil|españ|spanish|mexico|argentina|chile|colombia|peru|venezuela|ecuador|uruguay|paraguay|bolivia|cuba|dominican|puerto rico|francia|france|french|alemania|german|italia|italy|russia|rusia|romania|india|turkey|turquía|arab|egipt|iraq|iran|china|chinese|taiwan|thailand|vietnam|indonesia|philippines|poland|polonia|greek|grecia|hungary|hungría|czech|checa|slovak|ukraine|ucrania|belarus|serbia|serbia|croatia|bosnia|albania|macedonia|slovenia|bulgaria|netherlands|holanda|belgium|belgica|sweden|suecia|norway|noruega|denmark|dinamarca|finland|finlandia|switzerland|suiza|austria|ireland|irlanda|scotland|wales|israel|pakistan|bangladesh|sri lanka|nepal|myanmar|cambodia|laos|mongolia|kazakh|uzbek|georgia|armenia|azerbaijan|nigeria|ghana|kenya|south africa|etiopia|filipino|tagalog|indonesia|malaysia|vietnam)/i;
 
 // ─── Genre detection ─────────────────────────────────────────────────────────
 

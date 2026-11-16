@@ -1,6 +1,8 @@
 /** Upstream loaders: normalize Xtream panels + M3U playlists into one virtual catalog. */
 import type { Config, UpstreamSource } from "./config.ts";
-import { classifyNonArray, recordHealth, recordError } from "./health.ts";
+import { classifyNonArray, recordHealth, recordError, recordNoStreams } from "./health.ts";
+import { bucketOf } from "./categories.ts";
+import { CAT_DROP, PREFIX_DROP } from "./lang.ts";
 
 export interface VirtualChannel {
   /** Stable numeric id (hash of source id + upstream id). */
@@ -34,6 +36,9 @@ export interface VirtualChannel {
     username?: string;
     password?: string;
     streamId: string;
+    /** Stream capability (VLC-audit SSOT). "no-streams" = answers API but
+     *  serves no playable streams → playback fail-fasts. undefined = unknown. */
+    streamStatus?: "stream-ok" | "no-streams";
     /** Stalker only: portal cmd to resolve via create_link at play time. */
     cmd?: string;
     /** Stalker only: portal MAC + bearer token for create_link. */
@@ -57,6 +62,50 @@ const idFor = (sourceId: string, upstreamId: string): number => {
 
 const matches = (candidate: string | undefined, filter?: string): boolean =>
   !filter || new RegExp(filter, "i").test(candidate ?? "");
+
+/**
+ * Fold an adult/xxx raw category into ONE canonical bucket per source.
+ * Raw panels emit dozens of adult names across feeds ("For Adults", "XXX",
+ * "❌❌❌ADULTOS II", "PORNBOX"...), which surface as separate noisy category
+ * rows on the TV. The curated tree's bucketOf already maps those names to
+ * cur-adult — reuse it here so every adult category (and its channels) lands
+ * under a single "Adult" entry instead of 39 near-duplicates. Non-adult
+ * categories keep their source-scoped id (unchanged behavior).
+ */
+export function bucketCategoryId(srcId: string, rawCategoryId: string, name: string): string {
+  if (bucketOf(name) === "cur-adult") {
+    return `cur-adult:${srcId}:${idFor(srcId, "adult").toString()}`;
+  }
+  return idFor(`${srcId}:cat`, rawCategoryId).toString();
+}
+
+/** "Adult" for adult buckets, else the raw name. */
+export function bucketCategoryName(name: string): string {
+  return bucketOf(name) === "cur-adult" ? "Adult" : name;
+}
+
+/**
+ * Catalog keep-gate: a raw category name survives only when it is English-
+ * useful or the xx (Adult) bucket. Foreign-language categories (Spanish,
+ * Portuguese, French, German, Italian, Russian, Arabic, Indian, Chinese,
+ * Thai, Polish, Greek, Hungarian, Ukrainian, Balkan, Nordic, Middle-Eastern,
+ * African...) and junk markers (radio, 24/7 replay, PPV) are pointless on the
+ * TV — the old catalog dumped 500+ foreign categories onto the rail. Adult
+ * passes because the xx provider is the active quest; radio/24-7/ppv drop.
+ * This mirrors the lang.ts DROP doctrine, wired at the category write so both
+ * the category row AND its channels disappear together.
+ */
+export function keepCategory(name: string): boolean {
+  if (bucketOf(name) === "cur-adult") return true;
+  if (CAT_DROP.test(name)) return false;
+  if (/(^|\s)(radio|radios)(\s|$)|24\/7|ppv|pay-per-view/i.test(name)) return false;
+  // Acronym country prefixes: AR| / "BR |" / MX: — the 822 junk Arabic/LatAm
+  // prefixed categories (AR| MBC, AR| BEIN...). Keep EN/JP/KR prefixes
+  // (US/UK/CA/AU/NZ/IE/JP/KR) which are not in PREFIX_DROP.
+  const m = name.match(/^([A-Z]{2,3})(?:\s*[:|\-–]|\s{1,2}\|)/);
+  if (m && PREFIX_DROP.has(m[1].toUpperCase())) return false;
+  return true;
+}
 
 /** Parse audio-language hints from a channel name. Signals (in priority order):
  *   (Audio: ES) / (Audio ES) / (Multi-Audio) — explicit panel convention
@@ -94,6 +143,10 @@ export function audioLanguagesOf(name: string): string[] | undefined {
 }
 
 async function loadXtream(src: UpstreamSource, out: VirtualChannel[], cats: Map<string, string>, config: Config): Promise<void> {
+  // A source verified to serve no playable streams (VLC-audit streamStatus) is
+  // excluded from the catalog entirely — advertising its channels on the TV
+  // only makes the client pick a dead channel and hit a 502 at play time.
+  if (src.streamStatus === "no-streams") return;
   const base = src.url.trimEnd("/");
   const q = `username=${encodeURIComponent(src.username ?? "")}&password=${encodeURIComponent(src.password ?? "")}`;
   const [streamsRes, catsRes] = await Promise.all([
@@ -127,10 +180,15 @@ async function loadXtream(src: UpstreamSource, out: VirtualChannel[], cats: Map<
       console.error(`[provider] xtream ${src.id}: get_live_categories ${cls.status} (${cls.keys.join(",")})`);
     }
   }
-  // Streams array arrived — mark the source healthy (categories may still be degraded
-  // above; the streams check is the liveness signal). Only when the array was real.
+  // Streams array arrived — mark the source healthy, or no-streams when the
+  // VLC-audit flagged this panel as serving no playable streams (catalog loads,
+  // playback fail-fasts). Only when the array was real.
   if (Array.isArray(streamsRaw)) {
-    recordHealth(src.id, { status: "ok", channels: streams.length, at: Date.now() });
+    if (src.streamStatus === "no-streams") {
+      recordNoStreams(src.id, streams.length);
+    } else {
+      recordHealth(src.id, { status: "ok", channels: streams.length, at: Date.now() });
+    }
   }
   for (const s of streams) {
     const name = String(s.name ?? "").replace(/^#EXTINF:0,\s*/, "");
@@ -139,9 +197,15 @@ async function loadXtream(src: UpstreamSource, out: VirtualChannel[], cats: Map<
     // SOURCE-SCOPED category id: raw panel category_ids collide across 27 feeds
     // (every panel has its own "3"/"4"/"5"...). Namespace with the source id so
     // categories stay distinct per feed — the "same number across feeds" anomaly.
+    // Adult/xxx names fold into ONE "Adult" bucket per source (cur-adult).
     const rawCategoryId = String(s.category_id ?? "0");
-    const categoryId = idFor(`${src.id}:cat`, rawCategoryId).toString();
-    if (!cats.has(categoryId)) cats.set(categoryId, categoryMap[rawCategoryId] ?? "Uncategorized");
+    const rawCategoryName = categoryMap[rawCategoryId] ?? "Uncategorized";
+    // Catalog keep-gate: drop foreign/radio/24-7/ppv categories entirely
+    // (English + Adult only) — pointless junk off the TV rail.
+    if (!keepCategory(rawCategoryName)) continue;
+    const categoryId = bucketCategoryId(src.id, rawCategoryId, rawCategoryName);
+    const categoryName = bucketCategoryName(rawCategoryName);
+    if (!cats.has(categoryId)) cats.set(categoryId, categoryName);
     const tvArchive = Number(s.tv_archive ?? 0) === 1;
     const audioLanguages = audioLanguagesOf(name);
     // Full catchup contract from the panel (OwnTV CatchupUrl.kt reads these).
@@ -172,6 +236,7 @@ async function loadXtream(src: UpstreamSource, out: VirtualChannel[], cats: Map<
         username: src.username,
         password: src.password,
         streamId,
+        streamStatus: src.streamStatus,
       },
     });
   }
@@ -198,8 +263,12 @@ async function loadM3u(src: UpstreamSource, out: VirtualChannel[], cats: Map<str
     if (current && trimmed && !trimmed.startsWith("#")) {
       const name = current.name;
       if (name && matches(name, src.filter)) {
-        const categoryId = idFor(`${src.id}:cat`, current.group ?? "0").toString();
-        const categoryName = current.group ?? "Uncategorized";
+        const rawCategoryName = current.group ?? "Uncategorized";
+        // Catalog keep-gate (English + Adult only).
+        if (!keepCategory(rawCategoryName)) continue;
+        // Adult/xxx group names fold into ONE "Adult" bucket per source.
+        const categoryId = bucketCategoryId(src.id, current.group ?? "0", rawCategoryName);
+        const categoryName = bucketCategoryName(rawCategoryName);
         if (!cats.has(categoryId)) cats.set(categoryId, categoryName);
         out.push({
           id: idFor(src.id, trimmed),

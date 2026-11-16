@@ -3,7 +3,9 @@
 set -e
 export JAVA_HOME=/usr/lib/jvm/java-21-openjdk
 export PATH="$JAVA_HOME/bin:$PATH"
-cd /tmp/owntv
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# The Gradle project lives in repo/, not at the fork root.
+cd "$ROOT/repo"
 echo "=== Building OwnTV debug (JAVA_HOME=$JAVA_HOME) ==="
 ./gradlew :app:assembleStandardDebug --no-daemon -Dorg.gradle.java.home=$JAVA_HOME 2>&1 | grep -E "BUILD|FAILURE|error:|> Task :app:assemble" | sed -n '1,20p'
 APK=$(find app/build/outputs/apk -name "*.apk" 2>/dev/null | sed -n '1p')
