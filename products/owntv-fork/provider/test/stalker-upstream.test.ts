@@ -10,11 +10,11 @@ import { stalkerCreateLinkForTest } from "../src/stream.ts";
 
 const TOKEN = "mock-bearer-token-123";
 
-function mockPortal(port: number) {
+function mockPortal() {
   let channelsSeen = 0;
   let createLinks = 0;
   const server = Bun.serve({
-    port,
+    port: 0,
     async fetch(req) {
       const url = new URL(req.url);
       const action = url.searchParams.get("action") ?? "";
@@ -46,10 +46,10 @@ function mockPortal(port: number) {
 }
 
 test("stalker upstream handshake → get_all_channels → catalog", async () => {
-  const { server, stats } = mockPortal(38991);
+  const { server, stats } = mockPortal();
   try {
     const config = defineConfig({
-      PROVIDER_SOURCES: `stalker|id=st1|name=StalkerTest|url=http://127.0.0.1:38991`,
+      PROVIDER_SOURCES: `stalker|id=st1|name=StalkerTest|url=http://127.0.0.1:${server.port}`,
       PROVIDER_FETCH_TIMEOUT_MS: "5000",
     });
     const { channels, categories } = await loadUpstreams(config);
@@ -72,10 +72,10 @@ test("stalker upstream handshake → get_all_channels → catalog", async () => 
 });
 
 test("stalker create_link resolves cmd to playable URL", async () => {
-  const { server, stats } = mockPortal(38992);
+  const { server, stats } = mockPortal();
   try {
     const config = defineConfig({
-      PROVIDER_SOURCES: `stalker|id=st1|name=StalkerTest|url=http://127.0.0.1:38992`,
+      PROVIDER_SOURCES: `stalker|id=st1|name=StalkerTest|url=http://127.0.0.1:${server.port}`,
       PROVIDER_STREAM_CONNECT_TIMEOUT_MS: "5000",
     });
     const { channels } = await loadUpstreams(config);
@@ -90,11 +90,11 @@ test("stalker create_link resolves cmd to playable URL", async () => {
 });
 
 test("stalker portal with bare host tries candidate API paths", async () => {
-  const { server } = mockPortal(38993);
+  const { server } = mockPortal();
   try {
     // Serve handshake ONLY at server/load.php (candidate 3), not portal.php
     const config = defineConfig({
-      PROVIDER_SOURCES: `stalker|id=st2|name=StalkerTest2|url=http://127.0.0.1:38993`,
+      PROVIDER_SOURCES: `stalker|id=st2|name=StalkerTest2|url=http://127.0.0.1:${server.port}`,
       PROVIDER_FETCH_TIMEOUT_MS: "3000",
     });
     // Our mock answers at any path, so just assert load succeeds via candidates.
