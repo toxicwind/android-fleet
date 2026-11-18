@@ -1,8 +1,0 @@
-package com.uwetrottmann.tmdb2.entities;
-
-/* JADX INFO: loaded from: classes7.dex */
-public class AccountStates extends BaseAccountStates {
-    public Integer episode_number;
-    public Boolean favorite;
-    public Boolean watchlist;
-}

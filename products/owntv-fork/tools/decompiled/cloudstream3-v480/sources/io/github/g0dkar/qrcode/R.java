@@ -1,7 +1,0 @@
-package io.github.g0dkar.qrcode;
-
-/* JADX INFO: loaded from: classes7.dex */
-public final class R {
-    private R() {
-    }
-}
